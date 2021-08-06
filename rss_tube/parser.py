@@ -25,14 +25,11 @@ def parse_url(url: str) -> str:
         return url.rstrip("/")
 
 
-def parse_feed(filename: str, feed_type: str = "", author: str = "") -> dict:
-    with open(filename, "rb") as f:
-        text = f.read()
-
+def parse_feed(feed_bytes: bytes, feed_type: str = "", author: str = "") -> dict:
     try:
-        root = XML(text)
+        root = XML(feed_bytes)
     except Exception as e:
-        logger.debug(f"parse_feed: parsing {filename} ({feed_type}) failed: {e}")
+        logger.debug(f"parse_feed: parsing {feed_type} failed: {e}")
         return {}
 
     prefixes = {prefix: "{" + root.nsmap[prefix] + "}" for prefix in root.nsmap.keys()}
@@ -73,6 +70,6 @@ def parse_feed(filename: str, feed_type: str = "", author: str = "") -> dict:
                     "rating_count": int(community.find(prefixes["media"] + "starRating").get("count"))
                 })
         except Exception as e:
-            logger.error(f"parse_feed: parsing feed {filename} entry {i} failed: {e}")
+            logger.error(f"parse_feed: parsing entry {i} failed: {e}")
 
     return feed

@@ -53,11 +53,11 @@ class Downloader(object):
 
         return response.content
 
-    def get_filename(self, url: str, retrieve_from_cache: bool = True, add_time: bool = True) -> str:
+    def get_filename(self, url: str, cached: bool = True, add_time: bool = True) -> str:
         """
         Get the content of an http get request, as a filename.
         """
-        if retrieve_from_cache:
+        if cached:
             filename = self.cache.lookup(url)
             if filename:
                 return filename

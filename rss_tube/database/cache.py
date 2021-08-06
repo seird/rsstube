@@ -31,6 +31,9 @@ class Cache(object):
 
     def clear(self):
         self.cursor.execute("DELETE FROM cache")
+        self.database.isolation_level = None
+        self.cursor.execute("VACUUM")
+        self.database.isolation_level = ''
         self.database.commit()
         for filename in glob.glob(self.cache_dir + "/*"):
             os.remove(filename)

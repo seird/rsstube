@@ -126,13 +126,13 @@ class Feeds(object):
         else:
             return None
 
-        filename = self.downloader.get_filename(url, retrieve_from_cache=False, add_time=False)
+        feed_bytes = self.downloader.get_bytes(url, cached=False, add_time=False)
 
-        if filename == "":
+        if feed_bytes == b"":
             logging.debug(f"add_feed: Adding {url} failed.")
             return None
 
-        parsed_feed = parse_feed(filename, feed_type=feed_type)
+        parsed_feed = parse_feed(feed_bytes, feed_type=feed_type)
 
         if not parsed_feed:
             return None
@@ -392,11 +392,9 @@ class Feeds(object):
                     continue
 
             if f["match"] == "any":
-                match = False
                 for rule in f.get_rules_list():
-                    match = match or apply_rule(feed, entry, rule)
-                if match:
-                    return FilterAction(f["action"])
+                    if apply_rule(feed, entry, rule):
+                        return FilterAction(f["action"])
             elif f["match"] == "all":
                 match = True
                 for rule in f.get_rules_list():
@@ -416,13 +414,13 @@ class Feeds(object):
         if q is None:
             return
 
-        filename = self.downloader.get_filename(q["url"], retrieve_from_cache=False, add_time=False)
+        feed_bytes = self.downloader.get_bytes(q["url"], cached=False, add_time=False)
 
-        if filename == "":
+        if feed_bytes == b"":
             logging.debug(f"update_feed_entries: Updating feed {feed_id} failed.")
             return
 
-        parsed_feed = parse_feed(filename, q["type"], q["author"])
+        parsed_feed = parse_feed(feed_bytes, q["type"], q["author"])
 
         for i, entry in parsed_feed["entries"].items():
             entry_fetched = self.cursor.execute("SELECT * FROM entries WHERE entry_id=:entry_id", entry).fetchone()
