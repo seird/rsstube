@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=rsstube
+Comment=A simple desktop application for Youtube, based on RSS feeds.
+Path=/usr/lib/rsstube
+Exec=/usr/lib/rsstube/rsstube
+Icon=/usr/share/icons/rsstube.ico
+Terminal=false
+Type=Application
+Categories=Network;

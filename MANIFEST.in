@@ -1,0 +1,2 @@
+include README.md
+recursive-include rss_tube/gui/themes *.png *.css

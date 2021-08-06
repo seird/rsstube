@@ -1,0 +1,27 @@
+/* QLabel */
+
+EntryYoutube QLabel[objectName^="label_title"] {
+    color: #CF5B5B;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+EntryYoutube QLabel[objectName^="label_date"] {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+EntryYoutube:QLabel[objectName^="label_description"] {
+    font-size: 13px;
+}
+
+EntryYoutube QLabel[objectName^="label_static_meta_"] {
+    color: rgb(150, 150, 150);
+    font-size: 13px;
+    font-weight: default;
+}
+
+EntryYoutube QLabel[objectName^="label_meta_"] {
+    font-size: 13px;
+    font-weight: bold;
+}

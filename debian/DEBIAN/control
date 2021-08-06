@@ -1,0 +1,6 @@
+Package: rsstube
+Version: 0.2.1
+Architecture: amd64
+Maintainer: k.dries@protonmail.com
+Description: rsstube
+ A simple desktop application for Youtube, based on RSS feeds.

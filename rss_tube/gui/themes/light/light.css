@@ -1,0 +1,38 @@
+DatabaseWidget:!active, GroupView:!active,
+EntryPreviewWidget QLineEdit:!active, EntryPreviewWidget QTextEdit:!active {
+    background-color: #FCFCFC;
+}
+
+DatabaseWidget:disabled, GroupView:disabled,
+EntryPreviewWidget QLineEdit:disabled, EntryPreviewWidget QTextEdit:disabled {
+    background-color: #EDEDED;
+}
+
+QGroupBox::title {
+    color: #4B7B19;
+}
+
+QToolTip {
+    color: #F9F9F9;
+    background-color: #4D7F1A;
+}
+
+QPushButton:hover {
+    color: white;
+    background-color: #4D7F1A;
+}
+
+QMenuBar::item:selected {
+    color: white;
+    background-color: #4D7F1A;
+}
+
+QTabBar::tab:hover {
+    color: white;
+    background-color: #4D7F1A;
+}
+
+MyTreeWidget::item:hover {
+    color: black;
+    background-color: rgba(120, 120, 120, 0.2);
+}

@@ -1,0 +1,13 @@
+*.xml
+*.log
+*.db.sqlite3
+rsstube-installer-win.exe
+
+.idea
+.vscode
+__pycache__
+cache
+dist
+build
+inno-output
+*.egg-info
