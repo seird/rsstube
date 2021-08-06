@@ -1,9 +1,6 @@
 {
-    "version": "0.2.1",
-    "url": "https://github.com/seird/rsstube",
+    "version": "0.2.2",
+    "url": "https://github.com/seird/rsstube/releases/latest",
     "releaseNotes": [
-        "- Fix 'any' filter rule.",
-        "- Clickable description links.",
-        "- Play/Audio buttons."
     ]
 }
