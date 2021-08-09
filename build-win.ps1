@@ -15,4 +15,3 @@ try {Remove-Item "dist/rsstube/Qt5WebSockets.dll"} catch {}
 
 echo "Creating installer"
 iscc rss-tube.iss
-Move-Item "inno-output\rss-tube-setup.exe" "rsstube-installer-win.exe"
