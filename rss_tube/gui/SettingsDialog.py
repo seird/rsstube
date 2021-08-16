@@ -1,7 +1,7 @@
 import logging
 import os
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from .designs.widget_settings import Ui_Dialog
 from .FiltersWidget import FiltersWidget
@@ -18,7 +18,7 @@ settings = Settings("rss-tube")
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(SettingsDialog, self).__init__()
+        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
         self.setupUi(self)
 
         self.settings_changed = False

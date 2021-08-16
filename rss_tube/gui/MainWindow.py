@@ -238,7 +238,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             self.add_feed_task.start()
 
     def new_category_callback(self):
-        category, ok = QtWidgets.QInputDialog.getText(self, "Add new a category", "New category:" + " " * 96)
+        category, ok = QtWidgets.QInputDialog.getText(self, "Add new a category", "New category:" + " " * 96, flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
         if ok and category:
             if self.feeds.add_category(category):
                 self.tree_feeds.add_category(category)

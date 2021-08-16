@@ -11,7 +11,7 @@ from rss_tube.utils import center_widget, get_abs_path
 
 class StatisticsDialog(QtWidgets.QDialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(StatisticsDialog, self).__init__()
+        super(StatisticsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
 
         feeds: Feeds = mainwindow.feeds
 

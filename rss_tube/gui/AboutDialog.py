@@ -11,7 +11,7 @@ settings = Settings("rss-tube")
 
 class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(AboutDialog, self).__init__()
+        super(AboutDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
         self.setupUi(self)
 
         self.setWindowTitle(f"About {__title__}")
