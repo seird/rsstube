@@ -13,7 +13,6 @@ class PlayerInstance(QtCore.QThread):
     def __init__(self):
         super(PlayerInstance, self).__init__()
         self.url = ""
-        self.player = "mpv"
         self.playing = False
         self.play_quality_once = ""
 
@@ -31,18 +30,19 @@ class PlayerInstance(QtCore.QThread):
 
         self.playing = True
 
+        mpv_path = settings.value("mpv/path", type=str)
         player_args = player_args.split()
 
         try:
             logger.debug(f"Player Thread started playing {self.url}")
             if "--no-video" in player_args:
-                retcode = subprocess.call([self.player, *player_args, self.url])
+                retcode = subprocess.call([mpv_path, *player_args, self.url])
             else:
-                retcode = subprocess.call([self.player, *player_args, f"--ytdl-format=bestvideo[height<={player_quality.rstrip('p')}]+bestaudio", self.url])
+                retcode = subprocess.call([mpv_path, *player_args, f"--ytdl-format=bestvideo[height<={player_quality.rstrip('p')}]+bestaudio", self.url])
             if retcode != 0:
                 logger.debug(f"Player Thread: first try returned {retcode}. Trying again without parameters.")
                 # Try again without extra parameters in case it's a livestream
-                subprocess.call([self.player, self.url])
+                subprocess.call([mpv_path, self.url])
         except Exception as e:
             logger.error(f"Player Thread failed to open {self.url}: {e}")
         finally:

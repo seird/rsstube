@@ -21,6 +21,7 @@ DEFAULT_SETTINGS = {
     "tray/notifications/duration_ms": 2000,
     "feeds/update_interval/minutes": 10,
     "youtube/show_description": True,
+    "mpv/path": "mpv",
     "mpv/args": "",
     "mpv/quality": "1080p",
     "cache/preload_thumbnails": False,

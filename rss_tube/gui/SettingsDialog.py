@@ -1,4 +1,5 @@
 import logging
+import os
 
 from PyQt5 import QtWidgets
 
@@ -62,6 +63,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_update_feed_interval_minutes.setValue(settings.value("feeds/update_interval/minutes", type=int))
 
         # Player Tab
+        self.line_mpv_path.setText(settings.value("mpv/path", type=str))
         self.line_mpv_args.setText(settings.value("mpv/args", type=str))
         self.combo_mpv_quality.setCurrentText(settings.value("mpv/quality", type=str))
 
@@ -103,6 +105,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         if response == QtWidgets.QMessageBox.Ok:
             settings.clear()
 
+    def mpv_path_callback(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open", os.path.dirname(self.line_mpv_path.text()), "*")[0]
+        if fname and os.path.exists(os.path.dirname(fname)):
+            self.line_mpv_path.setText(fname)
+
     def link_callbacks(self):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).clicked.connect(self.apply_settings)
 
@@ -126,6 +133,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_update_feed_interval_minutes.valueChanged.connect(self.schedule_changed_callback)
 
         # Player Tab
+        self.pb_mpv_path.clicked.connect(self.mpv_path_callback)
+        self.line_mpv_path.textChanged.connect(self.settings_changed_callback)
         self.line_mpv_args.textChanged.connect(self.settings_changed_callback)
         self.combo_mpv_quality.currentTextChanged.connect(self.settings_changed_callback)
 
@@ -185,6 +194,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("feeds/update_interval/minutes", self.spin_update_feed_interval_minutes.value())
 
         # Player Tab
+        settings.setValue("mpv/path", self.line_mpv_path.text())
         settings.setValue("mpv/args", self.line_mpv_args.text().strip())
         settings.setValue("mpv/quality", self.combo_mpv_quality.currentText())
 
