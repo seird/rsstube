@@ -8,9 +8,11 @@ from PyQt5 import QtGui, QtWidgets
 from rss_tube.__version__ import __title__, __version__, __url__, __description__
 from textwrap import dedent
 from rss_tube.gui.themes import styles
+from rss_tube.database.settings import Settings
 
 
 logger = logging.getLogger("logger")
+settings = Settings("rss-tube")
 
 
 def load_pixmap(image_bytes: bytes) -> QtGui.QPixmap:
@@ -107,7 +109,7 @@ def get_debug_info() -> str:
     import subprocess
 
     try:
-        output = subprocess.check_output(["mpv", "--version"])
+        output = subprocess.check_output([settings.value("mpv/path", type=str), "--version"])
         mpv_version = str(output).split(" ")[1]
     except Exception:
         mpv_version = "not available"
