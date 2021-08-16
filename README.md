@@ -1,5 +1,7 @@
 # RSS Tube
 
+[![build](https://github.com/seird/rsstube/actions/workflows/build.yml/badge.svg)](https://github.com/seird/rsstube/actions)
+
 
 A simple desktop application for Youtube, based on RSS feeds.
 

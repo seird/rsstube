@@ -85,7 +85,7 @@ class ShortcutsWidget(QtWidgets.QWidget):
 
 class ShortcutsDialog(QtWidgets.QDialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(ShortcutsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
+        super(ShortcutsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
 
         self.shortcuts_widget = ShortcutsWidget(self)
 

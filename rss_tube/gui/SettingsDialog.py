@@ -18,7 +18,7 @@ settings = Settings("rss-tube")
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
+        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
         self.settings_changed = False

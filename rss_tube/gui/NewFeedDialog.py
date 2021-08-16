@@ -12,7 +12,7 @@ settings = Settings("rss-tube")
 
 class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow, categories: List[str], theme="light"):
-        super(NewFeedDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint)
+        super(NewFeedDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
         self.combo_categories.addItems(categories)
