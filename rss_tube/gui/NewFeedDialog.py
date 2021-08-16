@@ -17,7 +17,7 @@ class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
 
         self.combo_categories.addItems(categories)
 
-        self.setFixedSize(self.size())
+        self.resize(self.size().width(), self.sizeHint().height())
 
         self.mainwindow = mainwindow
 
