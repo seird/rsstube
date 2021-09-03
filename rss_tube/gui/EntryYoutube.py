@@ -156,7 +156,8 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
     def thumbnail_mouse_button(self, event: QtGui.QMouseEvent):
         if event.button() == QtCore.Qt.LeftButton:
             self.player.play(self.video_url)
-        event.accept()
+        else:
+            super(EntryYoutube, self).mousePressEvent(event)
 
     def thumbnail_context(self, event: QtGui.QContextMenuEvent):
         context_menu = ThumbnailContextMenu(self)
