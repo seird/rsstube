@@ -76,18 +76,14 @@ class BaseTask(QtCore.QThread):
 
 class DeleteEntriesTask(BaseTask):
     def task(self):
-        delete_older_than = settings.value("delete/older_than", type=bool)
-        days_older_than = settings.value("delete/older_than_days", type=int)
         delete_added_more_than = settings.value("delete/added_more_than", type=bool)
         days_added_more_than = settings.value("delete/added_more_than_days", type=int)
         keep_unviewed = settings.value("delete/keep_unviewed", type=bool)
 
-        if not delete_added_more_than and not delete_older_than:
+        if not delete_added_more_than:
             return
 
         feeds = Feeds()
-        if delete_older_than:
-            feeds.delete_entries_older_than_days(days_older_than, keep_unviewed)
         if delete_added_more_than:
             feeds.delete_entries_added_more_than_days(days_added_more_than, keep_unviewed)
 
@@ -96,7 +92,7 @@ class FeedUpdateTask(BaseTask):
     _finished = pyqtSignal()
 
     def task(self):
-        Feeds().update_feeds(interval=0.1)
+        Feeds().update_feeds(interval=0.5)
         self._finished.emit()
 
 

@@ -25,8 +25,6 @@ DEFAULT_SETTINGS = {
     "mpv/args": "",
     "mpv/quality": "1080p",
     "cache/preload_thumbnails": False,
-    "delete/older_than": False,
-    "delete/older_than_days": 14,
     "delete/added_more_than": False,
     "delete/added_more_than_days": 14,
     "delete/interval/hours": 2,
