@@ -348,10 +348,17 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         pos_mapped = self.mapToGlobal(pos)
         item.context_callback(pos_mapped)
 
-    def mousePressEvent(self, e: QtGui.QMouseEvent) -> None:
-        if e.button() != QtCore.Qt.RightButton:
-            super(MyTreeWidget, self).mousePressEvent(e)
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+            self.mainwindow.mousePressEvent(event)
+        elif event.button() != QtCore.Qt.RightButton:
+            super(MyTreeWidget, self).mousePressEvent(event)
 
+    def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+            self.mainwindow.mousePressEvent(event)
+        else:
+            super(MyTreeWidget, self).mouseDoubleClickEvent(event)
 
     def link_callbacks(self):
         self.itemSelectionChanged.connect(self.item_changed_callback)

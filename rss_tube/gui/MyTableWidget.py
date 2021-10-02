@@ -168,6 +168,18 @@ class MyTableWidget(QtWidgets.QTableWidget):
                 self.delete_entry(items[0])
         super(MyTableWidget, self).keyPressEvent(event)
 
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+            self.mainwindow.mousePressEvent(event)
+        else:
+            super(MyTableWidget, self).mousePressEvent(event)
+
+    def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+            self.mainwindow.mousePressEvent(event)
+        else:
+            super(MyTableWidget, self).mouseDoubleClickEvent(event)
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         if hovered_item := self.itemAt(event.pos()):
             row = hovered_item.row()
