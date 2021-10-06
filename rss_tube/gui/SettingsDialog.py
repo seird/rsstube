@@ -85,6 +85,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.gridLayout_tab_filters = QtWidgets.QGridLayout(self.tab_filters)
         self.gridLayout_tab_filters.addWidget(FiltersWidget(self))
 
+        # Connection tab
+        self.groupBox_proxy.setChecked(settings.value("proxies/enabled", type=bool))
+        self.line_proxy_host.setText(settings.value("proxies/socks/host", type=str))
+        self.spin_proxy_port.setValue(settings.value("proxies/socks/port", type=int))
+
     def settings_changed_callback(self, *args, **kwargs):
         self.settings_changed = True
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).setEnabled(True)
@@ -160,6 +165,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.pb_reset_settings.clicked.connect(self.reset_settings_callback)
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
+        # Connection tab
+        self.groupBox_proxy.toggled.connect(self.settings_changed_callback)
+        self.line_proxy_host.textChanged.connect(self.settings_changed_callback)
+        self.spin_proxy_port.valueChanged.connect(self.settings_changed_callback)
+
     def apply_settings(self):
         # General Tab
         settings.setValue("theme", self.combo_theme.currentText().lower().replace(" ", "_"))
@@ -213,6 +223,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("delete/added_more_than", self.cb_delete_added.isChecked())
         settings.setValue("delete/added_more_than_days", self.spin_delete_added.value())
         settings.setValue("delete/keep_unviewed", self.cb_keep_unviewed.isChecked())
+
+        # Connection tab
+        settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())
+        settings.setValue("proxies/socks/host", self.line_proxy_host.text())
+        settings.setValue("proxies/socks/port", self.spin_proxy_port.value())
+        self.mainwindow.entry_widgets["youtube"].download.update_proxy()
+        self.mainwindow.feeds.downloader.update_proxy()
 
         settings.sync()
 

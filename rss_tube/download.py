@@ -7,17 +7,25 @@ from rss_tube.database.settings import Settings
 
 
 logger = logging.getLogger("logger")
-settings = Settings()
+settings = Settings("rss-tube")
 
 
 class Downloader(object):
     def __init__(self):
         self.cache = Cache()
         self.session = requests.Session()
-        self.session.proxies.update({
-                "https": settings.value("proxies/https", type=str),
-                "http": settings.value("proxies/http", type=str)
-        })
+        self.update_proxy()
+
+    def update_proxy(self):
+        if settings.value("proxies/enabled", type=bool):
+            host = settings.value("proxies/socks/host", type=str)
+            port = settings.value("proxies/socks/port", type=int)
+            self.session.proxies.update({
+                    "https": f'socks5://{host}:{port}',
+                    "http": f'socks5://{host}:{port}'
+            })
+        else:
+            self.session.proxies.clear()
 
     def get(self, url: str) -> requests.Response:
         """
