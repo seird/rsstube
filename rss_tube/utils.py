@@ -109,7 +109,7 @@ def get_debug_info() -> str:
     import subprocess
 
     try:
-        output = subprocess.check_output([settings.value("mpv/path", type=str), "--version"])
+        output = subprocess.check_output([settings.value("player/mpv/path", type=str), "--version"])
         mpv_version = str(output).split(" ")[1]
     except Exception:
         mpv_version = "not available"

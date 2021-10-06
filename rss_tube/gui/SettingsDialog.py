@@ -63,9 +63,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_update_feed_interval_minutes.setValue(settings.value("feeds/update_interval/minutes", type=int))
 
         # Player Tab
-        self.line_mpv_path.setText(settings.value("mpv/path", type=str))
-        self.line_mpv_args.setText(settings.value("mpv/args", type=str))
-        self.combo_mpv_quality.setCurrentText(settings.value("mpv/quality", type=str))
+        player = settings.value("player", type=str)
+        self.combo_player.addItems(["mpv", "vlc"])
+        self.combo_player.setCurrentText(player)
+        self.combo_player_changed(player)
 
         # Shortcuts Tab
         self.gridLayout_tab_shortcuts = QtWidgets.QGridLayout(self.tab_shortcuts)
@@ -92,6 +93,15 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.schedule_changed = True
         self.settings_changed_callback()
 
+    def combo_player_changed(self, player: str):
+        self.line_player_path.setText(settings.value(f"player/{player}/path", type=str))
+        self.line_player_args.setText(settings.value(f"player/{player}/args", type=str))
+        self.combo_player_quality.setCurrentText(settings.value("player/mpv/quality", type=str))
+        if player == "mpv":
+            self.groupBox_player_quality.show()
+        elif player == "vlc":
+            self.groupBox_player_quality.hide()
+
     def reset_settings_callback(self):
         response = QtWidgets.QMessageBox.warning(
             self,
@@ -103,10 +113,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         if response == QtWidgets.QMessageBox.Ok:
             settings.clear()
 
-    def mpv_path_callback(self):
-        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open", os.path.dirname(self.line_mpv_path.text()), "*")[0]
+    def player_path_callback(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open", os.path.dirname(self.line_player_path.text()), "*")[0]
         if fname and os.path.exists(os.path.dirname(fname)):
-            self.line_mpv_path.setText(fname)
+            self.line_player_path.setText(fname)
 
     def link_callbacks(self):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).clicked.connect(self.apply_settings)
@@ -131,10 +141,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_update_feed_interval_minutes.valueChanged.connect(self.schedule_changed_callback)
 
         # Player Tab
-        self.pb_mpv_path.clicked.connect(self.mpv_path_callback)
-        self.line_mpv_path.textChanged.connect(self.settings_changed_callback)
-        self.line_mpv_args.textChanged.connect(self.settings_changed_callback)
-        self.combo_mpv_quality.currentTextChanged.connect(self.settings_changed_callback)
+        self.combo_player.currentIndexChanged[str].connect(self.combo_player_changed)
+        self.pb_player_path.clicked.connect(self.player_path_callback)
+        self.line_player_path.textChanged.connect(self.settings_changed_callback)
+        self.line_player_args.textChanged.connect(self.settings_changed_callback)
+        self.combo_player_quality.currentTextChanged.connect(self.settings_changed_callback)
 
         # Database Tab
         self.cb_preload_thumbnails.stateChanged.connect(self.settings_changed_callback)
@@ -190,9 +201,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("feeds/update_interval/minutes", self.spin_update_feed_interval_minutes.value())
 
         # Player Tab
-        settings.setValue("mpv/path", self.line_mpv_path.text())
-        settings.setValue("mpv/args", self.line_mpv_args.text().strip())
-        settings.setValue("mpv/quality", self.combo_mpv_quality.currentText())
+        player = self.combo_player.currentText()
+        settings.setValue("player", self.combo_player.currentText())
+        settings.setValue(f"player/{player}/path", self.line_player_path.text())
+        settings.setValue(f"player/{player}/args", self.line_player_args.text().strip())
+        settings.setValue(f"player/{player}/quality", self.combo_player_quality.currentText())
 
         # Database Tab
         settings.setValue("cache/preload_thumbnails", self.cb_preload_thumbnails.isChecked())

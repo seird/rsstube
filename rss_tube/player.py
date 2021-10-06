@@ -1,5 +1,6 @@
 import logging
 import subprocess
+from typing import Optional, Union
 
 from PyQt5 import QtCore
 
@@ -9,40 +10,24 @@ logger = logging.getLogger("logger")
 settings = Settings("rss-tube")
 
 
-class PlayerInstance(QtCore.QThread):
-    def __init__(self):
-        super(PlayerInstance, self).__init__()
+class BasePlayer(QtCore.QThread):
+    failed = QtCore.pyqtSignal(int)
+
+    def __init__(self, path: str):
+        super(BasePlayer, self).__init__()
+        self.path = path
         self.url = ""
-        self.playing = False
         self.play_quality_once = ""
+        self.playing = False
+
+    def _run(self):
+        ...
 
     def run(self):
-        if self.play_quality_once == "Audio only":
-            player_args = "--no-video --force-window"
-        else:
-            player_args = settings.value("mpv/args", type=str)
-            player_quality = self.play_quality_once or settings.value("mpv/quality", type=str)
-        self.play_quality_once = ""
-
-        if self.url == "":
-            logging.error("Player Thread: self.url == \"\" and thread was started")
-            return
-
-        self.playing = True
-
-        mpv_path = settings.value("mpv/path", type=str)
-        player_args = player_args.split()
-
         try:
+            self.playing = True
             logger.debug(f"Player Thread started playing {self.url}")
-            if "--no-video" in player_args:
-                retcode = subprocess.call([mpv_path, *player_args, self.url])
-            else:
-                retcode = subprocess.call([mpv_path, *player_args, f"--ytdl-format=bestvideo[height<={player_quality.rstrip('p')}]+bestaudio", self.url])
-            if retcode != 0:
-                logger.debug(f"Player Thread: first try returned {retcode}. Trying again without parameters.")
-                # Try again without extra parameters in case it's a livestream
-                subprocess.call([mpv_path, self.url])
+            self._run()
         except Exception as e:
             logger.error(f"Player Thread failed to open {self.url}: {e}")
         finally:
@@ -61,18 +46,58 @@ class PlayerInstance(QtCore.QThread):
         self.start()
 
 
+class MpvPlayerInstance(BasePlayer):
+    def _run(self):
+        if self.play_quality_once == "Audio only":
+            player_args = "--no-video --force-window"
+        else:
+            player_args = settings.value("player/mpv/args", type=str)
+            player_quality = self.play_quality_once or settings.value("player/mpv/quality", type=str)
+
+        player_args = player_args.split()
+        
+        if "--no-video" in player_args:
+            retcode = subprocess.call([self.path, *player_args, self.url])
+        else:
+            retcode = subprocess.call([self.path, *player_args, f"--ytdl-format=bestvideo[height<={player_quality.rstrip('p')}]+bestaudio", self.url])
+        if retcode != 0:
+            logger.debug(f"Player Thread: first try returned {retcode}. Trying again without parameters.")
+            # Try again without extra parameters in case it's a livestream
+            retcode = subprocess.call([self.path, self.url])
+            if retcode != 0:
+                self.failed.emit(retcode)
+
+
+class VlcPlayerInstance(BasePlayer):
+    def _run(self):
+        player_args = settings.value("player/vlc/args", type=str).split()
+        
+        retcode = subprocess.call([self.path, *player_args, self.url])
+        if retcode != 0:
+            self.failed.emit(retcode)
+
+
 class Player(object):
     def __init__(self):
-        self.players = [PlayerInstance()]
+        self.players = {}
+        self.ids = 0
 
-    def _get_available_player(self) -> PlayerInstance:
-        available_players = list(filter(lambda player: not player.playing, self.players))
-        if not available_players:
-            self.players.append(PlayerInstance())
-            return self.players[-1]
+    def _get_player(self) -> Optional[Union[MpvPlayerInstance, VlcPlayerInstance]]:
+        player = settings.value("player")
+        if player == "mpv":
+            return MpvPlayerInstance(path=settings.value("player/mpv/path", type=str))
+        elif player == "vlc":
+            return VlcPlayerInstance(path=settings.value("player/vlc/path", type=str))
         else:
-            return available_players[0]
+            return None
+
+    def _delete_player(self, player_id: int):
+        if (player := self.players.get(player_id)) and not player.playing:
+            self.players.pop(player_id)
 
     def play(self, url: str, play_quality_once: str = ""):
-        if url:
-            self._get_available_player().play(url, play_quality_once)
+        if url and (player := self._get_player()):
+            self.ids += 1
+            self.players[self.ids] = player
+            player.finished.connect(lambda: self._delete_player(self.ids))
+            player.play(url, play_quality_once)

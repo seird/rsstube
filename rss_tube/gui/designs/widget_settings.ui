@@ -267,22 +267,58 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QGroupBox" name="groupBox_13">
+         <property name="title">
+          <string>Player</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_9">
+          <item row="0" column="0" colspan="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QComboBox" name="combo_player">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
-          <string>MPV path</string>
+          <string>Path</string>
          </property>
          <layout class="QFormLayout" name="formLayout_5">
           <item row="0" column="0" colspan="2">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLineEdit" name="line_mpv_path">
+             <widget class="QLineEdit" name="line_player_path">
               <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pb_mpv_path">
+             <widget class="QPushButton" name="pb_player_path">
               <property name="maximumSize">
                <size>
                 <width>30</width>
@@ -302,16 +338,16 @@
        <item>
         <widget class="QGroupBox" name="groupBox_6">
          <property name="title">
-          <string>MPV commandline arguments</string>
+          <string>Commandline arguments</string>
          </property>
          <layout class="QFormLayout" name="formLayout_6">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="line_mpv_args">
+           <widget class="QLineEdit" name="line_player_args">
             <property name="text">
              <string/>
             </property>
             <property name="placeholderText">
-             <string>--no-video</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -319,7 +355,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_7">
+        <widget class="QGroupBox" name="groupBox_player_quality">
          <property name="title">
           <string>Video quality</string>
          </property>
@@ -327,7 +363,7 @@
           <item row="0" column="0" colspan="2">
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QComboBox" name="combo_mpv_quality">
+             <widget class="QComboBox" name="combo_player_quality">
               <property name="minimumSize">
                <size>
                 <width>70</width>
@@ -582,8 +618,8 @@
   <tabstop>spin_notification_duration</tabstop>
   <tabstop>spin_update_feed_interval_minutes</tabstop>
   <tabstop>combo_logging</tabstop>
-  <tabstop>line_mpv_args</tabstop>
-  <tabstop>combo_mpv_quality</tabstop>
+  <tabstop>line_player_args</tabstop>
+  <tabstop>combo_player_quality</tabstop>
   <tabstop>cb_preload_thumbnails</tabstop>
   <tabstop>spin_entries_to_fetch</tabstop>
   <tabstop>cb_delete_added</tabstop>
