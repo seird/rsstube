@@ -5,6 +5,12 @@ import requests
 from rss_tube.database.cache import Cache
 from rss_tube.database.settings import Settings
 
+try:
+    import socks
+    _socks_enabled = True
+except ImportError:
+    _socks_enabled = False
+
 
 logger = logging.getLogger("logger")
 settings = Settings("rss-tube")
@@ -17,7 +23,7 @@ class Downloader(object):
         self.update_proxy()
 
     def update_proxy(self):
-        if settings.value("proxies/enabled", type=bool):
+        if _socks_enabled and settings.value("proxies/enabled", type=bool):
             host = settings.value("proxies/socks/host", type=str)
             port = settings.value("proxies/socks/port", type=int)
             self.session.proxies.update({

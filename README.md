@@ -66,4 +66,5 @@ $ iscc rss-tube.iss
 - PyQt5
 - requests
 - schedule
-- (mpv + youtube-dl visible in your path, to directly play videos)
+- (pysocks to connect to a socks5 proxy)
+- (mpv + youtube-dl or vlc, to directly play videos)
