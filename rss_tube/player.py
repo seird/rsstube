@@ -77,8 +77,13 @@ class VlcPlayerInstance(BasePlayer):
             self.failed.emit(retcode)
 
 
-class Player(object):
+class Player(QtCore.QObject):
+    started = QtCore.pyqtSignal()
+    stopped = QtCore.pyqtSignal()
+    failed = QtCore.pyqtSignal(int)
+
     def __init__(self):
+        super(Player, self).__init__()
         self.players = {}
         self.ids = 0
 
@@ -91,6 +96,11 @@ class Player(object):
         else:
             return None
 
+    def _player_finished_callback(self, player_id: int):
+        self._delete_player(player_id)
+        if len(self.players) == 0:
+            self.stopped.emit()
+
     def _delete_player(self, player_id: int):
         if (player := self.players.get(player_id)) and not player.playing:
             self.players.pop(player_id)
@@ -99,5 +109,7 @@ class Player(object):
         if url and (player := self._get_player()):
             self.ids += 1
             self.players[self.ids] = player
-            player.finished.connect(lambda: self._delete_player(self.ids))
+            player.finished.connect(lambda x=self.ids: self._player_finished_callback(x))
+            player.started.connect(self.started.emit)
+            player.failed.connect(self.failed.emit)
             player.play(url, play_quality_once)

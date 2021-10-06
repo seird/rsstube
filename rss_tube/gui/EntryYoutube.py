@@ -179,8 +179,24 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
     def play_audio_callback(self):
         self.player.play(self.video_url, play_quality_once=PlayAudioOnlyAction().resolution)
 
+    def clear_player_status(self):
+        if "Playing" not in self.label_player_status.text():
+            self.label_player_status.clear()
+
+    def player_stopped_callback(self):
+        self.label_player_status.setText("Stopped")
+        QtCore.QTimer.singleShot(5000, self.clear_player_status)
+
+    def player_failed_callback(self, error_code: int):
+        self.label_player_status.setText(f"Failed ({error_code})")
+        QtCore.QTimer.singleShot(5000, self.clear_player_status)
+
     def link_callbacks(self):
         self.label_thumbnail.mousePressEvent = self.thumbnail_mouse_button
         self.label_thumbnail.contextMenuEvent = self.thumbnail_context
         self.pb_play.clicked.connect(self.play_callback)
         self.pb_audio.clicked.connect(self.play_audio_callback)
+
+        self.player.started.connect(lambda: self.label_player_status.setText("Playing..."))
+        self.player.stopped.connect(self.player_stopped_callback)
+        self.player.failed.connect(self.player_failed_callback)
