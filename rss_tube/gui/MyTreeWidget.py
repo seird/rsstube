@@ -217,7 +217,6 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         twi = TreeWidgetItemCategory(self, [category], category)
         for feed in self.feeds.get_feeds_in_category(category):
             child_item = TreeWidgetItemFeed(self, [feed["author"]], feed["id"])
-            child_item.setCheckState(0, QtCore.Qt.Checked if feed["notify"] else QtCore.Qt.Unchecked)
             twi.addChild(child_item)
         category_expanded = settings.value(f"MyTreeWidget/{category}_expanded", 1, type=bool)
         self.addTopLevelItem(twi)
@@ -243,7 +242,6 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
 
         feed = self.feeds.get_feed(feed_id)
         child_item = TreeWidgetItemFeed(self, [feed["author"]], feed["id"])
-        child_item.setCheckState(0, QtCore.Qt.Checked if feed["notify"] else QtCore.Qt.Unchecked)
         category_item.addChild(child_item)
         self.sortItems(0, QtCore.Qt.AscendingOrder)
         self.update_viewed()
@@ -338,11 +336,6 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         else:
             self.table_entries.clear_entries()
 
-    def item_clicked_callback(self, item: TreeWidgetItemFeed, column: int):
-        if not isinstance(item, TreeWidgetItemFeed):
-            return
-        self.feeds.set_feed_notify(item.feed_id, item.checkState(0) == QtCore.Qt.Checked)
-
     def context_callback(self, pos: QtCore.QPoint):
         item: Union[TreeWidgetItemFeed, TreeWidgetItemCategory, QtWidgets.QTreeWidgetItem] = self.itemAt(pos)
         if item is None:
@@ -364,7 +357,6 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
 
     def link_callbacks(self):
         self.itemSelectionChanged.connect(self.item_changed_callback)
-        self.itemClicked.connect(self.item_clicked_callback)
         self.itemExpanded.connect(lambda x: settings.setValue(f"MyTreeWidget/{x.category}_expanded", 1))
         self.itemCollapsed.connect(lambda x: settings.setValue(f"MyTreeWidget/{x.category}_expanded", 0))
         self.customContextMenuRequested.connect(self.context_callback)

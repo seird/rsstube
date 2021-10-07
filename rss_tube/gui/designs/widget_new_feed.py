@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(466, 227)
+        Dialog.resize(466, 178)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -37,11 +37,6 @@ class Ui_Dialog(object):
         self.line_name = QtWidgets.QLineEdit(Dialog)
         self.line_name.setObjectName("line_name")
         self.verticalLayout.addWidget(self.line_name)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.verticalLayout.addItem(spacerItem)
-        self.cb_receive_notifications = QtWidgets.QCheckBox(Dialog)
-        self.cb_receive_notifications.setObjectName("cb_receive_notifications")
-        self.verticalLayout.addWidget(self.cb_receive_notifications)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -62,7 +57,6 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "Category: "))
         self.label_3.setText(_translate("Dialog", "Name:"))
         self.line_name.setPlaceholderText(_translate("Dialog", "(optional)"))
-        self.cb_receive_notifications.setText(_translate("Dialog", "Receive Notifications"))
 
 
 if __name__ == "__main__":

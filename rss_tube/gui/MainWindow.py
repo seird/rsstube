@@ -230,10 +230,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             return
         feed_url = dialog.line_new_feed.text()
         category = dialog.combo_categories.currentText()
-        notify = dialog.cb_receive_notifications.isChecked()
         feed_name = dialog.line_name.text()
         if feed_url and category:
-            self.add_feed_task = AddFeedTask(feed_url, category, notify, feed_name)
+            self.add_feed_task = AddFeedTask(feed_url, category, feed_name)
             self.add_feed_task.added.connect(lambda feed_id: self.tree_feeds.add_feed(feed_id))
             self.add_feed_task.start()
 
@@ -280,7 +279,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.pb_update_feeds.setEnabled(True)
         self.tray.actionUpdate.setEnabled(True)
 
-        new_entries_notify = self.feeds.get_new_entries_notify(settings.value("last_refresh", type=str))
         new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
         settings.set_last_refresh()
 
@@ -294,11 +292,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
             self.table_entries.select_entry_id(selected_entry_id)
 
-        if new_entries_notify:
             if settings.value("tray/notifications/enabled", type=bool):
-                titles = ", ".join(x["title"] for x in new_entries_notify)
-                logger.debug(f"update_feeds_finished: {len(new_entries_notify)} new entries to notify." + titles)
-                self.display_notification(f"{len(new_entries_notify)} new entries.")
+                titles = ", ".join(x["title"] for x in new_entries)
+                logger.debug(f"update_feeds_finished: {len(new_entries)} new entries to notify." + titles)
+                self.display_notification(f"{len(new_entries)} new entries.")
 
             if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowMinimized):
                 self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray_new.png")))

@@ -107,7 +107,7 @@ class Feeds(object):
         )
         self.database.commit()
 
-    def add_feed(self, url: str, category: str, notify: bool = True, feed_name: str = "") -> Optional[int]:
+    def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)
 
         if self.cursor.execute("SELECT * FROM feeds WHERE url = ?", (url,)).fetchone():
@@ -141,7 +141,6 @@ class Feeds(object):
             "url": url,
             "channel_url": channel_url,
             "category": category,
-            "notify": notify,
             "author": feed_name if feed_name else parsed_feed["author"]
         })
 
@@ -158,9 +157,9 @@ class Feeds(object):
         self.cursor.execute(
             """
             INSERT INTO feeds 
-                (notify, author, category, type, url, channel_url, added_on, refreshed_on) 
+                (author, category, type, url, channel_url, added_on, refreshed_on) 
             VALUES
-                (:notify, :author, :category, :type, :url, :channel_url, datetime('now', 'localtime'),
+                (:author, :category, :type, :url, :channel_url, datetime('now', 'localtime'),
                  datetime('now', 'localtime'));
             """,
             parsed_feed
@@ -357,10 +356,6 @@ class Feeds(object):
             entry_ids = self.cursor.execute("SELECT id FROM entries WHERE added_on<?", (cutoff,)).fetchall()
         self.delete_entries(entry_ids)
 
-    def set_feed_notify(self, feed_id: int, notify: bool):
-        self.cursor.execute("UPDATE feeds SET notify=? WHERE id=?", (notify, feed_id))
-        self.database.commit()
-
     def update_feed_name(self, feed_id: int, new_name: str):
         self.cursor.execute("UPDATE feeds SET author=? WHERE id=?", (new_name, feed_id))
         self.cursor.execute("UPDATE entries SET author=? WHERE feed_id=?", (new_name, feed_id))
@@ -475,19 +470,6 @@ class Feeds(object):
         Get new entries since 'last_refreshed' ('%Y-%m-%d %H:%M:%S')
         """
         return self.cursor.execute("SELECT * FROM entries WHERE refreshed_on > ? AND deleted=0", (last_refreshed,)).fetchall()
-
-    def get_new_entries_notify(self, last_refreshed: str):
-        """
-        Get new entries since 'last_refreshed' ('%Y-%m-%d %H:%M:%S'), that have 'notify' set to True
-        """
-        return self.cursor.execute(
-            """
-            SELECT * FROM entries
-            WHERE
-                refreshed_on > ? AND feed_id IN (SELECT id FROM feeds WHERE notify=1) AND deleted=0 AND viewed=0
-            """,
-            (last_refreshed,)
-        ).fetchall()
 
     def set_viewed(self, feed_id: int = None, category: str = None):
         if feed_id:
