@@ -248,6 +248,8 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         self.sortItems(0, QtCore.Qt.AscendingOrder)
         self.update_viewed()
 
+        set_tree_icons(self, settings.value("theme", type=str))
+
     def remove_category(self, category: str):
         category_items = self.findItems(category, QtCore.Qt.MatchExactly)
         if not category_items:

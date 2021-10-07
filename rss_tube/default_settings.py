@@ -16,6 +16,8 @@ DEFAULT_SETTINGS = {
     "MainWindow/start_minimized": False,
     "MainWindow/export_location": os.path.join(Path.home(), "rsstube-channels.csv"),
     "MainWindow/entries_to_fetch": 10000,
+    "MainWindow/category_icon/show": True,
+    "MainWindow/feed_icon/show": True,
     "tray/show": True,
     "tray/minimize": True,
     "tray/notifications/enabled": False,
