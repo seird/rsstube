@@ -99,16 +99,15 @@ class FeedUpdateTask(BaseTask):
 class AddFeedTask(BaseTask):
     added = pyqtSignal(int)
 
-    def __init__(self, url: str, category: str, notify: bool, name: str):
+    def __init__(self, url: str, category: str, name: str):
         super(AddFeedTask, self).__init__()
         self.url = url
         self.category = category
-        self.notify = notify
         self.name = name
 
     def task(self):
         feeds = Feeds()
-        feed_id = feeds.add_feed(self.url, self.category, self.notify, self.name)
+        feed_id = feeds.add_feed(self.url, self.category, self.name)
         if feed_id is None:
             logger.error(f"AddFeedTask: adding '{self.url}' failed.")
             self.failed.emit()
@@ -137,8 +136,8 @@ class ImportFeedsTask(BaseTask):
         feeds = Feeds()
 
         for line in lines:
-            author, url, category, notify = line.rstrip("\n").split(",")
-            feed_id = feeds.add_feed(url, category, notify=bool(notify), feed_name=author)
+            author, url, category = line.rstrip("\n").split(",")
+            feed_id = feeds.add_feed(url, category, feed_name=author)
             if feed_id is None:
                 logger.error(f"ImportFeedsTask: adding '{url}' failed.")
                 continue
@@ -153,10 +152,10 @@ class ExportFeedsTask(BaseTask):
     def task(self):
         feeds = Feeds()
         with open(self.fname, "w", encoding="utf-8") as f:
-            f.write("author,url,category,notify\n")
+            f.write("author,url,category\n")
             for feed in feeds.get_feeds():
                 author = feed["author"].replace(",", "")
-                f.write(f'{author},{feed["url"]},{feed["category"]},{feed["notify"]}\n')
+                f.write(f'{author},{feed["url"]},{feed["category"]}\n')
 
 
 class SaveThumbnailTask(BaseTask):

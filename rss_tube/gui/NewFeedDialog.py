@@ -21,9 +21,6 @@ class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
 
         self.mainwindow = mainwindow
 
-        notifications_checked = settings.value("new_feed_dialog/receive_notifications", type=bool)
-        self.cb_receive_notifications.setChecked(notifications_checked if notifications_checked is not None else True)
-
         category_selected = settings.value("new_feed_dialog/selected_category", "", type=str)
         if self.combo_categories.findText(category_selected) >= 0:
             self.combo_categories.setCurrentText(category_selected)
