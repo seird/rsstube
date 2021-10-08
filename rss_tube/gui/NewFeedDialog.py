@@ -30,10 +30,6 @@ class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
         self.link_callbacks()
 
     def link_callbacks(self):
-        self.cb_receive_notifications.stateChanged.connect(
-            lambda _: settings.setValue("new_feed_dialog/receive_notifications", self.cb_receive_notifications.isChecked())
-        )
-
         self.combo_categories.currentTextChanged.connect(
             lambda _: settings.setValue("new_feed_dialog/selected_category", self.combo_categories.currentText())
         )
