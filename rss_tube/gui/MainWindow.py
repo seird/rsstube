@@ -280,11 +280,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tray.actionUpdate.setEnabled(True)
 
         new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
+        new_entries_unviewed = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
         settings.set_last_refresh()
 
-        logger.debug(f"MainWindow: There are {len(new_entries)} new entries")
-
         if new_entries:
+            # Insert the new entries
             selected_entry_id = self.table_entries.get_selected_entry_id()
 
             self.tree_feeds.redisplay_selected()
@@ -292,11 +292,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
             self.table_entries.select_entry_id(selected_entry_id)
 
+        if new_entries_unviewed:
+            # Display a popup notification
             if settings.value("tray/notifications/enabled", type=bool):
-                titles = ", ".join(x["title"] for x in new_entries)
-                logger.debug(f"update_feeds_finished: {len(new_entries)} new entries to notify." + titles)
-                self.display_notification(f"{len(new_entries)} new entries.")
+                titles = ", ".join(x["title"] for x in new_entries_unviewed)
+                logger.debug(f"update_feeds_finished: {len(new_entries_unviewed)} new entries to notify." + titles)
+                self.display_notification(f"{len(new_entries_unviewed)} new entries.")
 
+            # Change to tray icon to show that there are new entries
             if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowMinimized):
                 self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray_new.png")))
 
