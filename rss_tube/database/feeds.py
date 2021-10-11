@@ -471,7 +471,7 @@ class Feeds(object):
         """
         return self.cursor.execute("SELECT * FROM entries WHERE refreshed_on > ? AND deleted=0", (last_refreshed,)).fetchall()
 
-    def get_new_entries_unviewed(self, last_refresh: str):
+    def get_new_entries_unviewed(self, last_refreshed: str):
         """
         Get new entries since 'last_refreshed' ('%Y-%m-%d %H:%M:%S') that haven't been viewed
         """

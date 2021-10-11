@@ -280,7 +280,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tray.actionUpdate.setEnabled(True)
 
         new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
-        new_entries_unviewed = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
+        new_entries_unviewed = self.feeds.get_new_entries_unviewed(settings.value("last_refresh", type=str))
         settings.set_last_refresh()
 
         if new_entries:
