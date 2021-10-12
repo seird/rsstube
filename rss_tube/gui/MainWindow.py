@@ -275,9 +275,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tray.actionUpdate.setEnabled(False)
         self.pb_update_feeds.setToolTip("Updating channels...")
 
-    def update_feeds_finished(self):
-        self.pb_update_feeds.setEnabled(True)
-        self.tray.actionUpdate.setEnabled(True)
+    def update_feeds_finished(self, enable_buttons: bool = True):
+        self.pb_update_feeds.setEnabled(enable_buttons)
+        self.tray.actionUpdate.setEnabled(enable_buttons)
 
         new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
         new_entries_unviewed = self.feeds.get_new_entries_unviewed(settings.value("last_refresh", type=str))

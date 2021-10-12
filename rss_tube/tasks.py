@@ -23,7 +23,7 @@ class Tasks(QtCore.QThread):
         super(Tasks, self).__init__()
         self.running = False
 
-        self.feed_update_task = FeedUpdateTask()
+        self.feed_update_task = FeedsUpdateTask()
         self.delete_entries_task = DeleteEntriesTask()
 
         self.interval = settings.value("tasks/interval", type=int)
@@ -88,12 +88,21 @@ class DeleteEntriesTask(BaseTask):
             feeds.delete_entries_added_more_than_days(days_added_more_than, keep_unviewed)
 
 
-class FeedUpdateTask(BaseTask):
+class FeedsUpdateTask(BaseTask):
     _finished = pyqtSignal()
 
     def task(self):
         Feeds().update_feeds(interval=0.5)
         self._finished.emit()
+
+
+class FeedUpdateTask(BaseTask):
+    def __init__(self, feed_id: int):
+        super(FeedUpdateTask, self).__init__()
+        self.feed_id = feed_id
+
+    def task(self):
+        Feeds().update_feed(feed_id=self.feed_id)
 
 
 class AddFeedTask(BaseTask):
