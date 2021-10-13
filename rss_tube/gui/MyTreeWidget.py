@@ -4,6 +4,7 @@ from typing import Iterable, List, Union
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import unviewed_color
 from rss_tube.utils import set_tree_icons
+from rss_tube.tasks import FeedUpdateTask
 from PyQt5 import QtCore, QtGui, QtWidgets
 from .MyTableWidget import MyTableWidget
 
@@ -165,7 +166,9 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
                 logger.debug(f"Deleted all entries in feed {self.feed_id}")
                 self.parent.table_entries.clear_entries()
         elif action == context_menu.action_update:
-            self.parent.feeds.update_feed(self.feed_id)
+            self.feed_update_task = FeedUpdateTask(self.feed_id)
+            self.feed_update_task.finished.connect(lambda: self.parent.mainwindow.update_feeds_finished(enable_buttons=False))
+            self.feed_update_task.start()
         elif action == context_menu.action_open_url:
             channel_url = self.parent.feeds.get_feed(self.feed_id)["channel_url"]
             QtGui.QDesktopServices.openUrl(QtCore.QUrl(channel_url))

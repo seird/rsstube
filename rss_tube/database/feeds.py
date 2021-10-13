@@ -471,6 +471,13 @@ class Feeds(object):
         """
         return self.cursor.execute("SELECT * FROM entries WHERE refreshed_on > ? AND deleted=0", (last_refreshed,)).fetchall()
 
+    def get_new_entries_unviewed(self, last_refreshed: str):
+        """
+        Get new entries since 'last_refreshed' ('%Y-%m-%d %H:%M:%S') that haven't been viewed
+        """
+        return self.cursor.execute("SELECT * FROM entries WHERE refreshed_on > ? AND deleted=0 AND viewed=0", (last_refreshed,)).fetchall()
+
+
     def set_viewed(self, feed_id: int = None, category: str = None):
         if feed_id:
             self.cursor.execute("UPDATE entries SET viewed=1 WHERE feed_id=?", (feed_id,))
