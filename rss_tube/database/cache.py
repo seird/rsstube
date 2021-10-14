@@ -43,7 +43,6 @@ class Cache(object):
         if q:
             # Cache hit
             filename, cached_on = q
-            logger.debug(f"Cache: lookup found {key} as {filename}.")
             return filename
         else:
             # Cache miss
@@ -69,5 +68,4 @@ class Cache(object):
             (key, filename)
         )
         self.database.commit()
-        logger.debug(f"Cache: stored {key} as {filename}.")
         return filename

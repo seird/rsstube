@@ -27,7 +27,7 @@ from .SettingsDialog import SettingsDialog
 from .Tray import Tray
 from .designs.main_window import Ui_MainWindow
 
-settings = Settings("rss-tube")
+settings = Settings()
 logger = logging.getLogger("logger")
 
 if (level := settings.value("logging/level", type=str)) != "Disabled":
@@ -280,7 +280,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tray.actionUpdate.setEnabled(enable_buttons)
 
         new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
-        new_entries_unviewed = self.feeds.get_new_entries_unviewed(settings.value("last_refresh", type=str))
         settings.set_last_refresh()
 
         if new_entries:
@@ -291,8 +290,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             self.tree_feeds.update_viewed()
 
             self.table_entries.select_entry_id(selected_entry_id)
+        else:
+            return
 
-        if new_entries_unviewed:
+        if new_entries_unviewed := self.feeds.get_new_entries_unviewed(settings.value("last_refresh", type=str)):
             # Display a popup notification
             if settings.value("tray/notifications/enabled", type=bool):
                 titles = ", ".join(x["title"] for x in new_entries_unviewed)
@@ -473,7 +474,7 @@ def start_gui():
     logdir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DataLocation)[0]
     if not os.path.exists(logdir):
         os.mkdir(logdir)
-    logging.basicConfig(filename=os.path.join(logdir, "rss-tube.log"), format='%(levelname)s > %(name)s > %(asctime)s > %(message)s')
+    logging.basicConfig(filename=os.path.join(logdir, __title__.replace(" ", "-") + ".log"), format='%(levelname)s > %(name)s > %(asctime)s > %(message)s')
 
     window = MainWindow(app)
 

@@ -13,7 +13,7 @@ except ImportError:
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class Downloader(object):

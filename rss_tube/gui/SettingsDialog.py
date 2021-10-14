@@ -13,7 +13,7 @@ from rss_tube.utils import set_icons, set_style
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):

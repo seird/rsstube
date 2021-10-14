@@ -12,7 +12,7 @@ from rss_tube.database.settings import Settings
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 def load_pixmap(image_bytes: bytes) -> QtGui.QPixmap:

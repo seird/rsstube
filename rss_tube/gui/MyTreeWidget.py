@@ -9,7 +9,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from .MyTableWidget import MyTableWidget
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class TreeWidgetItemFeedContextMenu(QtWidgets.QMenu):

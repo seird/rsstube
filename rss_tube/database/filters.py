@@ -11,7 +11,7 @@ from .database import Database
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class FilterAction(Enum):

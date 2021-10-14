@@ -13,7 +13,7 @@ from rss_tube.database.settings import Settings
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class Tasks(QtCore.QThread):

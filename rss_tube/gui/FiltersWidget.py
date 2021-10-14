@@ -9,7 +9,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.utils import center_widget
 
 
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class FilterRuleWidget(QtWidgets.QWidget, QtWidgets.QTableWidgetItem, Ui_Form_FilterRule):

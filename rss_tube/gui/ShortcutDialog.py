@@ -7,7 +7,7 @@ from rss_tube.utils import center_widget
 from rss_tube.default_settings import DEFAULT_SETTINGS
 
 
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class MyQKeySequenceEditWidget(QtWidgets.QKeySequenceEdit):

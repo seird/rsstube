@@ -7,7 +7,7 @@ from rss_tube.utils import center_widget
 from .designs.widget_new_feed import Ui_Dialog
 
 
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):

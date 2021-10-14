@@ -14,7 +14,7 @@ from .filters import Filter, FilterAction, Filters
 
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class Feeds(object):

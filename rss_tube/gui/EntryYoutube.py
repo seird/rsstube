@@ -13,7 +13,7 @@ from rss_tube.utils import convert_links, get_abs_path, load_pixmap
 from .designs.widget_youtube import Ui_Form
 
 logger = logging.getLogger("logger")
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class RatingWidget(QtWidgets.QWidget):
@@ -119,7 +119,7 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
         self.download = Downloader()
         self.feeds: Feeds = self.parent.feeds
 
-        self.label_thumbnail.setToolTip("Click to play with MPV")
+        self.label_thumbnail.setToolTip("Click to play with external player")
         self.show_description(settings.value("youtube/show_description", type=bool))
 
         self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))

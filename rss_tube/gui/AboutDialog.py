@@ -6,7 +6,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.utils import get_abs_path, center_widget, get_about, get_debug_info
 
 
-settings = Settings("rss-tube")
+settings = Settings()
 
 
 class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
