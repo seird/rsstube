@@ -15,7 +15,7 @@ logger = logging.getLogger("logger")
 
 class Cache(object):
     def __init__(self, expiration=0):
-        self.database = Database("cache")
+        self.database = Database("cache", QtCore.QStandardPaths.CacheLocation)
         self.cursor = self.database.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS cache (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,

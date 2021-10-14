@@ -4,6 +4,8 @@ import time
 
 from typing import Any, List, Optional
 
+from PyQt5 import QtCore
+
 from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
 from rss_tube.parser import parse_url, parse_feed
@@ -17,7 +19,7 @@ settings = Settings("rss-tube")
 
 class Feeds(object):
     def __init__(self):
-        self.database = Database("feeds")
+        self.database = Database("feeds", QtCore.QStandardPaths.AppLocalDataLocation)
         self.downloader = Downloader()
         self.filters = Filters()
         self.cursor = self.database.cursor()
