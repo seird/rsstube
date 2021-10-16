@@ -524,6 +524,22 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_7">
+         <property name="title">
+          <string>Refresh</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_12">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="cb_refresh_entries">
+            <property name="text">
+             <string>Refresh existing entries</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_11">
          <property name="title">
           <string>Fetch upto</string>

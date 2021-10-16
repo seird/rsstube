@@ -418,22 +418,12 @@ class Feeds(object):
             return
 
         parsed_feed = parse_feed(feed_bytes, q["type"], q["author"])
+        refresh_entries = settings.value("feeds/refresh_entries", type=bool)
+        preload_thumbnails = settings.value("cache/preload_thumbnails", type=bool)
 
         for i, entry in parsed_feed["entries"].items():
             entry_fetched = self.cursor.execute("SELECT * FROM entries WHERE entry_id=:entry_id", entry).fetchone()
-            if entry_fetched:
-                # Entry already exists, update the entries
-                self.cursor.execute(
-                    """
-                    UPDATE entries SET
-                        title=:title, link=:link, published=:published, updated=:updated,
-                        thumbnail=:thumbnail, description=:description, rating_average=:rating_average,
-                        rating_count=:rating_count, views=:views
-                    WHERE entry_id=:entry_id AND deleted=0
-                    """,
-                    entry
-                )
-            else:
+            if not entry_fetched:
                 # Filter the new entry
                 action: FilterAction = self.apply_filters(parsed_feed, entry)
                 entry.update({
@@ -459,7 +449,19 @@ class Feeds(object):
                     """,
                     entry
                 )
-            if settings.value("cache/preload_thumbnails", type=bool):
+            elif refresh_entries:
+                # Entry already exists, update the entries
+                self.cursor.execute(
+                    """
+                    UPDATE entries SET
+                        title=:title, link=:link, published=:published, updated=:updated,
+                        thumbnail=:thumbnail, description=:description, rating_average=:rating_average,
+                        rating_count=:rating_count, views=:views
+                    WHERE entry_id=:entry_id AND deleted=0
+                    """,
+                    entry
+                )
+            if preload_thumbnails:
                 self.downloader.get_filename(entry["thumbnail"])
 
         self.cursor.execute("UPDATE feeds SET refreshed_on=datetime('now', 'localtime') WHERE id=?", (feed_id,))

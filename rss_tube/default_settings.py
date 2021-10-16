@@ -23,6 +23,7 @@ DEFAULT_SETTINGS = {
     "tray/notifications/enabled": False,
     "tray/notifications/duration_ms": 2000,
     "feeds/update_interval/minutes": 10,
+    "feeds/refresh_entries": True,
     "youtube/show_description": True,
     "player": "mpv",
     "player/mpv/path": "mpv",
