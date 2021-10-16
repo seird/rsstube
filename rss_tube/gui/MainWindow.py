@@ -276,8 +276,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.pb_update_feeds.setToolTip("Updating channels...")
 
     def update_feeds_finished(self, enable_buttons: bool = True):
-        self.pb_update_feeds.setEnabled(enable_buttons)
-        self.tray.actionUpdate.setEnabled(enable_buttons)
+        if enable_buttons:
+            self.pb_update_feeds.setEnabled(True)
+            self.tray.actionUpdate.setEnabled(True)
 
         last_refresh = settings.value("last_refresh", type=str)
         settings.set_last_refresh()
