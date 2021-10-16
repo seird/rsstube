@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .designs.widget_filter import Ui_Dialog as Ui_Dialog_Filter
 from .designs.widget_filters import Ui_Form as Ui_Form_Filters
@@ -62,13 +62,13 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         # Rules Table
         self.tableWidget.setRowCount(0)
         self.tableWidget.setColumnCount(3)
-        self.tableWidget.setSelectionMode(QtWidgets.QTableWidget.NoSelection)
+        self.tableWidget.setSelectionMode(QtWidgets.QTableWidget.SelectionMode.NoSelection)
         horizontal_header = self.tableWidget.horizontalHeader()
-        horizontal_header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        horizontal_header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        horizontal_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+        horizontal_header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         vertical_header = self.tableWidget.verticalHeader()
-        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Fixed)
         vertical_header.setDefaultSectionSize(30)
         self.insert_rule()
 
@@ -249,13 +249,13 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
     def initUI(self):
         self.tableWidget.setRowCount(0)
         self.tableWidget.setColumnCount(1)
-        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         horizontal_header = self.tableWidget.horizontalHeader()
-        horizontal_header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        horizontal_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         vertical_header = self.tableWidget.verticalHeader()
-        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Fixed)
         vertical_header.setDefaultSectionSize(30)
 
         self.list_filters()
@@ -279,7 +279,7 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
 
     def new_filter_callback(self):
         filter_dialog = NewFilterDialog(self.mainwindow)
-        accepted = filter_dialog.exec_()
+        accepted = filter_dialog.exec()
         if accepted:
             # store the new filter entry
             f = Filter(
@@ -301,7 +301,7 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
             if not fw:
                 return
         filter_dialog = EditFilterDialog(self.mainwindow, self.filters.get_filter(fw.filter_id))
-        accepted = filter_dialog.exec_()
+        accepted = filter_dialog.exec()
         if accepted:
             # update the filter entry
             f = Filter(
@@ -327,10 +327,10 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
                 self.mainwindow,
                 "Are you sure?",
                 f"Delete filter \"{tw.name}\"?",
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                defaultButton=QtWidgets.QMessageBox.Cancel
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
             )
-            if response != QtWidgets.QMessageBox.Ok:
+            if response != QtWidgets.QMessageBox.StandardButton.Ok:
                 return
 
             # Delete from database
@@ -414,9 +414,9 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
         self.filters.rank_bottom(f)
 
     def keyPressEvent(self, e: QtGui.QKeyEvent) -> None:
-        if e.key() == QtCore.Qt.Key_Delete:
+        if e.key() == QtCore.Qt.Key.Key_Delete:
             self.delete_filter_callback()
-        elif e.key() == QtCore.Qt.Key_Escape:
+        elif e.key() == QtCore.Qt.Key.Key_Escape:
             pass
         else:
             e.accept()
@@ -439,7 +439,7 @@ class FiltersDialog(QtWidgets.QDialog):
         super(FiltersDialog, self).__init__()
 
         self.scrollArea = QtWidgets.QScrollArea()
-        self.scrollArea.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        self.scrollArea.setFrameStyle(QtWidgets.QFrame.Shape.NoFrame)
         self.scrollArea.setWidget(FiltersWidget(self))
 
         self.gridLayout = QtWidgets.QGridLayout(self)

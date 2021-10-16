@@ -4,7 +4,7 @@ import re
 
 from pathlib import Path
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 from rss_tube.__version__ import __title__, __version__, __url__, __description__
 from textwrap import dedent
 from rss_tube.gui.themes import styles
@@ -114,7 +114,7 @@ def get_debug_info() -> str:
     import sys
     import platform
     import lxml
-    from PyQt5.QtCore import QT_VERSION_STR
+    from PyQt6.QtCore import QT_VERSION_STR
     import requests
     import subprocess
 
@@ -132,7 +132,7 @@ def get_debug_info() -> str:
     <b>CPU</b>: {platform.machine()} <br>
     <b>Kernel</b>: {platform.version()} <br><br>
 
-    <b>PyQt5</b>: {QT_VERSION_STR} <br>
+    <b>PyQt6</b>: {QT_VERSION_STR} <br>
     <b>lxml</b>: {lxml.__version__} <br>
     <b>requests</b>: {requests.__version__} <br><br>
 

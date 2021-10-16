@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt6 import QtGui
 
 
 def get_palette() -> QtGui.QPalette:

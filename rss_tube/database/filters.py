@@ -4,7 +4,7 @@ import pickle
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 from rss_tube.database.settings import Settings
 from .database import Database
@@ -53,7 +53,7 @@ class Filter(dict):
 
 class Filters(object):
     def __init__(self):
-        self.database = Database("filters", QtCore.QStandardPaths.AppLocalDataLocation)
+        self.database = Database("filters", QtCore.QStandardPaths.StandardLocation.AppLocalDataLocation)
         self.cursor = self.database.cursor()
 
         # Filters table

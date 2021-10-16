@@ -1,6 +1,6 @@
 from typing import List
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from rss_tube.database.settings import Settings
 from rss_tube.utils import center_widget
@@ -12,7 +12,7 @@ settings = Settings()
 
 class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow, categories: List[str], theme="light"):
-        super(NewFeedDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
+        super(NewFeedDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
         self.setupUi(self)
 
         self.combo_categories.addItems(categories)

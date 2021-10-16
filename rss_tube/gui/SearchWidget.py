@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class SearchWidget(QtWidgets.QLineEdit):
@@ -9,7 +9,7 @@ class SearchWidget(QtWidgets.QLineEdit):
         self.setFixedHeight(height)
 
     def keyPressEvent(self, e: QtGui.QKeyEvent) -> None:
-        if e.key() == QtCore.Qt.Key_Escape:
+        if e.key() == QtCore.Qt.Key.Key_Escape:
             self.clear()
         else:
             super().keyPressEvent(e)

@@ -6,7 +6,7 @@ import sys
 import tempfile
 import webbrowser
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 
 from rss_tube.__version__ import __title__, __version__
 from rss_tube.database.feeds import Feeds
@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         set_icons(self, style=settings.value("theme", type=str))
 
         self.show()
-        self.window_state_to_restore = QtCore.Qt.WindowNoState
+        self.window_state_to_restore = QtCore.Qt.WindowState.WindowNoState
         
         if settings.value("MainWindow/start_minimized", type=bool) and settings.value("tray/show", type=bool):
             self.tray_activated_callback(QtWidgets.QSystemTrayIcon.ActivationReason.Trigger)
@@ -134,18 +134,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def tray_activated_callback(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
         if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Trigger:
-            if self.windowState() & QtCore.Qt.WindowMinimized or self.windowState() == (QtCore.Qt.WindowMinimized | QtCore.Qt.WindowMaximized):
+            if self.windowState() & QtCore.Qt.WindowState.WindowMinimized or self.windowState() == (QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowMaximized):
                 self.show()
-                self.setWindowState(self.window_state_to_restore | QtCore.Qt.WindowActive)  # Set the window to its normal state
+                self.setWindowState(self.window_state_to_restore | QtCore.Qt.WindowState.WindowActive)  # Set the window to its normal state
             else:
                 window_state_temp = self.windowState()
-                self.setWindowState(QtCore.Qt.WindowMinimized)
+                self.setWindowState(QtCore.Qt.WindowState.WindowMinimized)
                 self.hide()
                 self.window_state_to_restore = window_state_temp
 
     def settings_callback(self):
         settings_dialog = SettingsDialog(self)
-        accepted = settings_dialog.exec_()
+        accepted = settings_dialog.exec()
 
         self.set_shortcuts()
 
@@ -177,11 +177,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.updater.new_update_available.connect(self.new_update_available_callback)
         self.updater.no_update_available.connect(
             lambda: QtWidgets.QMessageBox(
-                QtWidgets.QMessageBox.Information,
+                QtWidgets.QMessageBox.Icon.Information,
                 f"Already using the latest {__title__} version.",
                 "No updates available.\nYou are already using the latest version.",
                 parent=self
-            ).exec_()
+            ).exec()
         )
         self.updater.start()
 
@@ -191,30 +191,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             text += "\n\nRelease Notes:\n"
             text += "\n".join(message['releaseNotes'])
         mb = QtWidgets.QMessageBox(
-            QtWidgets.QMessageBox.Information,
+            QtWidgets.QMessageBox.Icon.Information,
             "New version available",
             text,
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.Cancel,
             parent=self
         )
 
-        r = mb.exec_()
+        r = mb.exec()
 
-        if r == QtWidgets.QMessageBox.Yes:
+        if r == QtWidgets.QMessageBox.StandardButton.Yes:
             QtGui.QDesktopServices.openUrl(QtCore.QUrl(message['url']))
 
     def about_callback(self):
         dialog = AboutDialog(self)
-        dialog.exec_()
+        dialog.exec()
 
     def shortcuts_callback(self):
         dialog = ShortcutsDialog(self)
-        dialog.exec_()
+        dialog.exec()
         self.set_shortcuts()
 
     def statistics_callback(self):
         dialog = StatisticsDialog(self)
-        dialog.exec_()
+        dialog.exec()
 
     def play_video(self, play_quality_once: str = ""):
         self.entry_widgets["youtube"].play_video(play_quality_once=play_quality_once)
@@ -225,7 +225,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def new_feed_callback(self):
         categories = self.feeds.get_categories()
         dialog = NewFeedDialog(self, categories, theme=settings.value("theme", type=str))
-        accepted = dialog.exec_()
+        accepted = dialog.exec()
         if not accepted:
             return
         feed_url = dialog.line_new_feed.text()
@@ -237,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             self.add_feed_task.start()
 
     def new_category_callback(self):
-        category, ok = QtWidgets.QInputDialog.getText(self, "Add new a category", "New category:" + " " * 96, flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
+        category, ok = QtWidgets.QInputDialog.getText(self, "Add new a category", "New category:" + " " * 96, flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
         if ok and category:
             if self.feeds.add_category(category):
                 self.tree_feeds.add_category(category)
@@ -302,7 +302,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                 self.display_notification(f"{len(new_entries_unviewed)} new entries.")
 
             # Change to tray icon to show that there are new entries
-            if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowMinimized):
+            if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowState.WindowMinimized):
                 self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray_new.png")))
 
     def display_entry(self, entry_id: int):
@@ -339,19 +339,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def change_category_name(self, current_name: str):
         dialog = RenameCategoryDialog(self, current_name)
         current_categories = [c for c in self.feeds.get_categories() if c != current_name]
-        if dialog.exec_() and dialog.new_name not in current_categories:
+        if dialog.exec() and dialog.new_name not in current_categories:
             self.feeds.update_category_name(current_name, dialog.new_name)
             self.tree_feeds.build_tree()
 
     def change_channel_name(self, current_name: str, feed_id: int):
         dialog = RenameChannelDialog(self, current_name)
-        if dialog.exec_():
+        if dialog.exec():
             self.feeds.update_feed_name(feed_id, dialog.new_name)
             self.tree_feeds.build_tree()
 
     def display_notification(self,
                              message: str,
-                             icon: QtWidgets.QSystemTrayIcon = QtWidgets.QSystemTrayIcon.Information):
+                             icon: QtWidgets.QSystemTrayIcon.MessageIcon = QtWidgets.QSystemTrayIcon.MessageIcon.Information):
         if not settings.value("tray/notifications/enabled", type=bool) or not settings.value("tray/show", type=bool):
             return
 
@@ -398,16 +398,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.line_search.textChanged.connect(self.search_text_changed_callback)
 
     def init_shortcuts(self):
-        self.shortcut_search = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)), self)
-        self.shortcut_quit = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/quit", type=str)), self)
-        self.shortcut_refresh = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/refresh", type=str)), self)
-        self.shortcut_new_feed = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/new_feed", type=str)), self)
-        self.shortcut_new_category = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/new_category", type=str)), self)
-        self.shortcut_play = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play", type=str)), self)
-        self.shortcut_play_audio = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_audio", type=str)), self)
-        self.shortcut_play_in_browser = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_in_browser", type=str)), self)
-        self.shortcut_previous_entry = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/previous_entry", type=str)), self)
-        self.shortcut_next_entry = QtWidgets.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/next_entry", type=str)), self)
+        self.shortcut_search = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)), self)
+        self.shortcut_quit = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/quit", type=str)), self)
+        self.shortcut_refresh = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/refresh", type=str)), self)
+        self.shortcut_new_feed = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/new_feed", type=str)), self)
+        self.shortcut_new_category = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/new_category", type=str)), self)
+        self.shortcut_play = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play", type=str)), self)
+        self.shortcut_play_audio = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_audio", type=str)), self)
+        self.shortcut_play_in_browser = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_in_browser", type=str)), self)
+        self.shortcut_previous_entry = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/previous_entry", type=str)), self)
+        self.shortcut_next_entry = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/next_entry", type=str)), self)
 
         self.shortcut_search.activated.connect(self.line_search.setFocus)
         self.shortcut_quit.activated.connect(self.close)
@@ -434,17 +434,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         # TODO: child widgets?
-        if event.button() == QtCore.Qt.BackButton:
+        if event.button() == QtCore.Qt.MouseButton.BackButton:
             self.display_previous_entry()
-        elif event.button() == QtCore.Qt.ForwardButton:
+        elif event.button() == QtCore.Qt.MouseButton.ForwardButton:
             self.display_next_entry()
         event.accept()
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
-        if event.type() == QtCore.QEvent.WindowStateChange:
+        if event.type() == QtCore.QEvent.Type.WindowStateChange:
             if settings.value("tray/show", type=bool) and settings.value("tray/minimize", type=bool):
-                if self.windowState() & QtCore.Qt.WindowMinimized:
-                    self.window_state_to_restore = self.windowState() & ~QtCore.Qt.WindowMinimized
+                if self.windowState() & QtCore.Qt.WindowState.WindowMinimized:
+                    self.window_state_to_restore = self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized
                     self.hide()
                 else:
                     # Restore tray icon in case of new entries
@@ -472,7 +472,7 @@ def start_gui():
     app.setApplicationName(__title__.replace(" ", "-"))
     app.setQuitOnLastWindowClosed(False)  # Prevent dialogs from quitting the application when the main window is minimized
 
-    logdir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DataLocation)[0]
+    logdir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.StandardLocation.AppDataLocation)[0]
     if not os.path.exists(logdir):
         os.mkdir(logdir)
     logging.basicConfig(filename=os.path.join(logdir, __title__.replace(" ", "-") + ".log"), format='%(levelname)s > %(name)s > %(asctime)s > %(message)s')
@@ -482,4 +482,4 @@ def start_gui():
     # prevent multiple instances
     if window.acquire_lock() or "--no-lock" in sys.argv:
         window.init_ui()
-        sys.exit(app.exec_())
+        sys.exit(app.exec())

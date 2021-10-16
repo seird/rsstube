@@ -63,7 +63,7 @@ $ iscc rss-tube.iss
 
 - Python >= 3.6
 - lxml
-- PyQt5
+- PyQt6
 - requests
 - schedule
 - (pysocks to connect to a socks5 proxy)

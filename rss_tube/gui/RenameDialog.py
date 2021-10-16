@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from .designs.widget_rename import Ui_Dialog
 from rss_tube.utils import center_widget
@@ -11,14 +11,14 @@ class RenameDialog(QtWidgets.QDialog, Ui_Dialog):
         self.current_name = current_name
         self.new_name = current_name
         self.line_name.setText(current_name)
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
 
         center_widget(mainwindow, self)
 
         self.link_callbacks()
 
     def text_changed_callback(self, new_name: str):
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(self.current_name != new_name and new_name != "")
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(self.current_name != new_name and new_name != "")
         self.new_name = new_name
 
     def link_callbacks(self):

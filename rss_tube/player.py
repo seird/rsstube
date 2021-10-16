@@ -2,7 +2,7 @@ import logging
 import subprocess
 from typing import Optional, Union
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 from rss_tube.database.settings import Settings
 

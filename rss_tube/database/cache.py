@@ -5,7 +5,7 @@ import time
 
 import requests
 
-from PyQt5 import  QtCore
+from PyQt6 import  QtCore
 
 from rss_tube.utils import get_abs_path
 from .database import Database
@@ -15,7 +15,7 @@ logger = logging.getLogger("logger")
 
 class Cache(object):
     def __init__(self, expiration=0):
-        self.database = Database("cache", QtCore.QStandardPaths.CacheLocation)
+        self.database = Database("cache", QtCore.QStandardPaths.StandardLocation.CacheLocation)
         self.cursor = self.database.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS cache (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +25,7 @@ class Cache(object):
         """)
 
         # create a directory to store cached files
-        path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.CacheLocation)[0]
+        path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.StandardLocation.CacheLocation)[0]
         self.cache_dir = os.path.join(path, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
 

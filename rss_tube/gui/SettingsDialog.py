@@ -1,7 +1,7 @@
 import logging
 import os
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from .designs.widget_settings import Ui_Dialog
 from .FiltersWidget import FiltersWidget
@@ -18,7 +18,7 @@ settings = Settings()
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
+        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
         self.setupUi(self)
 
         self.settings_changed = False
@@ -34,7 +34,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.link_callbacks()
 
     def initUI(self):
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).setEnabled(False)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).setEnabled(False)
 
         # General Tab
         self.combo_theme.addItems(styles.keys())
@@ -93,7 +93,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
     def settings_changed_callback(self, *args, **kwargs):
         self.settings_changed = True
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).setEnabled(True)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).setEnabled(True)
 
     def schedule_changed_callback(self, *args, **kwargs):
         self.schedule_changed = True
@@ -113,10 +113,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
             self,
             "Are you sure?",
             "Reset all settings?",
-            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-            defaultButton=QtWidgets.QMessageBox.Cancel
+            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+            defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
         )
-        if response == QtWidgets.QMessageBox.Ok:
+        if response == QtWidgets.QMessageBox.StandardButton.Ok:
             settings.clear()
 
     def player_path_callback(self):
@@ -125,7 +125,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
             self.line_player_path.setText(fname)
 
     def link_callbacks(self):
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).clicked.connect(self.apply_settings)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply_settings)
 
         # General Tab
         self.combo_theme.currentTextChanged.connect(self.settings_changed_callback)
@@ -147,7 +147,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_update_feed_interval_minutes.valueChanged.connect(self.schedule_changed_callback)
 
         # Player Tab
-        self.combo_player.currentIndexChanged[str].connect(self.combo_player_changed)
+        self.combo_player.currentTextChanged.connect(self.combo_player_changed)
         self.pb_player_path.clicked.connect(self.player_path_callback)
         self.line_player_path.textChanged.connect(self.settings_changed_callback)
         self.line_player_args.textChanged.connect(self.settings_changed_callback)
@@ -237,6 +237,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.sync()
 
         self.settings_changed = False
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply).setEnabled(False)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).setEnabled(False)
 
         self.changes_applied = True

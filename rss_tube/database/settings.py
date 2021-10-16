@@ -4,7 +4,7 @@ from typing import Any
 from rss_tube.default_settings import DEFAULT_SETTINGS
 from rss_tube.__version__ import __title__
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 class Settings(QtCore.QSettings):

@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 from rss_tube.__version__ import __version__, __versionurl__
 
 

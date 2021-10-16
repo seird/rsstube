@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from typing import Dict
 from functools import reduce
 
@@ -51,32 +51,32 @@ class ShortcutsWidget(QtWidgets.QWidget):
         for i, s in enumerate(shortcuts):
             text = s.split("/")[1].replace("_", " ").title()
             label = QtWidgets.QLabel(f"{text:30s}")
-            self.formLayout.setWidget(i, QtWidgets.QFormLayout.LabelRole, label)
+            self.formLayout.setWidget(i, QtWidgets.QFormLayout.ItemRole.LabelRole, label)
             key_str = settings.value(s)
             key = QtGui.QKeySequence.fromString(key_str)
 
             keySequenceEdit = MyQKeySequenceEditWidget(s, key, self.used_shortcuts, settings)
-            keySequenceEdit.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
+            keySequenceEdit.setSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.Minimum)
             keySequenceEdit.editingFinished.connect(keySequenceEdit.editingFinished_callback)
 
             self.used_shortcuts[keySequenceEdit] = key_str
 
-            self.formLayout.setWidget(i, QtWidgets.QFormLayout.FieldRole, keySequenceEdit)
+            self.formLayout.setWidget(i, QtWidgets.QFormLayout.ItemRole.FieldRole, keySequenceEdit)
 
     def restore_defaults(self):
         response = QtWidgets.QMessageBox.warning(
             self,
             "Are you sure?",
             "Reset all shortcuts to their default values?",
-            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-            defaultButton=QtWidgets.QMessageBox.Cancel
+            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+            defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
         )
-        if response != QtWidgets.QMessageBox.Ok:
+        if response != QtWidgets.QMessageBox.StandardButton.Ok:
             return
 
         for row in range(self.formLayout.rowCount()):
-            label: QtWidgets.QLabel = self.formLayout.itemAt(row, QtWidgets.QFormLayout.LabelRole).widget()
-            keyseq_edit: MyQKeySequenceEditWidget = self.formLayout.itemAt(row, QtWidgets.QFormLayout.FieldRole).widget()
+            label: QtWidgets.QLabel = self.formLayout.itemAt(row, QtWidgets.QFormLayout.ItemRole.LabelRole).widget()
+            keyseq_edit: MyQKeySequenceEditWidget = self.formLayout.itemAt(row, QtWidgets.QFormLayout.ItemRole.FieldRole).widget()
 
             key = "shortcuts/" + label.text().strip().lower().replace(" ", "_")
             keyseq_edit.setKeySequence(DEFAULT_SETTINGS[key])
@@ -85,7 +85,7 @@ class ShortcutsWidget(QtWidgets.QWidget):
 
 class ShortcutsDialog(QtWidgets.QDialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(ShortcutsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
+        super(ShortcutsDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
 
         self.shortcuts_widget = ShortcutsWidget(self)
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class TableWidgetItemEntryContextMenu(QtWidgets.QMenu):
@@ -22,7 +22,7 @@ class MyTableWidget(QtWidgets.QTableWidget):
         super(MyTableWidget, self).__init__()
         self.mainwindow = mainwindow
         self.feeds = self.mainwindow.feeds
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
         size_policy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
@@ -33,20 +33,20 @@ class MyTableWidget(QtWidgets.QTableWidget):
         self.verticalHeader().setVisible(False)
         self.setSortingEnabled(True)
         self.setMouseTracking(True)
-        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # make the table cells non editable
-        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # allow only 1 cell selected at a time
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # select entire row
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # make the table cells non editable
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # allow only 1 cell selected at a time
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # select entire row
         self.setColumnCount(3)  # Title, Author, Date
         self.setHorizontalHeaderLabels(["Title", "Author", "Date"])
         self.setMinimumHeight(50)
         self.setShowGrid(False)
         vertical_header = self.verticalHeader()
-        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        vertical_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Fixed)
         vertical_header.setDefaultSectionSize(22)
         table_header = self.horizontalHeader()
-        table_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        table_header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        table_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        table_header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.last_hovered_row = None
 
@@ -100,7 +100,7 @@ class MyTableWidget(QtWidgets.QTableWidget):
         for row, entry in enumerate(entries):
             self.insert_entry(entry, row)
 
-        self.sortByColumn(2, QtCore.Qt.DescendingOrder)
+        self.sortByColumn(2, QtCore.Qt.SortOrder.DescendingOrder)
         if select_first_row:
             self.selectRow(0)
 
@@ -113,7 +113,7 @@ class MyTableWidget(QtWidgets.QTableWidget):
         for entry in entries_new:
             self.insert_entry(entry, 0)
 
-        self.sortByColumn(2, QtCore.Qt.DescendingOrder)
+        self.sortByColumn(2, QtCore.Qt.SortOrder.DescendingOrder)
 
     def delete_entry(self, item: TableWidgetItemEntry):
         # Delete the entry from the table
@@ -144,7 +144,7 @@ class MyTableWidget(QtWidgets.QTableWidget):
         pos_mapped = self.mapToGlobal(pos)
 
         context_menu = TableWidgetItemEntryContextMenu()
-        action = context_menu.exec_(pos_mapped)
+        action = context_menu.exec(pos_mapped)
         if action is None:
             return
 
@@ -162,20 +162,20 @@ class MyTableWidget(QtWidgets.QTableWidget):
                 item.setBackground(QtGui.QBrush())
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        if event.key() == QtCore.Qt.Key_Delete:
+        if event.key() == QtCore.Qt.Key.Key_Delete:
             items = self.selectedItems()
             if items:
                 self.delete_entry(items[0])
         super(MyTableWidget, self).keyPressEvent(event)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+        if event.button() in (QtCore.Qt.MouseButton.BackButton, QtCore.Qt.MouseButton.ForwardButton):
             self.mainwindow.mousePressEvent(event)
         else:
             super(MyTableWidget, self).mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+        if event.button() in (QtCore.Qt.MouseButton.BackButton, QtCore.Qt.MouseButton.ForwardButton):
             self.mainwindow.mousePressEvent(event)
         else:
             super(MyTableWidget, self).mouseDoubleClickEvent(event)

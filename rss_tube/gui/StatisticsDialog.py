@@ -1,7 +1,7 @@
 import os
 import glob
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from functools import reduce
 from textwrap import dedent
 
@@ -11,7 +11,7 @@ from rss_tube.utils import center_widget, get_abs_path
 
 class StatisticsDialog(QtWidgets.QDialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(StatisticsDialog, self).__init__(flags=QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint)
+        super(StatisticsDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
 
         feeds: Feeds = mainwindow.feeds
 
@@ -19,7 +19,7 @@ class StatisticsDialog(QtWidgets.QDialog):
         num_categories = len(feeds.get_categories())
         num_entries = reduce(lambda x, feed: x + len(feeds.get_entries(feed["id"])), feeds.get_feeds(), 0)
 
-        path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.CacheLocation)[0]
+        path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.StandardLocation.CacheLocation)[0]
         cache_dir = os.path.join(path, "cache")
         if os.path.exists(cache_dir):
             cache_size_bytes = reduce(lambda x, f: x + os.path.getsize(f), glob.glob(os.path.join(cache_dir, "*")), 0)

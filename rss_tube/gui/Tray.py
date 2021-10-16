@@ -1,4 +1,4 @@
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 from rss_tube.__version__ import __title__
 from rss_tube.utils import get_abs_path
 
@@ -12,30 +12,30 @@ class Tray(QtWidgets.QSystemTrayIcon):
         # Tray menu items
         menu = QtWidgets.QMenu()
 
-        self.actionUpdate = QtWidgets.QAction("Update Channels", self)
+        self.actionUpdate = QtGui.QAction("Update Channels", self)
         menu.addAction(self.actionUpdate)
 
         menu.addSeparator()
 
-        self.actionNewFeed = QtWidgets.QAction("New Channel", self)
+        self.actionNewFeed = QtGui.QAction("New Channel", self)
         menu.addAction(self.actionNewFeed)
 
-        self.actionNewCategory = QtWidgets.QAction("New Category", self)
+        self.actionNewCategory = QtGui.QAction("New Category", self)
         menu.addAction(self.actionNewCategory)
 
         menu.addSeparator()
 
-        self.actionSettings = QtWidgets.QAction("Settings", self)
+        self.actionSettings = QtGui.QAction("Settings", self)
         menu.addAction(self.actionSettings)
 
         menu.addSeparator()
 
-        self.actionToggleWindow = QtWidgets.QAction("Toggle Window", self)
+        self.actionToggleWindow = QtGui.QAction("Toggle Window", self)
         menu.addAction(self.actionToggleWindow)
 
         menu.addSeparator()
 
-        self.actionQuit = QtWidgets.QAction("Quit", self)
+        self.actionQuit = QtGui.QAction("Quit", self)
         menu.addAction(self.actionQuit)
 
         self.setContextMenu(menu)

@@ -4,7 +4,7 @@ import time
 
 from typing import Any, List, Optional
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
@@ -19,7 +19,7 @@ settings = Settings()
 
 class Feeds(object):
     def __init__(self):
-        self.database = Database("feeds", QtCore.QStandardPaths.AppLocalDataLocation)
+        self.database = Database("feeds", QtCore.QStandardPaths.StandardLocation.AppLocalDataLocation)
         self.downloader = Downloader()
         self.filters = Filters()
         self.cursor = self.database.cursor()

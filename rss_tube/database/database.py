@@ -2,7 +2,7 @@ import logging
 import os
 import sqlite3
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 
 logger = logging.getLogger("logger")

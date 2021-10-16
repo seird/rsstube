@@ -5,7 +5,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import unviewed_color
 from rss_tube.utils import set_tree_icons
 from rss_tube.tasks import FeedUpdateTask
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from .MyTableWidget import MyTableWidget
 
 logger = logging.getLogger("logger")
@@ -60,7 +60,7 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
         self.setForeground(
             0,
             QtGui.QBrush(QtGui.QColor(
-                self.parent.palette().brush(QtGui.QPalette.Active, QtGui.QPalette.Text) if category_viewed \
+                self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if category_viewed \
                 else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
             ))
         )
@@ -70,7 +70,7 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
 
     def context_callback(self, pos: QtCore.QPoint):
         context_menu = TreeWidgetItemCategoryContextMenu(self.text(0))
-        action = context_menu.exec_(pos)
+        action = context_menu.exec(pos)
         if action is None:
             return
         if action == context_menu.action_delete:
@@ -78,10 +78,10 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
                 self.parent,
                 "Are you sure?",
                 f"Delete category {self.category}",
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                defaultButton=QtWidgets.QMessageBox.Cancel
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
             )
-            if response == QtWidgets.QMessageBox.Ok:
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
                 self.parent.feeds.delete_category(self.category)
                 self.parent.remove_category(self.category)
                 logger.debug(f"Deleted Category {self.category}")
@@ -94,10 +94,10 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
                 self.parent,
                 "Are you sure?",
                 f"Delete all entries in {self.category}",
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                defaultButton=QtWidgets.QMessageBox.Cancel
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
             )
-            if response == QtWidgets.QMessageBox.Ok:
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
                 self.parent.feeds.delete_entries_in_category(self.category)
                 logger.debug(f"Deleted all entries in category {self.category}")
                 self.parent.table_entries.clear_entries()
@@ -121,7 +121,7 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
         self.setForeground(
             0,
             QtGui.QBrush(QtGui.QColor(
-                self.parent.palette().brush(QtGui.QPalette.Active, QtGui.QPalette.Text) if feed_viewed \
+                self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if feed_viewed \
                 else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
             ))
         )
@@ -131,7 +131,7 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
 
     def context_callback(self, pos: QtCore.QPoint):
         context_menu = TreeWidgetItemFeedContextMenu(self.text(0))
-        action = context_menu.exec_(pos)
+        action = context_menu.exec(pos)
         if action is None:
             return
         if action == context_menu.action_delete:
@@ -139,10 +139,10 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
                 self.parent,
                 "Are you sure?",
                 f"Delete feed {self.text(0)}",
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                defaultButton=QtWidgets.QMessageBox.Cancel
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
             )
-            if response == QtWidgets.QMessageBox.Ok:
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
                 self.parent.remove_feed(self.feed_id)
                 self.parent.feeds.delete_feed(self.feed_id)
                 self.parent.update_viewed()
@@ -158,10 +158,10 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
                 self.parent,
                 "Are you sure?",
                 f"Delete all entries in {self.text(0)}",
-                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                defaultButton=QtWidgets.QMessageBox.Cancel
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
             )
-            if response == QtWidgets.QMessageBox.Ok:
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
                 self.parent.feeds.delete_entries_in_feed(self.feed_id)
                 logger.debug(f"Deleted all entries in feed {self.feed_id}")
                 self.parent.table_entries.clear_entries()
@@ -190,12 +190,12 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         self.setColumnCount(1)
         self.setHeaderHidden(True)
         self.setAlternatingRowColors(False)
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Expanding)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Maximum, QtWidgets.QSizePolicy.Policy.Expanding)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
         size_policy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(size_policy)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.build_tree()
 
@@ -209,7 +209,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         categories = self.feeds.get_categories()
         for category in categories:
             self.add_category(category)
-        self.sortItems(0, QtCore.Qt.AscendingOrder)
+        self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
         set_tree_icons(self, settings.value("theme", type=str))
 
@@ -224,7 +224,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         category_expanded = settings.value(f"MyTreeWidget/{category}_expanded", 1, type=bool)
         self.addTopLevelItem(twi)
         twi.setExpanded(category_expanded)
-        self.sortItems(0, QtCore.Qt.AscendingOrder)
+        self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
         set_tree_icons(self, settings.value("theme", type=str))
 
@@ -233,12 +233,12 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         Add a single feed
         """
         category = self.feeds.get_category(feed_id)
-        category_items: List[TreeWidgetItemCategory] = self.findItems(category, QtCore.Qt.MatchExactly)
+        category_items: List[TreeWidgetItemCategory] = self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly)
         if not category_items:
             twi = TreeWidgetItemCategory(self, [category], category)
             twi.setExpanded(True)
             self.addTopLevelItem(twi)
-            self.sortItems(0, QtCore.Qt.AscendingOrder)
+            self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
             category_item = twi
         else:
             category_item = category_items[0]
@@ -246,13 +246,13 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         feed = self.feeds.get_feed(feed_id)
         child_item = TreeWidgetItemFeed(self, [feed["author"]], feed["id"])
         category_item.addChild(child_item)
-        self.sortItems(0, QtCore.Qt.AscendingOrder)
+        self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.update_viewed()
 
         set_tree_icons(self, settings.value("theme", type=str))
 
     def remove_category(self, category: str):
-        category_items = self.findItems(category, QtCore.Qt.MatchExactly)
+        category_items = self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly)
         if not category_items:
             return
         category_item_to_remove = category_items[0]
@@ -266,11 +266,11 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         if category is None:
             return
 
-        category_items = self.findItems(category, QtCore.Qt.MatchExactly)
+        category_items = self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly)
         if not category_items:
             return
 
-        feed_items = self.findItems(feed["author"], QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        feed_items = self.findItems(feed["author"], QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive)
         if not feed_items:
             return
         feed_item_to_remove = feed_items[0]
@@ -287,10 +287,10 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         if category is None:
             return
 
-        for item_category in self.findItems(category, QtCore.Qt.MatchExactly):
+        for item_category in self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly):
             item_category.set_font()
 
-        for item_feed in self.findItems(feed["author"], QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive):
+        for item_feed in self.findItems(feed["author"], QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive):
             item_feed.set_font()
 
     def redisplay_selected(self):
@@ -347,13 +347,13 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         item.context_callback(pos_mapped)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+        if event.button() in (QtCore.Qt.MouseButton.BackButton, QtCore.Qt.MouseButton.ForwardButton):
             self.mainwindow.mousePressEvent(event)
-        elif event.button() != QtCore.Qt.RightButton:
+        elif event.button() != QtCore.Qt.MouseButton.RightButton:
             super(MyTreeWidget, self).mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() in (QtCore.Qt.BackButton, QtCore.Qt.ForwardButton):
+        if event.button() in (QtCore.Qt.MouseButton.BackButton, QtCore.Qt.MouseButton.ForwardButton):
             self.mainwindow.mousePressEvent(event)
         else:
             super(MyTreeWidget, self).mouseDoubleClickEvent(event)

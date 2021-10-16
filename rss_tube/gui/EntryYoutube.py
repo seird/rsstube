@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
@@ -23,7 +23,7 @@ class RatingWidget(QtWidgets.QWidget):
         self.parent = parent
 
         self.star_layout = QtWidgets.QHBoxLayout()
-        self.star_layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.star_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.star_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.star_layout)
 
@@ -33,10 +33,10 @@ class RatingWidget(QtWidgets.QWidget):
         size = self.parent.label_static_meta_rating.height()/2
 
         self.star_pixmap = QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{theme}/star.png"))
-        self.star_pixmap = self.star_pixmap.scaled(size, size, QtCore.Qt.KeepAspectRatio)
+        self.star_pixmap = self.star_pixmap.scaled(size, size, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
 
         self.star_half_pixmap = QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{theme}/star_half.png"))
-        self.star_half_pixmap = self.star_half_pixmap.scaled(size, size, QtCore.Qt.KeepAspectRatio)
+        self.star_half_pixmap = self.star_half_pixmap.scaled(size, size, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
 
     def clear_stars(self):
         for i in reversed(range(self.star_layout.count())):
@@ -60,7 +60,7 @@ class RatingWidget(QtWidgets.QWidget):
             self.star_layout.insertWidget(int(rating), label_star_half)
 
 
-class PlayResolutionAction(QtWidgets.QAction):
+class PlayResolutionAction(QtGui.QAction):
     def __init__(self, resolution: str):
         self.resolution = resolution
         super(PlayResolutionAction, self).__init__(resolution)
@@ -71,7 +71,7 @@ class PlayAudioOnlyAction(PlayResolutionAction):
         super(PlayAudioOnlyAction, self).__init__("Audio only")
 
 
-class SaveThumbnailAction(QtWidgets.QAction):
+class SaveThumbnailAction(QtGui.QAction):
     def __init__(self):
         super(SaveThumbnailAction, self).__init__("Save thumbnail")
 
@@ -125,7 +125,7 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
         self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))
 
         self.widget_rating = RatingWidget(self)
-        self.formLayout_meta.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.widget_rating)
+        self.formLayout_meta.setWidget(3, QtWidgets.QFormLayout.ItemRole.FieldRole, self.widget_rating)
 
         self.link_callbacks()
 
@@ -154,14 +154,14 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
         self.player.play(self.video_url, play_quality_once=play_quality_once)
 
     def thumbnail_mouse_button(self, event: QtGui.QMouseEvent):
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.player.play(self.video_url)
         else:
             super(EntryYoutube, self).mousePressEvent(event)
 
     def thumbnail_context(self, event: QtGui.QContextMenuEvent):
         context_menu = ThumbnailContextMenu(self)
-        action = context_menu.exec_(self.label_thumbnail.mapToGlobal(event.pos()))
+        action = context_menu.exec(self.label_thumbnail.mapToGlobal(event.pos()))
 
         if isinstance(action, (PlayAudioOnlyAction, PlayResolutionAction)):
             self.player.play(self.video_url, play_quality_once=action.resolution)
