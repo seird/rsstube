@@ -46,7 +46,6 @@ class Cache(object):
             return filename
         else:
             # Cache miss
-            logger.debug(f"Cache: lookup did not find {key}.")
             return ""
 
     def store(self, key: str, response: requests.Response, add_time: bool = True) -> str:

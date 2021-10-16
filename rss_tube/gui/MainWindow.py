@@ -279,10 +279,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.pb_update_feeds.setEnabled(enable_buttons)
         self.tray.actionUpdate.setEnabled(enable_buttons)
 
-        new_entries = self.feeds.get_new_entries(settings.value("last_refresh", type=str))
+        last_refresh = settings.value("last_refresh", type=str)
         settings.set_last_refresh()
 
-        if new_entries:
+        if self.feeds.get_new_entries(last_refresh):
             # Insert the new entries
             selected_entry_id = self.table_entries.get_selected_entry_id()
 
@@ -293,7 +293,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         else:
             return
 
-        if new_entries_unviewed := self.feeds.get_new_entries_unviewed(settings.value("last_refresh", type=str)):
+        if new_entries_unviewed := self.feeds.get_new_entries_unviewed(last_refresh):
             # Display a popup notification
             if settings.value("tray/notifications/enabled", type=bool):
                 titles = ", ".join(x["title"] for x in new_entries_unviewed)
