@@ -389,15 +389,19 @@ class Feeds(object):
                     continue
 
             if f["match"] == "any":
+                match = False
                 for rule in f.get_rules_list():
-                    if apply_rule(feed, entry, rule):
-                        return FilterAction(f["action"])
+                    if match := match or apply_rule(feed, entry, rule):
+                        break
             elif f["match"] == "all":
                 match = True
                 for rule in f.get_rules_list():
                     match = match and apply_rule(feed, entry, rule)
-                if match:
-                    return FilterAction(f["action"])
+            else:
+                continue
+
+            if (not match if f["invert"] else match):
+                return FilterAction(f["action"])
 
         # No filters matched
         return FilterAction.Nop

@@ -21,12 +21,13 @@ class FilterAction(Enum):
 
 
 class Filter(dict):
-    def __init__(self, name: str, enabled: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], filter_id: int = None):
+    def __init__(self, name: str, enabled: bool, invert: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], filter_id: int = None):
         super(Filter, self).__init__()
         self.update({
             "id": filter_id,
             "name": name,
             "enabled": enabled,
+            "invert": invert,
             "apply_to_group": apply_to_group,
             "apply_to": apply_to,
             "match": match,
@@ -62,6 +63,7 @@ class Filters(object):
             id             INTEGER PRIMARY KEY AUTOINCREMENT,
             name           TEXT,
             enabled        INTEGER,
+            invert         INTEGER,
             apply_to_group TEXT,
             apply_to       TEXT,
             match          TEXT,
@@ -83,7 +85,7 @@ class Filters(object):
         self.cursor.execute(
             """
             INSERT INTO filters
-                (name, enabled, apply_to_group, apply_to, match, action, rules)
+                (name, enabled, invert, apply_to_group, apply_to, match, action, rules)
             VALUES
                 (:name, :enabled, :apply_to_group, :apply_to, :match, :action, :rules)
             """,
@@ -115,7 +117,7 @@ class Filters(object):
         self.cursor.execute(
             """
             UPDATE filters SET
-                name=:name, enabled=:enabled, apply_to_group=:apply_to_group,
+                name=:name, enabled=:enabled, invert=:invert, apply_to_group=:apply_to_group,
                 apply_to=apply_to, match=:match, action=:action, rules=:rules
             WHERE
                 id=:id
@@ -130,6 +132,7 @@ class Filters(object):
             return Filter(
                 r["name"],
                 r["enabled"],
+                r["invert"],
                 r["apply_to_group"],
                 r["apply_to"],
                 r["match"],
@@ -150,6 +153,7 @@ class Filters(object):
             filters.append(Filter(
                 r["name"],
                 r["enabled"],
+                r["invert"],
                 r["apply_to_group"],
                 r["apply_to"],
                 r["match"],
@@ -170,6 +174,7 @@ class Filters(object):
             filters.append(Filter(
                 r["name"],
                 r["enabled"],
+                r["invert"],
                 r["apply_to_group"],
                 r["apply_to"],
                 r["match"],
