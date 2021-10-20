@@ -18,7 +18,7 @@ settings = Settings()
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
-        super(SettingsDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super(SettingsDialog, self).__init__()
         self.setupUi(self)
 
         self.settings_changed = False

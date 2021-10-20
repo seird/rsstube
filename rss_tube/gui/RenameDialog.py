@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from .designs.widget_rename import Ui_Dialog
 from rss_tube.utils import center_widget

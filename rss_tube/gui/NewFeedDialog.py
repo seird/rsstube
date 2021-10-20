@@ -12,7 +12,9 @@ settings = Settings()
 
 class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow, categories: List[str], theme="light"):
-        super(NewFeedDialog, self).__init__(flags=QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowSystemMenuHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super(NewFeedDialog, self).__init__()
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+
         self.setupUi(self)
 
         self.combo_categories.addItems(categories)
@@ -25,9 +27,19 @@ class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
         if self.combo_categories.findText(category_selected) >= 0:
             self.combo_categories.setCurrentText(category_selected)
 
+        self.set_whatsthis()
+
         center_widget(mainwindow, self)
 
         self.link_callbacks()
+
+    def set_whatsthis(self):
+        str_valid_url = "Valid URL formats:\n"
+        str_valid_url += " - https://www.youtube.com/user/<username>\n"
+        str_valid_url += " - https://www.youtube.com/channel/<channel_id>\n"
+        str_valid_url += " - https://www.youtube.com/feeds/videos.xml?user=<username>\n"
+        str_valid_url += " - https://www.youtube.com/feeds/videos.xml?channel_id=<channel_id>"
+        self.line_new_feed.setWhatsThis(str_valid_url)
 
     def link_callbacks(self):
         self.combo_categories.currentTextChanged.connect(
