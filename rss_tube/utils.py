@@ -27,8 +27,8 @@ def center_widget(parent, widget):
     parent_size = parent.size()
     size = widget.size()
     widget.move(
-        parent_pos.x() + parent_size.width() * 0.5 - size.width() * 0.5,
-        parent_pos.y() + parent_size.height() * 0.5 - size.height() * 0.5
+        int(parent_pos.x() + parent_size.width() * 0.5 - size.width() * 0.5),
+        int(parent_pos.y() + parent_size.height() * 0.5 - size.height() * 0.5)
     )
 
 

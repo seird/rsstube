@@ -30,7 +30,7 @@ class RatingWidget(QtWidgets.QWidget):
         self.set_pixmaps(settings.value("theme", type=str))
 
     def set_pixmaps(self, theme: str):
-        size = self.parent.label_static_meta_rating.height()/2
+        size = int(self.parent.label_static_meta_rating.height()/2)
 
         self.star_pixmap = QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{theme}/star.png"))
         self.star_pixmap = self.star_pixmap.scaled(size, size, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
