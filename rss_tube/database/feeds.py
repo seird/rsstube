@@ -111,6 +111,8 @@ class Feeds(object):
 
     def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)
+        if url == "":
+            return None
 
         if self.cursor.execute("SELECT * FROM feeds WHERE url = ?", (url,)).fetchone():
             # feed already exists

@@ -33,7 +33,7 @@ def parse_url(url: str) -> str:
             feed_url = html.xpath("//link[@type='application/rss+xml']")[0].get("href")
         except IndexError:
             feed_url = ""
-            logger.error(f"parse_url: RSS feed url couldn't not be extracted from '{url}' ({response.url})")
+            logger.error(f"parse_url: RSS feed url could not be extracted from '{url}' ({response.url})")
         return feed_url
     else:
         return url.rstrip("/")
