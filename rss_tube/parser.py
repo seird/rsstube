@@ -1,7 +1,10 @@
 import logging
 from datetime import datetime
 
-from lxml.etree import XML
+from lxml.etree import HTML, XML
+
+from .download import Downloader
+
 
 logger = logging.getLogger("logger")
 
@@ -21,6 +24,17 @@ def parse_url(url: str) -> str:
     elif "youtube.com/user/" in url:
         username = url.split("youtube.com/user/")[1].split("/")[0]
         return f"https://www.youtube.com/feeds/videos.xml?user={username}"
+    elif "youtube.com/c/" in url:
+        # extract the channel id from the web page
+        downloader = Downloader()
+        response = downloader.get_accept_cookies(url)
+        html = HTML(response.content)
+        try:
+            feed_url = html.xpath("//link[@type='application/rss+xml']")[0].get("href")
+        except IndexError:
+            feed_url = ""
+            logger.error(f"parse_url: RSS feed url couldn't not be extracted from '{url}' ({response.url})")
+        return feed_url
     else:
         return url.rstrip("/")
 

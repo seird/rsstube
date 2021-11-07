@@ -40,6 +40,9 @@ class Downloader(object):
         """
         return self.session.get(url)
 
+    def get_accept_cookies(self, url: str) -> requests.Response:
+        return self.session.get(url, cookies={'CONSENT': 'YES+1'})
+
     def get_bytes(self, url: str, cached: bool = True, add_time: bool = True) -> bytes:
         """
         Get the content of an http get request, as bytes.
