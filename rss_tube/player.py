@@ -48,13 +48,12 @@ class BasePlayer(QtCore.QThread):
 
 class MpvPlayerInstance(BasePlayer):
     def _run(self):
-        if self.play_quality_once == "Audio only":
-            player_args = "--no-video --force-window"
-        else:
-            player_args = settings.value("player/mpv/args", type=str)
-            player_quality = self.play_quality_once or settings.value("player/mpv/quality", type=str)
-
+        player_args = settings.value("player/mpv/args", type=str)
         player_args = player_args.split()
+        if self.play_quality_once == "Audio only":
+            player_args += ["--no-video", "--force-window"]
+        else:
+            player_quality = self.play_quality_once or settings.value("player/mpv/quality", type=str)
         
         if "--no-video" in player_args:
             retcode = subprocess.call([self.path, *player_args, self.url])
