@@ -132,16 +132,6 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_static_meta_rating">
-           <property name="text">
-            <string>Rating</string>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>

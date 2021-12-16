@@ -16,50 +16,6 @@ logger = logging.getLogger("logger")
 settings = Settings()
 
 
-class RatingWidget(QtWidgets.QWidget):
-    def __init__(self, parent):
-        super(RatingWidget, self).__init__()
-
-        self.parent = parent
-
-        self.star_layout = QtWidgets.QHBoxLayout()
-        self.star_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        self.star_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.star_layout)
-
-        self.set_pixmaps(settings.value("theme", type=str))
-
-    def set_pixmaps(self, theme: str):
-        size = int(self.parent.label_static_meta_rating.height()/2)
-
-        self.star_pixmap = QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{theme}/star.png"))
-        self.star_pixmap = self.star_pixmap.scaled(size, size, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
-
-        self.star_half_pixmap = QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{theme}/star_half.png"))
-        self.star_half_pixmap = self.star_half_pixmap.scaled(size, size, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
-
-    def clear_stars(self):
-        for i in reversed(range(self.star_layout.count())):
-            self.star_layout.itemAt(i).widget().deleteLater()
-
-    def set_rating(self, rating: float, count: int):
-        self.setToolTip(f"{rating} ({count:,})")
-        self.clear_stars()
-        for i in range(0, int(rating)):
-            label_star = QtWidgets.QLabel()
-            label_star.setPixmap(self.star_pixmap)
-            self.star_layout.insertWidget(i, label_star)
-
-        if (rating - int(rating)) >= 0.75:
-            label_star = QtWidgets.QLabel()
-            label_star.setPixmap(self.star_pixmap)
-            self.star_layout.insertWidget(int(rating), label_star)
-        elif (rating - int(rating)) >= 0.25:
-            label_star_half = QtWidgets.QLabel()
-            label_star_half.setPixmap(self.star_half_pixmap)
-            self.star_layout.insertWidget(int(rating), label_star_half)
-
-
 class PlayResolutionAction(QtGui.QAction):
     def __init__(self, resolution: str):
         self.resolution = resolution
@@ -124,9 +80,6 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
 
         self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))
 
-        self.widget_rating = RatingWidget(self)
-        self.formLayout_meta.setWidget(3, QtWidgets.QFormLayout.ItemRole.FieldRole, self.widget_rating)
-
         self.link_callbacks()
 
     def display_entry(self, entry: dict):
@@ -145,7 +98,6 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
         self.label_meta_website.setText(f"<a href=\"{entry['link']}\">{entry['link']}</a>")
         self.label_meta_views.setText(f"{entry['views']:,}")
         self.label_description.setHtml(convert_links(entry["description"]).replace("\n", "<br>"))
-        self.widget_rating.set_rating(entry["rating_average"], entry["rating_count"])
 
     def show_description(self, show: bool = True):
         self.label_description.setHidden(not show)

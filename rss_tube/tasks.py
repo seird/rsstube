@@ -76,16 +76,12 @@ class BaseTask(QtCore.QThread):
 
 class DeleteEntriesTask(BaseTask):
     def task(self):
-        delete_added_more_than = settings.value("delete/added_more_than", type=bool)
-        days_added_more_than = settings.value("delete/added_more_than_days", type=int)
-        keep_unviewed = settings.value("delete/keep_unviewed", type=bool)
-
-        if not delete_added_more_than:
-            return
-
-        feeds = Feeds()
-        if delete_added_more_than:
-            feeds.delete_entries_added_more_than_days(days_added_more_than, keep_unviewed)
+        if settings.value("delete/added_more_than", type=bool):
+            feeds = Feeds()
+            feeds.delete_entries_added_more_than_days(
+                settings.value("delete/added_more_than_days", type=int),
+                settings.value("delete/keep_unviewed", type=bool)
+            )
 
 
 class FeedsUpdateTask(BaseTask):
