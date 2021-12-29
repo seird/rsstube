@@ -20,12 +20,12 @@ with open("version.txt", "r") as f:
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'PyQt6', 'schedule', 'lxml', 'pysocks'
+    'requests', 'PyQt6', 'schedule', 'lxml'
 ]
 
 # What packages are optional?
 EXTRAS = {
-    # 'fancy feature': ['django'],
+    'socks5 proxy': ['pysocks'],
 }
 
 # The rest you shouldn't have to touch too much :)
