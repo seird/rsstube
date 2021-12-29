@@ -43,7 +43,7 @@ class Cache(object):
         if q:
             # Cache hit
             filename, cached_on = q
-            return filename
+            return os.path.join(self.cache_dir, filename)
         else:
             # Cache miss
             return ""
@@ -57,9 +57,8 @@ class Cache(object):
             filename += response.url.split("/")[-1]
 
         filename = "".join([c for c in filename if c.isalpha() or c.isdigit()]).rstrip()
-        filename = os.path.join(self.cache_dir, filename)
-
-        with open(filename, "wb") as f:
+        filepath = os.path.join(self.cache_dir, filename)
+        with open(filepath, "wb") as f:
             f.write(response.content)
 
         self.cursor.execute(
@@ -67,4 +66,4 @@ class Cache(object):
             (key, filename)
         )
         self.database.commit()
-        return filename
+        return filepath
