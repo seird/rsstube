@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>515</height>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -516,23 +516,7 @@
           <item row="0" column="0" colspan="2">
            <widget class="QCheckBox" name="cb_preload_thumbnails">
             <property name="text">
-             <string>Preload thumbnails</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_7">
-         <property name="title">
-          <string>Refresh</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_12">
-          <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="cb_refresh_entries">
-            <property name="text">
-             <string>Refresh existing entries</string>
+             <string>Download thumbnails during update</string>
             </property>
            </widget>
           </item>

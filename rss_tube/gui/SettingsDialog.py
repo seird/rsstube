@@ -74,7 +74,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         # Database Tab
         self.cb_preload_thumbnails.setChecked(settings.value("cache/preload_thumbnails", type=bool))
-        self.cb_refresh_entries.setChecked(settings.value("feeds/refresh_entries", type=bool))
         self.spin_entries_to_fetch.setValue(settings.value("MainWindow/entries_to_fetch", type=int))
         self.cb_delete_added.setChecked(settings.value("delete/added_more_than", type=bool))
         self.spin_delete_added.setValue(settings.value("delete/added_more_than_days", type=int))
@@ -155,7 +154,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         # Database Tab
         self.cb_preload_thumbnails.stateChanged.connect(self.settings_changed_callback)
-        self.cb_refresh_entries.stateChanged.connect(self.settings_changed_callback)
         self.spin_entries_to_fetch.valueChanged.connect(self.settings_changed_callback)
         self.cb_delete_added.stateChanged.connect(self.settings_changed_callback)
         self.spin_delete_added.valueChanged.connect(self.settings_changed_callback)
@@ -221,7 +219,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         # Database Tab
         settings.setValue("cache/preload_thumbnails", self.cb_preload_thumbnails.isChecked())
-        settings.setValue("feeds/refresh_entries", self.cb_refresh_entries.isChecked())
         settings.setValue("MainWindow/entries_to_fetch", self.spin_entries_to_fetch.value())
         settings.setValue("delete/added_more_than", self.cb_delete_added.isChecked())
         settings.setValue("delete/added_more_than_days", self.spin_delete_added.value())
