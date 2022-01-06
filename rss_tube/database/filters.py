@@ -87,7 +87,7 @@ class Filters(object):
             INSERT INTO filters
                 (name, enabled, invert, apply_to_group, apply_to, match, action, rules)
             VALUES
-                (:name, :enabled, :apply_to_group, :apply_to, :match, :action, :rules)
+                (:name, :enabled, :invert, :apply_to_group, :apply_to, :match, :action, :rules)
             """,
             f
         )
