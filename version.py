@@ -6,8 +6,8 @@ VSVersionInfo(
   ffi=FixedFileInfo(
     # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
     # Set not needed items to zero 0.
-    filevers=(0, 4, 1, 0),
-    prodvers=(0, 4, 1, 0),
+    filevers=(0, 5, 0, 0),
+    prodvers=(0, 5, 0, 0),
     # Contains a bitmask that specifies the valid bits 'flags'r
     mask=0x3f,
     # Contains a bitmask that specifies the Boolean attributes of the file.
@@ -33,12 +33,12 @@ VSVersionInfo(
         [StringStruct(u'Comments', u'RSS Tube - Youtube RSS Reader Client'),
 	StringStruct(u'CompanyName', u''),
         StringStruct(u'FileDescription', u'Youtube RSS Reader Client'),
-        StringStruct(u'FileVersion', u'0.4.1'),
+        StringStruct(u'FileVersion', u'0.5.0'),
         StringStruct(u'InternalName', u'rss-tube'),
         StringStruct(u'LegalCopyright', u''),
         StringStruct(u'OriginalFilename', u'rsstube.exe'),
         StringStruct(u'ProductName', u'RSS Tube'),
-        StringStruct(u'ProductVersion', u'0.4.1')])
+        StringStruct(u'ProductVersion', u'0.5.0')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [0, 1200])])
   ]
