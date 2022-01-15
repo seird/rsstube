@@ -48,11 +48,13 @@ def set_style(app: QtWidgets.QApplication, style: str = "dark"):
     stylesheet = ""
     with open(get_abs_path(f"rss_tube/gui/themes/{style}/{style}.css"), "r") as f:
         stylesheet += f.read()
-    with open(get_abs_path(f"rss_tube/gui/themes/{style}/MainWindow.css"), "r") as f:
-        s = f.read()
-        s = s.replace("rss_tube", get_abs_path("rss_tube"))
-        stylesheet += s
+    # with open(get_abs_path(f"rss_tube/gui/themes/{style}/MainWindow.css"), "r") as f:
+    #     s = f.read()
+    #     s = s.replace("rss_tube", get_abs_path("rss_tube"))
+    #     stylesheet += s
     with open(get_abs_path(f"rss_tube/gui/themes/{style}/EntryYoutube.css"), "r") as f:
+        stylesheet += f.read()
+    with open(get_abs_path(f"rss_tube/gui/themes/{style}/EntrySoundcloud.css"), "r") as f:
         stylesheet += f.read()
 
     app.setPalette(styles[style].get_palette())
@@ -62,22 +64,10 @@ def set_style(app: QtWidgets.QApplication, style: str = "dark"):
 
 
 def set_icons(w: QtWidgets.QMainWindow, style: str = "dark"):
-    w.actionQuit.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/quit.png")))
-    w.actionNewFeed.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed_new.png")))
-    w.actionNewCategory.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category_new.png")))
-    w.actionImportChannels.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/import.png")))
-    w.actionExportChannels.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/export.png")))
-    w.actionSettings.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/settings.png")))
-    w.actionCheck_for_updates.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/check_for_updates.png")))
-    w.actionAbout.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/about.png")))
-    w.actionShortcuts.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/shortcuts.png")))
-
-    w.tray.actionQuit.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/quit.png")))
-    w.tray.actionNewFeed.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed_new.png")))
-    w.tray.actionNewCategory.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category_new.png")))
-    w.tray.actionUpdate.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/update_feeds.png")))
-    w.tray.actionSettings.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/settings.png")))
-    w.tray.actionToggleWindow.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/toggle.png")))
+    w.pb_new_category.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category_new.svg")))
+    w.pb_new_feed.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed_new.svg")))
+    w.pb_update_feeds.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/update_feeds.svg")))
+    w.pb_settings.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/settings.svg")))
 
     w.entry_widgets["youtube"].pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/audio.png")))
 

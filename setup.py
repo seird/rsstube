@@ -106,8 +106,8 @@ setup(
     # py_modules=['rss_tube'],
     packages=find_packages(),
     package_data={
-        'rss_tube.gui.themes.dark': ['*.css', '*.png'],
-        'rss_tube.gui.themes.light': ['*.css', '*.png']
+        'rss_tube.gui.themes.dark': ['*.css', '*.svg', '*.png'],
+        'rss_tube.gui.themes.light': ['*.css', '*.svg', '*.png']
     },
 
     entry_points={
