@@ -295,7 +295,7 @@ class Feeds(object):
             """
             SELECT * FROM entries 
             WHERE feed_id = ? AND deleted=0
-            ORDER BY added_on DESC
+            ORDER BY published DESC
             LIMIT ?
             """,
             (feed_id, limit)
@@ -313,7 +313,7 @@ class Feeds(object):
                 feed_id IN (
                     SELECT id FROM feeds WHERE category = ?
                 ) AND deleted=0
-            ORDER BY added_on DESC
+            ORDER BY published DESC
             LIMIT ?
             """,
             (category, limit)
