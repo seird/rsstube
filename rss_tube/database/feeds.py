@@ -66,7 +66,9 @@ class Feeds(object):
             description    TEXT,
             rating_average REAL,
             rating_count   INTEGER,
-            views          INTEGER)
+            views          INTEGER,
+            duration       TEXT,
+            link_raw       TEXT)
         """)
 
         self.database.commit()
@@ -127,6 +129,9 @@ class Feeds(object):
             else:
                 # https://www.youtube.com/feeds/videos.xml?channel_id=CHANNELID
                 channel_url = "https://www.youtube.com/channel/" + url.split(".xml?channel_id=")[-1]
+        elif "feeds.soundcloud.com" in url:
+            feed_type = "soundcloud"
+            channel_url = url # TODO "https://feeds.soundcloud.com/users/soundcloud:users:<id>/sounds.rss" to "soundcloud.com/<user>" ?
         else:
             return None
 
@@ -447,11 +452,11 @@ class Feeds(object):
                     INSERT INTO entries
                         (feed_id, viewed, deleted, added_on, refreshed_on, author, 
                          title, link, entry_id, published, updated, thumbnail,
-                         description, rating_average, rating_count, views)
+                         description, rating_average, rating_count, views, duration, link_raw)
                     VALUES
                         (:feed_id, :viewed, :deleted, datetime('now', 'localtime'), datetime('now', 'localtime'),
                          :author, :title, :link, :entry_id, :published, :updated, :thumbnail,
-                         :description, :rating_average, :rating_count, :views)
+                         :description, :rating_average, :rating_count, :views, :duration, :link_raw)
                     """,
                     entry
                 )
@@ -462,7 +467,7 @@ class Feeds(object):
                     UPDATE entries SET
                         title=:title, link=:link, published=:published, updated=:updated,
                         thumbnail=:thumbnail, description=:description, rating_average=:rating_average,
-                        rating_count=:rating_count, views=:views
+                        rating_count=:rating_count, views=:views, duration=:duration, link_raw=:link_raw
                     WHERE entry_id=:entry_id AND deleted=0
                     """,
                     entry

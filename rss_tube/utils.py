@@ -81,24 +81,7 @@ def set_icons(w: QtWidgets.QMainWindow, style: str = "dark"):
 
     w.entry_widgets["youtube"].pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/audio.png")))
 
-    set_tree_icons(w.tree_feeds, style)
-
-
-def set_tree_icons(w: QtWidgets.QTreeWidget, style: str = "dark"):
-    show_category_icon = settings.value("MainWindow/category_icon/show", type=bool)
-    show_feed_icon = settings.value("MainWindow/feed_icon/show", type=bool)
-    for i in range(w.topLevelItemCount()):
-        item = w.topLevelItem(i)
-
-        if show_category_icon:
-            item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category.png")))
-        
-        if not show_feed_icon:
-            continue
-        
-        for j in range(item.childCount()):
-            item.child(j).setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed.png")))
-
+    w.tree_feeds.set_tree_icons()
 
 def get_about() -> str:
     about = dedent(f"""

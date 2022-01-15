@@ -7,7 +7,6 @@ import requests
 
 from PyQt6 import  QtCore
 
-from rss_tube.utils import get_abs_path
 from .database import Database
 
 logger = logging.getLogger("logger")

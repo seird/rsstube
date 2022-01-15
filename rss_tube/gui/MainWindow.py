@@ -18,7 +18,7 @@ from .AboutDialog import AboutDialog
 from .RenameDialog import RenameCategoryDialog, RenameChannelDialog
 from .ShortcutDialog import ShortcutsDialog
 from .StatisticsDialog import StatisticsDialog
-from .EntryYoutube import EntryYoutube
+from .EntryWidgets import EntryYoutube, EntrySoundcloud
 from .MyTableWidget import MyTableWidget
 from .MyTreeWidget import MyTreeWidget
 from .NewFeedDialog import NewFeedDialog
@@ -39,10 +39,11 @@ else:
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def __init__(self, app: QtWidgets.QApplication):
         super(MainWindow, self).__init__()
-        self.setupUi(self)
         self.app = app
 
     def init_ui(self):
+        self.setupUi(self)
+
         self.setWindowTitle(__title__)
 
         set_style(self.app, style=settings.value("theme", type=str))
@@ -85,10 +86,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         self.entry_widgets = {
             # "": None,  # default entry TODO
-            "youtube": EntryYoutube(self)
+            "youtube": EntryYoutube(self),
+            "soundcloud": EntrySoundcloud(self),
         }
         for feed_type in self.entry_widgets:
             self.layout_entry.insertWidget(0, self.entry_widgets[feed_type])
+            self.entry_widgets[feed_type].hide()
 
         # self.resize(self.minimumSizeHint())
         set_icons(self, style=settings.value("theme", type=str))
@@ -234,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         if feed_url and category:
             self.add_feed_task = AddFeedTask(feed_url, category, feed_name)
             self.add_feed_task.added.connect(lambda feed_id: self.tree_feeds.add_feed(feed_id))
-            self.add_feed_task.start()
+            self.add_feed_task.run()
 
     def new_category_callback(self):
         category, ok = QtWidgets.QInputDialog.getText(self, "Add new a category", "New category:" + " " * 96)
@@ -318,8 +321,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         entry_to_display.display_entry(entry)
         for entry_type in self.entry_widgets:
             if feed_type != entry_type:
-                if self.entry_widgets[feed_type]:
-                    self.entry_widgets[feed_type].hide()
+                self.entry_widgets[entry_type].hide()
         entry_to_display.show()
 
     def display_previous_entry(self):
@@ -444,7 +446,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         if event.type() == QtCore.QEvent.Type.WindowStateChange:
             if settings.value("tray/show", type=bool) and settings.value("tray/minimize", type=bool):
                 if self.windowState() & QtCore.Qt.WindowState.WindowMinimized:
-                    self.window_state_to_restore = self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized
+                    self.window_state_to_restore = self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowActive
                     self.hide()
                 else:
                     # Restore tray icon in case of new entries

@@ -3,33 +3,16 @@ import os
 from datetime import datetime
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
-from rss_tube.download import Downloader
-from rss_tube.player import Player
 from rss_tube.tasks import SaveThumbnailTask
 from rss_tube.utils import convert_links, get_abs_path, load_pixmap
 
-from .designs.widget_youtube import Ui_Form
+from .entry_actions import PlayAudioOnlyAction, PlayResolutionAction, SaveThumbnailAction
+from .BaseEntry import BaseEntry
+from ..designs.widget_youtube import Ui_Form
 
 logger = logging.getLogger("logger")
 settings = Settings()
-
-
-class PlayResolutionAction(QtGui.QAction):
-    def __init__(self, resolution: str):
-        self.resolution = resolution
-        super(PlayResolutionAction, self).__init__(resolution)
-
-
-class PlayAudioOnlyAction(PlayResolutionAction):
-    def __init__(self):
-        super(PlayAudioOnlyAction, self).__init__("Audio only")
-
-
-class SaveThumbnailAction(QtGui.QAction):
-    def __init__(self):
-        super(SaveThumbnailAction, self).__init__("Save thumbnail")
 
 
 class ThumbnailContextMenu(QtWidgets.QMenu):
@@ -60,23 +43,13 @@ class ThumbnailContextMenu(QtWidgets.QMenu):
         self.addAction(self.action_save_thumbnail)
 
 
-class EntryYoutube(QtWidgets.QWidget, Ui_Form):
+class EntryYoutube(BaseEntry, Ui_Form):
     def __init__(self, parent):
-        super(EntryYoutube, self).__init__()
+        super(EntryYoutube, self).__init__(parent)
         self.setupUi(self)
 
-        self.url = ""
-        self.video_url = ""
-        self.thumbnail_url = ""
-        self.entry_id = ""
-
-        self.parent = parent
-        self.player = Player()
-        self.download = Downloader()
-        self.feeds: Feeds = self.parent.feeds
-
-        self.label_thumbnail.setToolTip("Click to play with external player")
         self.show_description(settings.value("youtube/show_description", type=bool))
+        self.label_thumbnail.setToolTip("Click to play with external player")
 
         self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))
 
@@ -99,18 +72,6 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
         self.label_meta_views.setText(f"{entry['views']:,}")
         self.label_description.setHtml(convert_links(entry["description"]).replace("\n", "<br>"))
 
-    def show_description(self, show: bool = True):
-        self.label_description.setHidden(not show)
-
-    def play_video(self, play_quality_once: str = ""):
-        self.player.play(self.video_url, play_quality_once=play_quality_once)
-
-    def thumbnail_mouse_button(self, event: QtGui.QMouseEvent):
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            self.player.play(self.video_url)
-        else:
-            super(EntryYoutube, self).mousePressEvent(event)
-
     def thumbnail_context(self, event: QtGui.QContextMenuEvent):
         context_menu = ThumbnailContextMenu(self)
         action = context_menu.exec(self.label_thumbnail.mapToGlobal(event.pos()))
@@ -125,30 +86,9 @@ class EntryYoutube(QtWidgets.QWidget, Ui_Form):
                 self.save_thumbnail_task.start()
                 settings.setValue("EntryYoutube/save_thumbnail_location", os.path.dirname(fname))
 
-    def play_callback(self):
-        self.player.play(self.video_url)
-
-    def play_audio_callback(self):
-        self.player.play(self.video_url, play_quality_once=PlayAudioOnlyAction().resolution)
-
-    def clear_player_status(self):
-        if "Playing" not in self.label_player_status.text():
-            self.label_player_status.clear()
-
-    def player_stopped_callback(self):
-        self.label_player_status.setText("Stopped")
-        QtCore.QTimer.singleShot(5000, self.clear_player_status)
-
-    def player_failed_callback(self, error_code: int):
-        self.label_player_status.setText(f"Failed ({error_code})")
-        QtCore.QTimer.singleShot(5000, self.clear_player_status)
-
     def link_callbacks(self):
         self.label_thumbnail.mousePressEvent = self.thumbnail_mouse_button
         self.label_thumbnail.contextMenuEvent = self.thumbnail_context
-        self.pb_play.clicked.connect(self.play_callback)
-        self.pb_audio.clicked.connect(self.play_audio_callback)
 
-        self.player.started.connect(lambda: self.label_player_status.setText("Playing..."))
-        self.player.stopped.connect(self.player_stopped_callback)
-        self.player.failed.connect(self.player_failed_callback)
+        self.pb_play.clicked.connect(self.play)
+        self.pb_audio.clicked.connect(self.play_audio)

@@ -3,8 +3,8 @@ from typing import Iterable, List, Union
 
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import unviewed_color
-from rss_tube.utils import set_tree_icons
 from rss_tube.tasks import FeedUpdateTask
+from rss_tube.utils import get_abs_path
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .MyTableWidget import MyTableWidget
 
@@ -12,9 +12,9 @@ logger = logging.getLogger("logger")
 settings = Settings()
 
 
-class TreeWidgetItemFeedContextMenu(QtWidgets.QMenu):
+class TreeWidgetItemYoutubeContextMenu(QtWidgets.QMenu):
     def __init__(self, name: str):
-        super(TreeWidgetItemFeedContextMenu, self).__init__()
+        super(TreeWidgetItemYoutubeContextMenu, self).__init__()
 
         action_name = self.addAction(name)
         action_name.setDisabled(True)
@@ -25,6 +25,23 @@ class TreeWidgetItemFeedContextMenu(QtWidgets.QMenu):
         self.addSeparator()
         self.action_open_url = self.addAction("Open Channel URL")
         self.action_open_videos_url = self.addAction("Open Channel Videos URL")
+        self.addSeparator()
+        self.action_delete = self.addAction("Delete Feed")
+        self.action_delete_entries = self.addAction("Delete Entries")
+
+
+class TreeWidgetItemSoundcloudContextMenu(QtWidgets.QMenu):
+    def __init__(self, name: str):
+        super(TreeWidgetItemSoundcloudContextMenu, self).__init__()
+
+        action_name = self.addAction(name)
+        action_name.setDisabled(True)
+        self.addSeparator()
+        self.action_update = self.addAction("Update")
+        self.action_mark_viewed = self.addAction("Mark Viewed")
+        self.action_rename = self.addAction("Rename")
+        self.addSeparator()
+        self.action_open_url = self.addAction("Open Feed URL")
         self.addSeparator()
         self.action_delete = self.addAction("Delete Feed")
         self.action_delete_entries = self.addAction("Delete Entries")
@@ -111,6 +128,7 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
         self.feed_id = feed_id
         self.parent = parent
         self.set_font()
+        self.context_menu = None
 
     def set_font(self):
         feed_viewed = self.parent.feeds.get_feed_viewed(self.feed_id)
@@ -130,11 +148,13 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
         return self.parent.feeds.get_entries(self.feed_id)
 
     def context_callback(self, pos: QtCore.QPoint):
-        context_menu = TreeWidgetItemFeedContextMenu(self.text(0))
+        if not self.context_menu:
+            return
+        context_menu = self.context_menu(self.text(0))
         action = context_menu.exec(pos)
         if action is None:
             return
-        if action == context_menu.action_delete:
+        if action == getattr(context_menu, "action_delete"):
             response = QtWidgets.QMessageBox.warning(
                 self.parent,
                 "Are you sure?",
@@ -147,13 +167,13 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
                 self.parent.feeds.delete_feed(self.feed_id)
                 self.parent.update_viewed()
                 logger.debug(f"Deleted Feed {self.feed_id}")
-        elif action == context_menu.action_mark_viewed:
+        elif action == getattr(context_menu, "action_mark_viewed"):
             self.parent.feeds.set_viewed(feed_id=self.feed_id)
             self.parent.update_viewed()
             logger.debug(f"Marked feed {self.feed_id} status as viewed")
-        elif action == context_menu.action_rename:
+        elif action == getattr(context_menu, "action_rename"):
             self.parent.mainwindow.change_channel_name(self.text(0), self.feed_id)
-        elif action == context_menu.action_delete_entries:
+        elif action == getattr(context_menu, "action_delete_entries"):
             response = QtWidgets.QMessageBox.warning(
                 self.parent,
                 "Are you sure?",
@@ -165,18 +185,28 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
                 self.parent.feeds.delete_entries_in_feed(self.feed_id)
                 logger.debug(f"Deleted all entries in feed {self.feed_id}")
                 self.parent.table_entries.clear_entries()
-        elif action == context_menu.action_update:
+        elif action == getattr(context_menu, "action_update"):
             self.feed_update_task = FeedUpdateTask(self.feed_id)
             self.feed_update_task.finished.connect(lambda: self.parent.mainwindow.update_feeds_finished(enable_buttons=False))
             self.feed_update_task.start()
-        elif action == context_menu.action_open_url:
+        elif action == getattr(context_menu, "action_open_url"):
             channel_url = self.parent.feeds.get_feed(self.feed_id)["channel_url"]
             QtGui.QDesktopServices.openUrl(QtCore.QUrl(channel_url))
-        elif action == context_menu.action_open_videos_url:
+        elif action == getattr(context_menu, "action_open_videos_url"):
             channel_url = self.parent.feeds.get_feed(self.feed_id)["channel_url"]
             QtGui.QDesktopServices.openUrl(QtCore.QUrl(channel_url + "/videos"))
 
-        # self.parent.table_entries.clearContents()
+
+class TreeWidgetItemYoutube(TreeWidgetItemFeed):
+    def __init__(self, parent: QtWidgets.QTreeWidget, text: Iterable[str], feed_id: int):
+        super(TreeWidgetItemYoutube, self).__init__(parent, text, feed_id)
+        self.context_menu = TreeWidgetItemYoutubeContextMenu    
+
+
+class TreeWidgetItemSoundcloud(TreeWidgetItemFeed):
+    def __init__(self, parent: QtWidgets.QTreeWidget, text: Iterable[str], feed_id: int):
+        super(TreeWidgetItemSoundcloud, self).__init__(parent, text, feed_id)
+        self.context_menu = TreeWidgetItemSoundcloudContextMenu   
 
 
 class MyTreeWidget(QtWidgets.QTreeWidget):
@@ -211,7 +241,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
             self.add_category(category)
         self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
-        set_tree_icons(self, settings.value("theme", type=str))
+        self.set_tree_icons()
 
     def add_category(self, category: str):
         """
@@ -219,14 +249,19 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         """
         twi = TreeWidgetItemCategory(self, [category], category)
         for feed in self.feeds.get_feeds_in_category(category):
-            child_item = TreeWidgetItemFeed(self, [feed["author"]], feed["id"])
+            if feed["type"] == "youtube":
+                child_item = TreeWidgetItemYoutube(self, [feed["author"]], feed["id"])
+            elif feed["type"] == "soundcloud":
+                child_item = TreeWidgetItemSoundcloud(self, [feed["author"]], feed["id"])
+            else:
+                continue 
             twi.addChild(child_item)
         category_expanded = settings.value(f"MyTreeWidget/{category}_expanded", 1, type=bool)
         self.addTopLevelItem(twi)
         twi.setExpanded(category_expanded)
         self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
-        set_tree_icons(self, settings.value("theme", type=str))
+        self.set_tree_icons()
 
     def add_feed(self, feed_id: int):
         """
@@ -244,12 +279,17 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
             category_item = category_items[0]
 
         feed = self.feeds.get_feed(feed_id)
-        child_item = TreeWidgetItemFeed(self, [feed["author"]], feed["id"])
+        if feed["type"] == "youtube":
+            child_item = TreeWidgetItemYoutube(self, [feed["author"]], feed["id"])
+        elif feed["type"] == "soundcloud":
+            child_item = TreeWidgetItemSoundcloud(self, [feed["author"]], feed["id"])
+        else:
+            return
         category_item.addChild(child_item)
         self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.update_viewed()
 
-        set_tree_icons(self, settings.value("theme", type=str))
+        self.set_tree_icons()
 
     def remove_category(self, category: str):
         category_items = self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly)
@@ -276,6 +316,30 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         feed_item_to_remove = feed_items[0]
         category_item = category_items[0]
         category_item.removeChild(feed_item_to_remove)
+
+    def set_tree_icons(self):
+        style = settings.value("theme", type=str)
+        show_category_icon = settings.value("MainWindow/category_icon/show", type=bool)
+        show_feed_icon = settings.value("MainWindow/feed_icon/show", type=bool)
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+
+            if show_category_icon:
+                item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category.svg")))
+            
+            if not show_feed_icon:
+                continue
+            
+            for j in range(item.childCount()):
+                child = item.child(j)
+                if isinstance(child, TreeWidgetItemYoutube):
+                    icon = "youtube"
+                elif isinstance(child, TreeWidgetItemSoundcloud):
+                    icon = "soundcloud"
+                else:
+                    continue
+                child.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/{icon}.svg")))
+
 
     def table_entry_clicked_callback(self, entry_id: int):
         """ Update viewed status of tree entries """
