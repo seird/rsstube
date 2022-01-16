@@ -44,8 +44,12 @@ class EntrySoundcloud(BaseEntry, Ui_Form):
         self.video_url = entry["link_raw"]
         self.url = entry["link"]
         self.entry_id = entry["entry_id"]
+        self._id = entry["id"]
 
         self.label_title.setText(entry["title"])
+
+        self.starred = entry["star"]
+        self.set_star(entry["star"])
 
         self.thumbnail_url = entry["thumbnail"]
         image_bytes = self.download.get_bytes(entry["thumbnail"])
@@ -75,3 +79,5 @@ class EntrySoundcloud(BaseEntry, Ui_Form):
         self.label_thumbnail.contextMenuEvent = self.thumbnail_context
 
         self.pb_play.clicked.connect(self.play)
+
+        self.pb_star.clicked.connect(self.star_toggled_callback)

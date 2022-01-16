@@ -6,6 +6,7 @@ from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
 from rss_tube.player import Player
+from rss_tube.utils import get_abs_path
 
 from .entry_actions import PlayAudioOnlyAction
 
@@ -22,13 +23,25 @@ class BaseEntry(QtWidgets.QWidget):
         self.url = ""
         self.thumbnail_url = ""
         self.entry_id = ""
+        self._id = None
 
         self.parent = parent
         self.player = Player()
         self.download = Downloader()
         self.feeds: Feeds = self.parent.feeds
 
+        self.starred = False
+
         self._link_callbacks()
+
+    def set_star(self, stard: bool = False):
+        star_img = "star.svg" if stard else "unstarred.svg"
+        self.pb_star.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/{star_img}")))
+
+    def star_toggled_callback(self):
+        self.starred = not self.starred
+        self.set_star(self.starred)
+        self.feeds.mark_star(self._id, self.starred)
 
     @abc.abstractmethod
     def display_entry(self, entry: dict):

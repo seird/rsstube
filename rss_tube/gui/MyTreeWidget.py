@@ -61,6 +61,19 @@ class TreeWidgetItemCategoryContextMenu(QtWidgets.QMenu):
         self.action_delete_entries = self.addAction("Delete Entries")
 
 
+class TreeWidgetItemStarredContextMenu(QtWidgets.QMenu):
+    def __init__(self, name: str):
+        super(TreeWidgetItemStarredContextMenu, self).__init__()
+
+        action_name = self.addAction(name)
+        action_name.setDisabled(True)
+        self.addSeparator()
+        self.action_mark_viewed = self.addAction("Mark Viewed")
+        self.action_clear = self.addAction("Clear Starred Entries")
+        self.addSeparator()
+        self.action_delete_entries = self.addAction("Delete Entries")
+
+
 class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent: QtWidgets.QTreeWidget, text: Iterable[str], category: str):
         super(TreeWidgetItemCategory, self).__init__(text)
@@ -209,6 +222,64 @@ class TreeWidgetItemSoundcloud(TreeWidgetItemFeed):
         self.context_menu = TreeWidgetItemSoundcloudContextMenu   
 
 
+class TreeWidgetItemStarred(QtWidgets.QTreeWidgetItem):
+    def __init__(self, parent: QtWidgets.QTreeWidget):
+        super(TreeWidgetItemStarred, self).__init__(["Starred"])
+        self.parent = parent
+        self.set_font()
+        self.context_menu = None
+
+    def set_font(self):
+        stars_viewed = self.parent.feeds.get_stars_viewed()
+        font = QtGui.QFont()
+        font.setBold(not stars_viewed)
+        font.setPointSize(8 if stars_viewed else 10)
+        self.setFont(0, font)
+        self.setForeground(
+            0,
+            QtGui.QBrush(QtGui.QColor(
+                self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if stars_viewed \
+                else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
+            ))
+        )
+
+    def get_entries(self):
+        return self.parent.feeds.get_stars()
+
+    def context_callback(self, pos: QtCore.QPoint):
+        context_menu = TreeWidgetItemStarredContextMenu(self.text(0))
+        action = context_menu.exec(pos)
+        if action is None:
+            return
+        if action == context_menu.action_mark_viewed:
+            self.parent.feeds.set_viewed_stars()
+            self.parent.update_viewed()
+        elif action == context_menu.action_clear:
+            response = QtWidgets.QMessageBox.warning(
+                self.parent,
+                "Are you sure?",
+                f"Clear all stars",
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
+            )
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
+                self.parent.feeds.clear_stars()
+                self.parent.table_entries.clear_entries()
+        elif action == context_menu.action_delete_entries:
+            response = QtWidgets.QMessageBox.warning(
+                self.parent,
+                "Are you sure?",
+                f"Delete all star entries",
+                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+                defaultButton=QtWidgets.QMessageBox.StandardButton.Cancel
+            )
+            if response == QtWidgets.QMessageBox.StandardButton.Ok:
+                self.parent.feeds.delete_stars()
+                self.parent.table_entries.clear_entries()
+        elif action == context_menu.action_rename:
+            self.parent.mainwindow.change_category_name(self.category)
+
+
 class MyTreeWidget(QtWidgets.QTreeWidget):
     def __init__(self, mainwindow):
         super(MyTreeWidget, self).__init__()
@@ -240,6 +311,8 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         for category in categories:
             self.add_category(category)
         self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
+
+        self.insertTopLevelItem(0, TreeWidgetItemStarred(self))
 
         self.set_tree_icons()
 
@@ -325,7 +398,10 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
             item = self.topLevelItem(i)
 
             if show_category_icon:
-                item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category.svg")))
+                if isinstance(item, TreeWidgetItemCategory):
+                    item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category.svg")))
+                elif isinstance(item, TreeWidgetItemStarred):
+                    item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/star.svg")))
             
             if not show_feed_icon:
                 continue
@@ -354,11 +430,14 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         for item_category in self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly):
             item_category.set_font()
 
+        for item_category in self.findItems("Starred", QtCore.Qt.MatchFlag.MatchExactly):
+            item_category.set_font()
+
         for item_feed in self.findItems(feed["author"], QtCore.Qt.MatchFlag.MatchExactly | QtCore.Qt.MatchFlag.MatchRecursive):
             item_feed.set_font()
 
     def redisplay_selected(self):
-        selected_items: List[Union[TreeWidgetItemFeed, TreeWidgetItemCategory]] = self.selectedItems()
+        selected_items: List[Union[TreeWidgetItemFeed, TreeWidgetItemCategory, TreeWidgetItemStarred]] = self.selectedItems()
         if not selected_items:
             logger.debug("MyTreeWidget: redisplay_selected: no category or feed selected.")
             return
@@ -371,6 +450,8 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         elif isinstance(selected_item, TreeWidgetItemCategory):
             entries = self.feeds.get_entries_category(selected_item.category)
             logger.debug(f"MyTreeWidget: redisplay_selected: category {selected_item.category} selected")
+        elif isinstance(selected_item, TreeWidgetItemStarred):
+            entries = self.feeds.get_stars()
         else:
             return
 

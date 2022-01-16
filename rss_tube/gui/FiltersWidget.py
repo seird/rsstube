@@ -51,7 +51,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         self.combo_apply_to.hide()
 
         # Action
-        self.combo_action.addItems(["Mark viewed", "Delete"])
+        self.combo_action.addItems([action.value for action in FilterAction if action is not FilterAction.Nop])
 
         action_selected = settings.value("filter_edit_dialog/action", "Delete", type=str)
         if self.combo_action.findText(action_selected) >= 0:
@@ -157,7 +157,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
                 "apply_to_group": self.combo_apply_to_group.currentText(),
                 "apply_to": self.combo_apply_to.currentText() if self.combo_apply_to.isVisible() else "",
                 "match": "any" if self.cb_match_any.isChecked() else "all" if self.cb_match_all.isChecked() else "",
-                "action": FilterAction.Delete if action_text == "Delete" else FilterAction.MarkViewed if action_text == "Mark viewed" else FilterAction.Nop,
+                "action": FilterAction(action_text),
                 "enabled": self.cb_enabled.isChecked(),
                 "invert": self.cb_invert.isChecked()
             })
@@ -207,11 +207,7 @@ class EditFilterDialog(NewFilterDialog):
         self.combo_apply_to.setCurrentText(f["apply_to"])
 
         # Action
-        action = FilterAction(f["action"])
-        if action == FilterAction.Delete:
-            self.combo_action.setCurrentText("Delete")
-        elif action == FilterAction.MarkViewed:
-            self.combo_action.setCurrentText("Mark viewed")
+        self.combo_action.setCurrentText(f["action"].value)
 
         # Match
         if f["match"] == "any":

@@ -59,8 +59,12 @@ class EntryYoutube(BaseEntry, Ui_Form):
         self.video_url = entry["link"]
         self.url = self.video_url
         self.entry_id = entry["entry_id"]
+        self._id = entry["id"]
 
         self.label_title.setText(entry["title"])
+
+        self.starred = entry["star"]
+        self.set_star(entry["star"])
 
         self.thumbnail_url = entry["thumbnail"]
         image_bytes = self.download.get_bytes(entry["thumbnail"])
@@ -92,3 +96,5 @@ class EntryYoutube(BaseEntry, Ui_Form):
 
         self.pb_play.clicked.connect(self.play)
         self.pb_audio.clicked.connect(self.play_audio)
+
+        self.pb_star.clicked.connect(self.star_toggled_callback)

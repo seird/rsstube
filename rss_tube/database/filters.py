@@ -16,8 +16,10 @@ settings = Settings()
 
 class FilterAction(Enum):
     Nop = 0
-    Delete = 1
-    MarkViewed = 2
+    Delete = "Delete"
+    MarkViewed = "Mark Viewed"
+    Star = "Star"
+    StarAndMarkViewed = "Star and Mark Viewed"
 
 
 class Filter(dict):
@@ -31,12 +33,20 @@ class Filter(dict):
             "apply_to_group": apply_to_group,
             "apply_to": apply_to,
             "match": match,
-            "action": action.value if isinstance(action, FilterAction) else action,
-            "rules": pickle.dumps(rules)
+            "action": pickle.loads(action) if isinstance(action, bytes) else action,
+            "rules": pickle.loads(rules) if isinstance(rules, bytes) else rules
         })
 
     def get_rules_list(self) -> List[Dict]:
-        return pickle.loads(self.get("rules"))
+        return self.get("rules")
+
+    def blobbed(self) -> dict:
+        c = dict(self)
+        c.update({
+            "action": pickle.dumps(c["action"]),
+            "rules": pickle.dumps(c["rules"])
+        })
+        return c
 
     def __str__(self):
         text = ""
@@ -46,7 +56,7 @@ class Filter(dict):
                 for rule in self.get_rules_list():
                     text += f" - {rule['target']} {rule['type']} {rule['text']}<br>"
             elif key == "action":
-                text += f"<b>{key}</b>: {FilterAction(value).name}<br>"
+                text += f"<b>{key}</b>: {self['action'].value}<br>"
             else:
                 text += f"<b>{key}</b>: {value}<br>"
         return text
@@ -67,7 +77,7 @@ class Filters(object):
             apply_to_group TEXT,
             apply_to       TEXT,
             match          TEXT,
-            action         INT,
+            action         BLOB,
             rules          BLOB)
         """)
 
@@ -89,7 +99,7 @@ class Filters(object):
             VALUES
                 (:name, :enabled, :invert, :apply_to_group, :apply_to, :match, :action, :rules)
             """,
-            f
+            f.blobbed()
         )
 
         f["id"] = self.cursor.lastrowid
@@ -122,7 +132,7 @@ class Filters(object):
             WHERE
                 id=:id
             """,
-            f
+            f.blobbed()
         )
         self.database.commit()
 
@@ -137,7 +147,7 @@ class Filters(object):
                 r["apply_to"],
                 r["match"],
                 r["action"],
-                pickle.loads(r["rules"]),
+                r["rules"],
                 filter_id=r["id"]
             )
         else:
@@ -158,7 +168,7 @@ class Filters(object):
                 r["apply_to"],
                 r["match"],
                 r["action"],
-                pickle.loads(r["rules"]),
+                r["rules"],
                 filter_id=r["id"]
             ))
         return filters
@@ -179,7 +189,7 @@ class Filters(object):
                 r["apply_to"],
                 r["match"],
                 r["action"],
-                pickle.loads(r["rules"]),
+                r["rules"],
                 filter_id=r["id"]
             ))
         return filters

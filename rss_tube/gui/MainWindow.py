@@ -79,11 +79,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         self.restore_window_state()
 
-        self.link_callbacks()
-        self.tasks_thread.start()
-        self.init_shortcuts()
-        self.set_shortcuts()
-
         self.entry_widgets = {
             # "": None,  # default entry TODO
             "youtube": EntryYoutube(self),
@@ -92,6 +87,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         for feed_type in self.entry_widgets:
             self.layout_entry.insertWidget(0, self.entry_widgets[feed_type])
             self.entry_widgets[feed_type].hide()
+
+        self.link_callbacks()
+        self.tasks_thread.start()
+        self.init_shortcuts()
+        self.set_shortcuts()
 
         # self.resize(self.minimumSizeHint())
         set_icons(self, style=settings.value("theme", type=str))

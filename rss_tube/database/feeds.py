@@ -68,7 +68,8 @@ class Feeds(object):
             rating_count   INTEGER,
             views          INTEGER,
             duration       TEXT,
-            link_raw       TEXT)
+            link_raw       TEXT,
+            star           INTEGER)
         """)
 
         self.database.commit()
@@ -229,6 +230,18 @@ class Feeds(object):
             (feed_id,)
         ).fetchone()["count"] == 0
 
+    def get_stars_viewed(self) -> bool:
+        """
+        Get the viewed status of all stars.
+        Return True if all stard entries are viewed.
+        """
+        return self.cursor.execute(
+            """
+            SELECT COUNT(*) as count FROM entries
+            WHERE star=1 AND viewed=0 AND deleted=0
+            """
+        ).fetchone()["count"] == 0
+
     def get_categories(self) -> List[str]:
         return [x["category"] for x in self.cursor.execute("SELECT category FROM categories").fetchall()]
 
@@ -329,6 +342,21 @@ class Feeds(object):
         Get a single entry in a feed
         """
         return self.cursor.execute("SELECT * FROM entries WHERE id = ? AND deleted=0", (entry_id,)).fetchone()
+
+    def get_stars(self) -> List:
+        """
+        Get all entries that are marked as star
+        """
+        limit = settings.value("MainWindow/entries_to_fetch", type=int)
+        return self.cursor.execute(
+            """
+            SELECT * FROM entries
+            WHERE star=1 AND deleted=0
+            ORDER BY published DESC
+            LIMIT ?
+            """,
+            (limit,)
+        ).fetchall()
 
     def set_entry_viewed(self, entry_id: int, viewed: bool = True):
         """
@@ -441,33 +469,39 @@ class Feeds(object):
                     "feed_id": feed_id,
                     "deleted": 0,
                     "viewed": 0,
+                    "star": 0,
                 })
                 if action == FilterAction.Delete:
                     entry.update({"deleted": 1})
                 elif action == FilterAction.MarkViewed:
                     entry.update({"viewed": 1})
+                elif action == FilterAction.Star:
+                    entry.update({"star": 1})
+                elif action == FilterAction.StarAndMarkViewed:
+                    entry.update({"viewed": 1, "star": 1})
 
                 self.cursor.execute(
                     """
                     INSERT INTO entries
                         (feed_id, viewed, deleted, added_on, refreshed_on, author, 
                          title, link, entry_id, published, updated, thumbnail,
-                         description, rating_average, rating_count, views, duration, link_raw)
+                         description, rating_average, rating_count, views, duration, link_raw, star)
                     VALUES
                         (:feed_id, :viewed, :deleted, datetime('now', 'localtime'), datetime('now', 'localtime'),
                          :author, :title, :link, :entry_id, :published, :updated, :thumbnail,
-                         :description, :rating_average, :rating_count, :views, :duration, :link_raw)
+                         :description, :rating_average, :rating_count, :views, :duration, :link_raw, :star)
                     """,
                     entry
                 )
             elif refresh_entries:
                 # Entry already exists, update the entries
+                entry['star'] = entry_fetched['star']
                 self.cursor.execute(
                     """
                     UPDATE entries SET
                         title=:title, link=:link, published=:published, updated=:updated,
                         thumbnail=:thumbnail, description=:description, rating_average=:rating_average,
-                        rating_count=:rating_count, views=:views, duration=:duration, link_raw=:link_raw
+                        rating_count=:rating_count, views=:views, duration=:duration, link_raw=:link_raw, star=:star
                     WHERE entry_id=:entry_id AND deleted=0
                     """,
                     entry
@@ -506,6 +540,22 @@ class Feeds(object):
                 (category,)
             )
             self.database.commit()
+
+    def set_viewed_stars(self):
+        self.cursor.execute("UPDATE entries SET viewed=1 WHERE star=1")
+        self.database.commit()
+
+    def clear_stars(self):
+        self.cursor.execute("UPDATE entries SET star=0 WHERE star=1")
+        self.database.commit()
+
+    def delete_stars(self):
+        self.cursor.execute("UPDATE entries SET deleted=1 WHERE star=1")
+        self.database.commit()
+
+    def mark_star(self, entry_id: int, star: bool):
+        self.cursor.execute("UPDATE entries SET star=? WHERE id=?", (star, entry_id))
+        self.database.commit()
 
     def __len__(self):
         return self.cursor.execute("SELECT COUNT(*) as count FROM feeds").fetchone()["count"]
