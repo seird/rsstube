@@ -22,6 +22,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.setupUi(self)
 
         self.settings_changed = False
+        self.setting_theme_changed = False
         self.schedule_changed = False
         self.changes_applied = False
 
@@ -107,6 +108,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         elif player == "vlc":
             self.groupBox_player_quality.hide()
 
+    def combo_theme_changed(self):
+        self.setting_theme_changed = True
+        self.settings_changed_callback()
+
     def reset_settings_callback(self):
         response = QtWidgets.QMessageBox.warning(
             self,
@@ -127,7 +132,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply_settings)
 
         # General Tab
-        self.combo_theme.currentTextChanged.connect(self.settings_changed_callback)
+        self.combo_theme.currentTextChanged.connect(self.combo_theme_changed)
 
         self.cb_show_menu.stateChanged.connect(self.settings_changed_callback)
         self.cb_show_description.stateChanged.connect(self.settings_changed_callback)
@@ -172,16 +177,17 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
     def apply_settings(self):
         # General Tab
-        settings.setValue("theme", self.combo_theme.currentText().lower().replace(" ", "_"))
-        set_style(self.mainwindow.app, style=settings.value("theme", "dark", type=str))
-        set_icons(self.mainwindow, style=settings.value("theme", "dark", type=str))
-        # reapply the font of all the items in the tree widget
-        for i in range(self.mainwindow.tree_feeds.topLevelItemCount()):
-            item = self.mainwindow.tree_feeds.topLevelItem(i)
-            item.set_font()
-            for j in range(item.childCount()):
-                child = item.child(j)
-                child.set_font()
+        if self.setting_theme_changed:
+            settings.setValue("theme", self.combo_theme.currentText().lower().replace(" ", "_"))
+            set_style(self.mainwindow.app, style=settings.value("theme", "dark", type=str))
+            set_icons(self.mainwindow, style=settings.value("theme", "dark", type=str))
+            # reapply the font of all the items in the tree widget
+            for i in range(self.mainwindow.tree_feeds.topLevelItemCount()):
+                item = self.mainwindow.tree_feeds.topLevelItem(i)
+                item.set_font()
+                for j in range(item.childCount()):
+                    child = item.child(j)
+                    child.set_font()
 
         settings.setValue("MainWindow/menu/show", self.cb_show_menu.isChecked())
         self.mainwindow.menubar.setVisible(settings.value("MainWindow/menu/show", type=bool))
