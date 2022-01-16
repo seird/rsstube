@@ -128,7 +128,7 @@ class Filters(object):
             """
             UPDATE filters SET
                 name=:name, enabled=:enabled, invert=:invert, apply_to_group=:apply_to_group,
-                apply_to=apply_to, match=:match, action=:action, rules=:rules
+                apply_to=:apply_to, match=:match, action=:action, rules=:rules
             WHERE
                 id=:id
             """,
