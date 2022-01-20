@@ -81,6 +81,12 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
         self.parent = parent
         self.set_font()
 
+    def __lt__(self, other):
+        if isinstance(other, TreeWidgetItemStarred):
+            return False
+        else:
+            return super().__lt__(other)
+
     def set_font(self):
         category_viewed = self.parent.feeds.get_category_viewed(self.category)
         font = QtGui.QFont()
@@ -307,12 +313,12 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         Initialize the tree
         """
         self.clear()
-        categories = self.feeds.get_categories()
-        for category in categories:
-            self.add_category(category)
-        self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
-        self.insertTopLevelItem(0, TreeWidgetItemStarred(self))
+        self.addTopLevelItem(TreeWidgetItemStarred(self))
+        for category in self.feeds.get_categories():
+            self.add_category(category)
+
+        self.sortItems(0, QtCore.Qt.SortOrder.AscendingOrder)
 
         self.set_tree_icons()
 
@@ -460,7 +466,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
     def update_viewed(self):
         # Update the font of all items in the tree widget
         for i in range(self.topLevelItemCount()):
-            category_item: TreeWidgetItemCategory = self.topLevelItem(i)
+            category_item: Union[TreeWidgetItemCategory, TreeWidgetItemStarred] = self.topLevelItem(i)
             category_item.set_font()
             for j in range(category_item.childCount()):
                 feed_item: TreeWidgetItemFeed = category_item.child(j)
@@ -471,7 +477,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
 
     def item_changed_callback(self, select_first_row=True):
         self.mainwindow.line_search.clear()
-        item: Union[TreeWidgetItemFeed, TreeWidgetItemCategory] = self.selectedItems()
+        item: Union[TreeWidgetItemFeed, TreeWidgetItemCategory, TreeWidgetItemStarred] = self.selectedItems()
         if not item:
             return
 
