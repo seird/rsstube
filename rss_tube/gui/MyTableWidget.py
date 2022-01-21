@@ -122,6 +122,11 @@ class MyTableWidget(QtWidgets.QTableWidget):
         # Delete the entry from the database
         self.feeds.delete_entry(item.entry_id)
 
+    def pop_selected_entry(self):
+        if selected_items := self.selectedItems():
+            item: TableWidgetItemEntry = selected_items[0]
+            self.removeRow(self.row(item))
+
     def current_item_changed_callback(self, current: TableWidgetItemEntry, previous: TableWidgetItemEntry):
         if not current:
             return

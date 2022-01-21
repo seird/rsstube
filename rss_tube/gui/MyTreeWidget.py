@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable, List, Union
+from typing import Iterable, List, Union, Type
 
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import unviewed_color
@@ -474,6 +474,14 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
 
         # Update the font of all the items in the table widget
         self.item_changed_callback(select_first_row=False)
+
+    def is_itemtype_selected(self, itemtype: Type[Union[TreeWidgetItemFeed, TreeWidgetItemCategory, TreeWidgetItemStarred]]) -> bool:
+        selected_items: List[Union[TreeWidgetItemFeed, TreeWidgetItemCategory, TreeWidgetItemStarred]] = self.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            return isinstance(selected_item, itemtype)
+        else:
+            return False
 
     def item_changed_callback(self, select_first_row=True):
         self.mainwindow.line_search.clear()

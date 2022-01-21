@@ -20,7 +20,7 @@ from .ShortcutDialog import ShortcutsDialog
 from .StatisticsDialog import StatisticsDialog
 from .EntryWidgets import EntryYoutube, EntrySoundcloud
 from .MyTableWidget import MyTableWidget
-from .MyTreeWidget import MyTreeWidget
+from .MyTreeWidget import MyTreeWidget, TreeWidgetItemStarred
 from .NewFeedDialog import NewFeedDialog
 from .SearchWidget import SearchWidget
 from .SettingsDialog import SettingsDialog
@@ -324,6 +324,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                 self.entry_widgets[entry_type].hide()
         entry_to_display.show()
 
+    def unstarred_callback(self):
+        if self.tree_feeds.is_itemtype_selected(TreeWidgetItemStarred):
+            self.table_entries.pop_selected_entry()
+            # self.tree_feeds.redisplay_selected()
+
     def display_previous_entry(self):
         current_row = self.table_entries.currentRow()
         self.table_entries.selectRow(max(0, current_row-1))
@@ -398,6 +403,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tasks_thread.job_update_info.connect(self.job_update_info_callback)
 
         self.line_search.textChanged.connect(self.search_text_changed_callback)
+
+        for entry in self.entry_widgets.values():
+            entry.unstarred.connect(self.unstarred_callback)
 
     def init_shortcuts(self):
         self.shortcut_search = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)), self)

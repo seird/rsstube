@@ -16,6 +16,8 @@ settings = Settings()
 
 
 class BaseEntry(QtWidgets.QWidget):
+    unstarred = QtCore.pyqtSignal()
+
     def __init__(self, parent):
         super(BaseEntry, self).__init__()
 
@@ -42,6 +44,8 @@ class BaseEntry(QtWidgets.QWidget):
         self.starred = not self.starred
         self.set_star(self.starred)
         self.feeds.mark_star(self._id, self.starred)
+        if not self.starred:
+            self.unstarred.emit()
 
     @abc.abstractmethod
     def display_entry(self, entry: dict):
