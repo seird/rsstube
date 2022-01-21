@@ -107,10 +107,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             self.tray_activated_callback(QtWidgets.QSystemTrayIcon.ActivationReason.Trigger)
         
 
-    def acquire_lock(self) -> bool:
+    def acquire_lock(self, force: bool = False) -> bool:
         temp_dir = tempfile.gettempdir()
         lock_filename = os.path.join(temp_dir, "rsstube-" + getpass.getuser() + ".lock")
         self.lock_file = QtCore.QLockFile(lock_filename)
+        if force:
+            self.lock_file.removeStaleLockFile()
         self.lock_file.setStaleLockTime(0)
         return self.lock_file.tryLock()
 
@@ -518,4 +520,7 @@ def start_gui():
                 break
 
         if not already_running:
-            logger.warning("start_gui: Existing lockfile is not valid.")
+            logger.warning("start_gui: Existing lockfile is not valid. Forcing a new instance.")
+            window.acquire_lock(force=True)
+            window.init_ui()
+            sys.exit(app.exec())
