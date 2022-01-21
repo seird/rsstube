@@ -513,6 +513,7 @@ def start_gui():
             client.connectToServer("rsstube.socket")
             if (client.waitForConnected(150)):
                 # connection succeeded, this will bring the window of that process to the front
+                already_running = True
                 client.abort()
                 break
 
