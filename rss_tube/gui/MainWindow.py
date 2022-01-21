@@ -6,7 +6,7 @@ import sys
 import tempfile
 import webbrowser
 
-from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore, QtNetwork
 
 from rss_tube.__version__ import __title__, __version__
 from rss_tube.database.feeds import Feeds
@@ -50,6 +50,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         self.feeds = Feeds()
         self.tasks_thread = Tasks()
+        
+        self.lock_server = QtNetwork.QLocalServer()
+        self.lock_server.setSocketOptions(QtNetwork.QLocalServer.SocketOption.UserAccessOption)
+        self.lock_server.listen("rsstube.socket")
 
         self.table_entries = MyTableWidget(self)
         self.horizontalLayout_entries.addWidget(self.table_entries)
@@ -369,6 +373,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             settings.value("tray/notifications/duration_ms", type=int)
         )
 
+    def bring_to_front(self):
+        self.ensurePolished()
+        self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
+        self.show()
+        self.activateWindow()
+
     def link_callbacks(self):
         self.pb_previous.hide()
         self.pb_next.hide()
@@ -406,6 +416,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         for entry in self.entry_widgets.values():
             entry.unstarred.connect(self.unstarred_callback)
+
+        self.lock_server.newConnection.connect(self.bring_to_front)
 
     def init_shortcuts(self):
         self.shortcut_search = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)), self)
@@ -490,6 +502,19 @@ def start_gui():
     window = MainWindow(app)
 
     # prevent multiple instances
-    if window.acquire_lock() or "--no-lock" in sys.argv:
+    if window.acquire_lock():
         window.init_ui()
         sys.exit(app.exec())
+    else:
+        # connect to the process that's already running
+        client = QtNetwork.QLocalSocket()
+        already_running = False
+        for _ in range(3):
+            client.connectToServer("rsstube.socket")
+            if (client.waitForConnected(150)):
+                # connection succeeded, this will bring the window of that process to the front
+                client.abort()
+                break
+
+        if not already_running:
+            logger.warning("start_gui: Existing lockfile is not valid.")
