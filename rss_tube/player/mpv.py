@@ -11,8 +11,10 @@ settings = Settings()
 
 class MpvPlayerInstance(BasePlayer):
     def _run(self):
+        self.args.append("--force-window")
+
         if self.play_quality_once == "Audio only":
-            self.args += ["--no-video", "--force-window"]
+            self.args.append("--no-video")
         else:
             player_quality = self.play_quality_once or settings.value("player/mpv/quality", type=str)
         
