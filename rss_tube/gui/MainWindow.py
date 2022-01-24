@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import tempfile
+from typing import Optional
 import webbrowser
 
 from PyQt6 import QtWidgets, QtGui, QtCore, QtNetwork
@@ -11,6 +12,7 @@ from PyQt6 import QtWidgets, QtGui, QtCore, QtNetwork
 from rss_tube.__version__ import __title__, __version__
 from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
+from rss_tube.gui.EntryWidgets.BaseEntry import BaseEntry
 from rss_tube.updater import Updater
 from rss_tube.utils import get_abs_path, set_icons, set_style
 from rss_tube.tasks import Tasks, AddFeedTask, ExportFeedsTask, ImportFeedsTask
@@ -226,7 +228,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         dialog.exec()
 
     def play_video(self, play_quality_once: str = ""):
-        self.entry_widgets["youtube"].play_video(play_quality_once=play_quality_once)
+        self.get_current_entry_widget().play_video(play_quality_once=play_quality_once)
 
     def play_in_browser(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.entry_widgets["youtube"].video_url))
@@ -330,6 +332,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                 self.entry_widgets[entry_type].hide()
         entry_to_display.show()
 
+    def get_current_entry_widget(self) -> Optional[BaseEntry]:
+        for entry_type in self.entry_widgets:
+            if self.entry_widgets[entry_type].isVisible():
+                return self.entry_widgets[entry_type]
+        return None
+
     def unstarred_callback(self):
         if self.tree_feeds.is_itemtype_selected(TreeWidgetItemStarred):
             self.table_entries.pop_selected_entry()
@@ -432,6 +440,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.shortcut_play_in_browser = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_in_browser", type=str)), self)
         self.shortcut_previous_entry = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/previous_entry", type=str)), self)
         self.shortcut_next_entry = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/next_entry", type=str)), self)
+        self.shortcut_toggle_star = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/toggle_star", type=str)), self)
 
         self.shortcut_search.activated.connect(self.line_search.setFocus)
         self.shortcut_quit.activated.connect(self.close)
@@ -443,6 +452,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.shortcut_play_in_browser.activated.connect(self.play_in_browser)
         self.shortcut_previous_entry.activated.connect(self.display_previous_entry)
         self.shortcut_next_entry.activated.connect(self.display_next_entry)
+        self.shortcut_toggle_star.activated.connect(lambda: self.get_current_entry_widget().toggle_star())
 
     def set_shortcuts(self):
         self.shortcut_search.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)))
@@ -455,6 +465,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.shortcut_play_in_browser.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/play_in_browser", type=str)))
         self.shortcut_previous_entry.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/previous_entry", type=str)))
         self.shortcut_next_entry.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/next_entry", type=str)))
+        self.shortcut_toggle_star.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/toggle_star", type=str)))
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         # TODO: child widgets?
@@ -504,7 +515,7 @@ def start_gui():
     window = MainWindow(app)
 
     # prevent multiple instances
-    if window.acquire_lock():
+    if window.acquire_lock() or "--no-lock" in sys.argv:
         window.init_ui()
         sys.exit(app.exec())
     else:

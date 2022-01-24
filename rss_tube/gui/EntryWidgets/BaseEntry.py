@@ -36,8 +36,11 @@ class BaseEntry(QtWidgets.QWidget):
 
         self._link_callbacks()
 
-    def set_star(self, stard: bool = False):
-        star_img = "star.svg" if stard else "unstarred.svg"
+    def toggle_star(self):
+        self.star_toggled_callback()
+
+    def set_star(self, starred: bool = False):
+        star_img = "star.svg" if starred else "unstarred.svg"
         self.pb_star.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/{star_img}")))
 
     def star_toggled_callback(self):

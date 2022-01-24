@@ -45,5 +45,6 @@ DEFAULT_SETTINGS = {
     "shortcuts/play_audio": "Ctrl+Alt+O",
     "shortcuts/play_in_browser": "Ctrl+Shift+O",
     "shortcuts/previous_entry": "Ctrl+,",
-    "shortcuts/next_entry": "Ctrl+."
+    "shortcuts/next_entry": "Ctrl+.",
+    "shortcuts/toggle_star": "Ctrl+S"
 }
