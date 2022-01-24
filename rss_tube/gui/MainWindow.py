@@ -231,7 +231,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.get_current_entry_widget().play_video(play_quality_once=play_quality_once)
 
     def play_in_browser(self):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.entry_widgets["youtube"].video_url))
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.get_current_entry_widget().video_url))
 
     def new_feed_callback(self):
         categories = self.feeds.get_categories()
