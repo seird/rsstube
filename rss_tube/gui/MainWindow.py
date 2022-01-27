@@ -146,8 +146,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def tray_activated_callback(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
         if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Trigger:
             if self.windowState() & QtCore.Qt.WindowState.WindowMinimized or self.windowState() == (QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowMaximized):
-                self.show()
-                self.setWindowState(self.window_state_to_restore | QtCore.Qt.WindowState.WindowActive)  # Set the window to its normal state
+                self.bring_to_front()
             else:
                 window_state_temp = self.windowState()
                 self.setWindowState(QtCore.Qt.WindowState.WindowMinimized)
@@ -391,7 +390,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def bring_to_front(self):
         self.ensurePolished()
-        self.setWindowState((self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized) | QtCore.Qt.WindowState.WindowActive)
+        self.setWindowState(self.window_state_to_restore & ~QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowActive)
         self.show()
         self.activateWindow()
 
