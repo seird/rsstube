@@ -228,10 +228,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         dialog.exec()
 
     def play_video(self, play_quality_once: str = ""):
-        self.get_current_entry_widget().play_video(play_quality_once=play_quality_once)
+        if entry_widget := self.get_current_entry_widget():
+            entry_widget.play_video(play_quality_once=play_quality_once)
 
     def play_in_browser(self):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.get_current_entry_widget().video_url))
+        if entry_widget := self.get_current_entry_widget():
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl(entry_widget.video_url))
+
+    def toggle_star_callback(self):
+        if entry_widget := self.get_current_entry_widget():
+            entry_widget.toggle_star()
 
     def new_feed_callback(self):
         categories = self.feeds.get_categories()
@@ -452,7 +458,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.shortcut_play_in_browser.activated.connect(self.play_in_browser)
         self.shortcut_previous_entry.activated.connect(self.display_previous_entry)
         self.shortcut_next_entry.activated.connect(self.display_next_entry)
-        self.shortcut_toggle_star.activated.connect(lambda: self.get_current_entry_widget().toggle_star())
+        self.shortcut_toggle_star.activated.connect(self.toggle_star_callback)
 
     def set_shortcuts(self):
         self.shortcut_search.setKey(QtGui.QKeySequence.fromString(settings.value("shortcuts/filter", type=str)))
