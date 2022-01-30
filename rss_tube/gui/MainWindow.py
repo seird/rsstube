@@ -349,12 +349,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             # self.tree_feeds.redisplay_selected()
 
     def display_previous_entry(self):
+        # this would have been a lot more elegant with model/view
         current_row = self.table_entries.currentRow()
-        self.table_entries.selectRow(max(0, current_row-1))
+        while current_row > 0:
+            current_row -= 1
+            if not self.table_entries.isRowHidden(current_row):
+                self.table_entries.selectRow(current_row)
+                return
 
     def display_next_entry(self):
+        # this would have been a lot more elegant with model/view
         current_row = self.table_entries.currentRow()
-        self.table_entries.selectRow(min(self.table_entries.rowCount(), current_row + 1))
+        rows = self.table_entries.rowCount()
+        while current_row < rows:
+            current_row += 1
+            if not self.table_entries.isRowHidden(current_row):
+                self.table_entries.selectRow(current_row)
+                return
+                
 
     def open_database_callback(self):
         webbrowser.open(self.feeds.database.dir)
