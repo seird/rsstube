@@ -42,7 +42,8 @@ class Cache(object):
         if q:
             # Cache hit
             filename, cached_on = q
-            return os.path.join(self.cache_dir, filename)
+            filepath = os.path.join(self.cache_dir, filename)
+            return filepath if os.path.exists(filepath) else ""
         else:
             # Cache miss
             return ""
