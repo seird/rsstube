@@ -166,6 +166,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         if settings_dialog.changes_applied and settings_dialog.schedule_changed:
             self.tasks_thread.set_schedule()
 
+    def update_proxies(self):
+        for feed_type in self.entry_widgets:
+            self.entry_widgets[feed_type].download.update_proxy()
+        self.feeds.downloader.update_proxy()
+
     def search_text_changed_callback(self, text):
         text = text.lower()
 

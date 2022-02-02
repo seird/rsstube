@@ -234,8 +234,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())
         settings.setValue("proxies/socks/host", self.line_proxy_host.text())
         settings.setValue("proxies/socks/port", self.spin_proxy_port.value())
-        self.mainwindow.entry_widgets["youtube"].download.update_proxy()
-        self.mainwindow.feeds.downloader.update_proxy()
+        self.mainwindow.update_proxies()
 
         settings.sync()
 
