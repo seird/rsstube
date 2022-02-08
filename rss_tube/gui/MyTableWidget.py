@@ -186,7 +186,8 @@ class MyTableWidget(QtWidgets.QTableWidget):
             super(MyTableWidget, self).mouseDoubleClickEvent(event)
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        if hovered_item := self.itemAt(event.pos()):
+        pos = event.position()
+        if hovered_item := self.itemAt(QtCore.QPoint(pos.x(), pos.y())):
             row = hovered_item.row()
 
             if row == self.last_hovered_row:
