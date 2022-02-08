@@ -73,6 +73,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.pb_new_category.setToolTip("Add a new category")
         self.pb_update_feeds.setFixedSize(QtCore.QSize(icon_width, icon_height))
         self.pb_update_feeds.setToolTip("Update channels")
+        self.splitter_vertical.setStretchFactor(0, 1)
+        self.splitter_vertical.setStretchFactor(1, 0)
+        self.splitter_horizontal.setStretchFactor(0, 0)
+        self.splitter_horizontal.setStretchFactor(1, 1)
 
         self.line_search = SearchWidget(icon_height, f"  Filter {settings.value('shortcuts/filter', type=str)} ...")
         self.horizontalLayout_buttons.addWidget(self.line_search)
