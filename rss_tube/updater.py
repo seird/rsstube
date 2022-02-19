@@ -1,9 +1,7 @@
 import logging
 
-
-import requests
-
 from PyQt6 import QtCore
+from rss_tube.download import Downloader
 from rss_tube.__version__ import __version__, __versionurl__
 
 
@@ -17,8 +15,9 @@ class Updater(QtCore.QThread):
     def run(self):
         local_version = __version__
 
+        downloader = Downloader()
         try:
-            r = requests.get(__versionurl__).json()
+            r = downloader.get(__versionurl__).json()
         except Exception as e:
             logger.error(f"Updater: failed to query remote version: {e}")
             return

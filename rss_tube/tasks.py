@@ -2,7 +2,6 @@ import abc
 from datetime import datetime
 import schedule
 import logging
-import requests
 import time
 
 from PyQt6 import QtCore
@@ -10,6 +9,7 @@ from PyQt6.QtCore import pyqtSignal
 
 from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
+from rss_tube.download import Downloader
 
 
 logger = logging.getLogger("logger")
@@ -170,7 +170,7 @@ class SaveThumbnailTask(BaseTask):
         self.fname = fname
 
     def task(self):
-        response = requests.get(self.img_url)
-        if response.ok:
+        downloader = Downloader()
+        if content := downloader.get_bytes(self.img_url):
             with open(self.fname, "wb") as f:
-                f.write(response.content)
+                f.write(content)
