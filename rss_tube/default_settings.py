@@ -14,7 +14,7 @@ DEFAULT_SETTINGS = {
     "MainWindow/icon/height": 32,
     "MainWindow/menu/show": True,
     "MainWindow/start_minimized": False,
-    "MainWindow/export_location": os.path.join(Path.home(), "rsstube-channels.csv"),
+    "MainWindow/export_location": os.path.join(Path.home(), "rsstube-channels.json"),
     "MainWindow/entries_to_fetch": 1000,
     "MainWindow/category_icon/show": True,
     "MainWindow/feed_icon/show": True,

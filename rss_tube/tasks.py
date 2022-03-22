@@ -1,6 +1,7 @@
 import abc
 from datetime import datetime
 import schedule
+import json
 import logging
 import time
 
@@ -130,9 +131,8 @@ class ImportFeedsTask(BaseTask):
 
     def task(self):
         try:
-            with open(self.fname, "r", encoding="utf-8") as f:
-                header = f.readline()
-                lines = f.readlines()
+            with open(self.fname, "r") as f:
+                j = json.load(f)
         except FileNotFoundError:
             logger.error(f"ImportFeedsTask failed: {self.name} does not exist.")
             self.failed.emit()
@@ -140,11 +140,10 @@ class ImportFeedsTask(BaseTask):
 
         feeds = Feeds()
 
-        for line in lines:
-            author, url, category = line.rstrip("\n").split(",")
-            feed_id = feeds.add_feed(url, category, feed_name=author)
+        for entry in j:
+            feed_id = feeds.add_feed(entry["url"], entry["category"], feed_name=entry["author"])
             if feed_id is None:
-                logger.error(f"ImportFeedsTask: adding '{url}' failed.")
+                logger.error(f"ImportFeedsTask: adding '{entry['url']}' failed.")
                 continue
             self.imported.emit(feed_id)
 
@@ -156,11 +155,18 @@ class ExportFeedsTask(BaseTask):
 
     def task(self):
         feeds = Feeds()
-        with open(self.fname, "w", encoding="utf-8") as f:
-            f.write("author,url,category\n")
-            for feed in feeds.get_feeds():
-                author = feed["author"].replace(",", "")
-                f.write(f'{author},{feed["url"]},{feed["category"]}\n')
+
+        j = [
+            {
+                "author": feed["author"],
+                "category": feed["category"],
+                "url": feed["url"]
+            }
+            for feed in feeds.get_feeds()
+        ]
+
+        with open(self.fname, "w") as f:
+            json.dump(j, f, indent=4)
 
 
 class SaveThumbnailTask(BaseTask):
