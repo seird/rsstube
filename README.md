@@ -8,12 +8,17 @@ A simple desktop application for Youtube, based on RSS feeds.
 
 Dark theme                                                            |  Light theme
 :--------------------------------------------------------------------:|:---------------------------------------------------------------------:
-![](images/dark.png)  |  ![](images/light.png)
+![](https://raw.githubusercontent.com/seird/rsstube/master/images/dark.png)  |  ![](https://raw.githubusercontent.com/seird/rsstube/master/images/light.png)
 
 
 ## Download
 
 [Download the latest release.](https://github.com/seird/rsstube/releases/latest)
+
+or, install via pip:
+```
+$ pip install rsstube
+```
 
 
 ## Install
