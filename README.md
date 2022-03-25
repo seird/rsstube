@@ -29,7 +29,7 @@ $ pip install -r requirements.txt
 ### Run from source
 
 ```
-$ python entry_point.py
+$ python -m rss_tube
 ```
 
 ### Create a pyinstaller executable
@@ -61,7 +61,7 @@ $ iscc rss-tube.iss
 
 ## Requirements
 
-- Python >= 3.6
+- Python >= 3.8
 - lxml
 - PyQt6
 - requests
