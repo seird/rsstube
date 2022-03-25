@@ -65,7 +65,9 @@ setup(
     packages=find_packages(),
     package_data={
         'rss_tube.gui.themes.dark': ['*.css', '*.svg', '*.png'],
-        'rss_tube.gui.themes.light': ['*.css', '*.svg', '*.png']
+        'rss_tube.gui.themes.dark_red': ['*.css', '*.svg', '*.png'],
+        'rss_tube.gui.themes.light': ['*.css', '*.svg', '*.png'],
+        'rss_tube.gui.themes.light_red': ['*.css', '*.svg', '*.png']
     },
 
     entry_points={
