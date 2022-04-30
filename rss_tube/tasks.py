@@ -31,6 +31,11 @@ class Tasks(QtCore.QThread):
 
         self.set_schedule()
 
+    def _feed_update_task_finished_callback(self):
+        if self.feed_update_job.last_run is None:
+            self.feed_update_job.last_run = datetime.now()
+        self.job_update_info.emit(self.feed_update_job.last_run, self.feed_update_job.next_run)
+
     def set_schedule(self):
         schedule.clear("update-feed")
         schedule.clear("delete_entries")
@@ -38,7 +43,7 @@ class Tasks(QtCore.QThread):
         schedule.every(settings.value("delete/interval/hours", type=int)).hours.do(self.delete_entries_task.start).tag("delete_entries")
 
         self.job_update_info.emit(self.feed_update_job.last_run or datetime.now(), self.feed_update_job.next_run or datetime.now())
-        self.feed_update_task._finished.connect(lambda: self.job_update_info.emit(self.feed_update_job.last_run, self.feed_update_job.next_run))
+        self.feed_update_task._finished.connect(self._feed_update_task_finished_callback)
 
     def run(self):
         self.running = True
