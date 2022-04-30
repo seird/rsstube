@@ -72,7 +72,7 @@ setup(
     },
 
     entry_points={
-        'console_scripts': ['rsstube=rss_tube:start_gui'],
+        'console_scripts': ['rsstube=rss_tube.__main__:main'],
     },
     install_requires=REQUIRED,
     extras_require=EXTRAS,

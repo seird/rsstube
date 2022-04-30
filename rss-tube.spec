@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-a = Analysis(['entry_point.py'],
+a = Analysis(['rss_tube/__main__.py'],
              pathex=[os.getcwd()],
              binaries=[],
              datas=[('rss_tube/gui/themes', 'rss_tube/gui/themes'), ('version.txt', '.')],
