@@ -20,8 +20,6 @@ DEFAULT_SETTINGS = {
     "MainWindow/feed_icon/show": True,
     "tray/show": True,
     "tray/minimize": True,
-    "tray/notifications/enabled": False,
-    "tray/notifications/duration_ms": 2000,
     "feeds/update_interval/minutes": 10,
     "feeds/refresh_entries": True,
     "youtube/show_description": True,

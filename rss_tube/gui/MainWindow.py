@@ -320,12 +320,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             return
 
         if new_entries_unviewed := self.feeds.get_new_entries_unviewed(last_refresh):
-            # Display a popup notification
-            if settings.value("tray/notifications/enabled", type=bool):
-                titles = ", ".join(x["title"] for x in new_entries_unviewed)
-                logger.debug(f"update_feeds_finished: {len(new_entries_unviewed)} new entries to notify." + titles)
-                self.display_notification(f"{len(new_entries_unviewed)} new entries.")
-
             # Change to tray icon to show that there are new entries
             if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowState.WindowMinimized):
                 self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray_new.png")))
@@ -398,15 +392,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def display_notification(self,
                              message: str,
-                             icon: QtWidgets.QSystemTrayIcon.MessageIcon = QtWidgets.QSystemTrayIcon.MessageIcon.Information):
-        if not settings.value("tray/notifications/enabled", type=bool) or not settings.value("tray/show", type=bool):
+                             icon: QtWidgets.QSystemTrayIcon.MessageIcon = QtWidgets.QSystemTrayIcon.MessageIcon.Information,
+                             duration_ms: int = 2000):
+        if not settings.value("tray/show", type=bool):
             return
 
         self.tray.showMessage(
             self.windowTitle(),
             message,
             icon,
-            settings.value("tray/notifications/duration_ms", type=int)
+            duration_ms
         )
 
     def bring_to_front(self):

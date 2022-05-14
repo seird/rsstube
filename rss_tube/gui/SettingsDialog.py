@@ -48,9 +48,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_minimize_to_tray.setChecked(settings.value("tray/minimize", type=bool))
         self.cb_start_minimized.setChecked(settings.value("MainWindow/start_minimized", type=bool))
 
-        self.spin_notification_duration.setValue(settings.value("tray/notifications/duration_ms", type=int))
-        self.cb_notifications.setChecked(settings.value("tray/notifications/enabled", type=bool))
-
         self.combo_logging.addItems([
             logging.getLevelName(logging.ERROR),
             logging.getLevelName(logging.WARNING),
@@ -141,9 +138,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_show_tray.stateChanged.connect(self.settings_changed_callback)
         self.cb_start_minimized.stateChanged.connect(self.settings_changed_callback)
 
-        self.spin_notification_duration.valueChanged.connect(self.settings_changed_callback)
-        self.cb_notifications.stateChanged.connect(self.settings_changed_callback)
-
         self.combo_logging.currentTextChanged.connect(self.settings_changed_callback)
         self.pb_open_log.clicked.connect(self.mainwindow.open_log_callback)
 
@@ -201,9 +195,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         settings.setValue("tray/minimize", self.cb_minimize_to_tray.isChecked())
         settings.setValue("MainWindow/start_minimized", self.cb_start_minimized.isChecked())
-
-        settings.setValue("tray/notifications/enabled", self.cb_notifications.isChecked())
-        settings.setValue("tray/notifications/duration_ms", self.spin_notification_duration.value())
 
         selected_level = self.combo_logging.currentText()
         settings.setValue("logging/level", selected_level)

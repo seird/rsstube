@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>554</height>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -196,17 +196,17 @@
           <string>Desktop</string>
          </property>
          <layout class="QFormLayout" name="formLayout_3">
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="cb_minimize_to_tray">
-            <property name="text">
-             <string>Minimize to tray</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0" colspan="2">
            <widget class="QCheckBox" name="cb_show_tray">
             <property name="text">
              <string>Show tray icon</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="cb_minimize_to_tray">
+            <property name="text">
+             <string>Minimize to tray</string>
             </property>
            </widget>
           </item>
@@ -215,45 +215,6 @@
             <property name="text">
              <string>Start Minimized</string>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QGroupBox" name="groupBox_4">
-            <property name="title">
-             <string>Notifications</string>
-            </property>
-            <layout class="QFormLayout" name="formLayout_4">
-             <item row="0" column="0" colspan="2">
-              <widget class="QCheckBox" name="cb_notifications">
-               <property name="text">
-                <string>Receive desktop notifications</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QSpinBox" name="spin_notification_duration">
-               <property name="minimum">
-                <number>100</number>
-               </property>
-               <property name="maximum">
-                <number>10000</number>
-               </property>
-               <property name="singleStep">
-                <number>100</number>
-               </property>
-               <property name="value">
-                <number>2000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Notification duration [ms]</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
          </layout>
@@ -674,8 +635,6 @@
   <tabstop>cb_show_tray</tabstop>
   <tabstop>cb_minimize_to_tray</tabstop>
   <tabstop>cb_start_minimized</tabstop>
-  <tabstop>cb_notifications</tabstop>
-  <tabstop>spin_notification_duration</tabstop>
   <tabstop>spin_update_feed_interval_minutes</tabstop>
   <tabstop>combo_logging</tabstop>
   <tabstop>line_player_args</tabstop>
