@@ -33,12 +33,12 @@ VSVersionInfo(
         [StringStruct(u'Comments', u'RSS Tube - Youtube RSS Reader Client'),
 	StringStruct(u'CompanyName', u''),
         StringStruct(u'FileDescription', u'Youtube RSS Reader Client'),
-        StringStruct(u'FileVersion', u'0.6.6'),
+        StringStruct(u'FileVersion', u'0.6.7'),
         StringStruct(u'InternalName', u'rss-tube'),
         StringStruct(u'LegalCopyright', u''),
         StringStruct(u'OriginalFilename', u'rsstube.exe'),
         StringStruct(u'ProductName', u'RSS Tube'),
-        StringStruct(u'ProductVersion', u'0.6.6')])
+        StringStruct(u'ProductVersion', u'0.6.7')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [0, 1200])])
   ]
