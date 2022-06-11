@@ -6,11 +6,6 @@
 A simple desktop application for Youtube, based on RSS feeds.
 
 
-Dark theme                                                            |  Light theme
-:--------------------------------------------------------------------:|:---------------------------------------------------------------------:
-![](https://raw.githubusercontent.com/seird/rsstube/master/images/dark.png)  |  ![](https://raw.githubusercontent.com/seird/rsstube/master/images/light.png)
-
-
 ## Download
 
 [Download the latest release.](https://github.com/seird/rsstube/releases/latest)
@@ -21,7 +16,19 @@ $ pip install rsstube
 ```
 
 
-## Install
+## Features
+
+- Subscribe to youtube (and soundcloud) channels via RSS without needing a google account.
+- Launch mpv (or other external video players) directly from the gui.
+- Rule based filters to automatically delete new entries or mark them as viewed.
+
+
+Dark theme                                                            |  Light theme
+:--------------------------------------------------------------------:|:---------------------------------------------------------------------:
+![](https://raw.githubusercontent.com/seird/rsstube/master/images/dark.png)  |  ![](https://raw.githubusercontent.com/seird/rsstube/master/images/light.png)
+
+
+## Manual Installation
 
 Get the source and install the requirements:
 
@@ -72,4 +79,4 @@ $ iscc rss-tube.iss
 - requests
 - schedule
 - (pysocks to connect to a socks5 proxy)
-- (mpv + youtube-dl or vlc, to directly play videos)
+- (mpv + yt-dlp/youtube-dl or vlc, to directly play videos)
