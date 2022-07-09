@@ -36,7 +36,7 @@ jobs:
   build-ubuntu:
     strategy:
       matrix:
-        tag: [focal, groovy]
+        tag: [focal, hirsute, impish, jammy]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -70,4 +70,6 @@ jobs:
         files: |
           rsstube-installer-win.exe
           rsstube_amd64_ubuntu_focal.deb
-          rsstube_amd64_ubuntu_groovy.deb
+          rsstube_amd64_ubuntu_hirsute.deb
+          rsstube_amd64_ubuntu_impish.deb
+          rsstube_amd64_ubuntu_jammy.deb
