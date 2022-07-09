@@ -62,7 +62,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         # Player Tab
         player = settings.value("player", type=str)
-        self.combo_player.addItems(["mpv", "vlc"])
+        self.combo_player.addItems(["mpv", "vlc", "generic"])
         self.combo_player.setCurrentText(player)
         self.combo_player_changed(player)
 
@@ -102,7 +102,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.combo_player_quality.setCurrentText(settings.value("player/mpv/quality", type=str))
         if player == "mpv":
             self.groupBox_player_quality.show()
-        elif player == "vlc":
+        else:
             self.groupBox_player_quality.hide()
 
     def combo_theme_changed(self):
