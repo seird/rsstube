@@ -1,5 +1,6 @@
 import logging
 import pickle
+import sqlite3
 
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -20,10 +21,18 @@ class FilterAction(Enum):
     MarkViewed = "Mark Viewed"
     Star = "Star"
     StarAndMarkViewed = "Star and Mark Viewed"
+    RunExternalProgram = "Run external program"
+
+
+supported_parameters = [
+    ("%T", "Title", "title"),
+    ("%A", "Author", "author"),
+    ("%U", "Url", "link"),
+]
 
 
 class Filter(dict):
-    def __init__(self, name: str, enabled: bool, invert: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], filter_id: int = None):
+    def __init__(self, name: str, enabled: bool, invert: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], action_external_program: str, filter_id: int = None):
         super(Filter, self).__init__()
         self.update({
             "id": filter_id,
@@ -34,7 +43,8 @@ class Filter(dict):
             "apply_to": apply_to,
             "match": match,
             "action": pickle.loads(action) if isinstance(action, bytes) else action,
-            "rules": pickle.loads(rules) if isinstance(rules, bytes) else rules
+            "rules": pickle.loads(rules) if isinstance(rules, bytes) else rules,
+            "action_external_program": action_external_program,
         })
 
     def get_rules_list(self) -> List[Dict]:
@@ -67,6 +77,12 @@ class Filters(object):
         self.database = Database("filters", QtCore.QStandardPaths.StandardLocation.AppLocalDataLocation)
         self.cursor = self.database.cursor()
 
+        try:
+            self.cursor.execute("ALTER TABLE filters ADD COLUMN action_external_program TEXT default null")
+        except sqlite3.OperationalError:
+            logger.debug(f"Column action_external_program already exists")
+
+
         # Filters table
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS filters (
@@ -78,7 +94,8 @@ class Filters(object):
             apply_to       TEXT,
             match          TEXT,
             action         BLOB,
-            rules          BLOB)
+            rules          BLOB,
+            action_external_program TEXT)
         """)
 
         # Filter order table
@@ -95,9 +112,9 @@ class Filters(object):
         self.cursor.execute(
             """
             INSERT INTO filters
-                (name, enabled, invert, apply_to_group, apply_to, match, action, rules)
+                (name, enabled, invert, apply_to_group, apply_to, match, action, rules, action_external_program)
             VALUES
-                (:name, :enabled, :invert, :apply_to_group, :apply_to, :match, :action, :rules)
+                (:name, :enabled, :invert, :apply_to_group, :apply_to, :match, :action, :rules, :action_external_program)
             """,
             f.blobbed()
         )
@@ -128,7 +145,7 @@ class Filters(object):
             """
             UPDATE filters SET
                 name=:name, enabled=:enabled, invert=:invert, apply_to_group=:apply_to_group,
-                apply_to=:apply_to, match=:match, action=:action, rules=:rules
+                apply_to=:apply_to, match=:match, action=:action, rules=:rules, action_external_program=:action_external_program
             WHERE
                 id=:id
             """,
@@ -148,6 +165,7 @@ class Filters(object):
                 r["match"],
                 r["action"],
                 r["rules"],
+                r["action_external_program"],
                 filter_id=r["id"]
             )
         else:
@@ -169,6 +187,7 @@ class Filters(object):
                 r["match"],
                 r["action"],
                 r["rules"],
+                r["action_external_program"],
                 filter_id=r["id"]
             ))
         return filters
@@ -190,6 +209,7 @@ class Filters(object):
                 r["match"],
                 r["action"],
                 r["rules"],
+                r["action_external_program"],
                 filter_id=r["id"]
             ))
         return filters

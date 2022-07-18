@@ -1,8 +1,10 @@
 import datetime
 import logging
+import os
 import time
+import threading
 
-from typing import Any, List, Optional
+from typing import Any, Iterator, List, Optional, Tuple
 
 from PyQt6 import QtCore
 
@@ -10,7 +12,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
 from rss_tube.parser import parse_url, parse_feed
 from .database import Database
-from .filters import Filter, FilterAction, Filters
+from .filters import Filter, FilterAction, Filters, supported_parameters
 
 
 logger = logging.getLogger("logger")
@@ -403,8 +405,7 @@ class Feeds(object):
         self.cursor.execute("UPDATE feeds SET category=? WHERE category=?", (new_name, current_name))
         self.database.commit()
 
-
-    def apply_filters(self, feed: dict, entry: dict) -> FilterAction:
+    def apply_filters(self, feed: dict, entry: dict) -> Iterator[Tuple[FilterAction, dict]]:
         """
         If no filter matches, FilterAction.Nop is returned
         Returns on first filter match
@@ -434,12 +435,12 @@ class Feeds(object):
                     match = match and apply_rule(feed, entry, rule)
             else:
                 continue
-
+            
             if (not match if f["invert"] else match):
-                return FilterAction(f["action"])
+                yield FilterAction(f["action"]), {"action_external_program": f["action_external_program"]}
 
         # No filters matched
-        return FilterAction.Nop
+        yield FilterAction.Nop, {}
 
     def update_feed_entries(self, feed_id: int, commit: bool = True):
         """
@@ -464,21 +465,31 @@ class Feeds(object):
             entry_fetched = self.cursor.execute("SELECT * FROM entries WHERE entry_id=:entry_id", entry).fetchone()
             if not entry_fetched:
                 # Filter the new entry
-                action: FilterAction = self.apply_filters(parsed_feed, entry)
-                entry.update({
-                    "feed_id": feed_id,
-                    "deleted": 0,
-                    "viewed": 0,
-                    "star": 0,
-                })
-                if action == FilterAction.Delete:
-                    entry.update({"deleted": 1})
-                elif action == FilterAction.MarkViewed:
-                    entry.update({"viewed": 1})
-                elif action == FilterAction.Star:
-                    entry.update({"star": 1})
-                elif action == FilterAction.StarAndMarkViewed:
-                    entry.update({"viewed": 1, "star": 1})
+                for action, action_args in self.apply_filters(parsed_feed, entry):
+                    entry.update({
+                        "feed_id": feed_id,
+                        "deleted": 0,
+                        "viewed": 0,
+                        "star": 0,
+                    })
+                    if action == FilterAction.Delete:
+                        entry.update({"deleted": 1})
+                    elif action == FilterAction.MarkViewed:
+                        entry.update({"viewed": 1})
+                    elif action == FilterAction.Star:
+                        entry.update({"star": 1})
+                    elif action == FilterAction.StarAndMarkViewed:
+                        entry.update({"viewed": 1, "star": 1})
+                    elif action == FilterAction.RunExternalProgram:
+                        command = action_args["action_external_program"]
+                        for p in supported_parameters:
+                            command = command.replace(p[0], entry[p[2]])
+                        logger.debug(f"Executing command '{command}' on entry")
+                        try:
+                            thread = threading.Thread(target=os.system, args=(command, ))
+                            thread.start()
+                        except Exception as e:
+                            logger.error(f"Error executing command: {e}")
 
                 self.cursor.execute(
                     """
