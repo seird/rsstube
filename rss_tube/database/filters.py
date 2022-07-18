@@ -98,14 +98,6 @@ class Filters(object):
             action_external_program TEXT)
         """)
 
-        # Filter order table
-        self.cursor.execute("""
-        CREATE TABLE IF NOT EXISTS filter_rank (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
-            filter_id      INTEGER,
-            rank          INTEGER)
-        """)
-
         self.database.commit()
 
     def store_filter(self, f: Filter) -> Any:
@@ -121,22 +113,6 @@ class Filters(object):
 
         f["id"] = self.cursor.lastrowid
 
-        self.cursor.execute(
-            """
-            INSERT INTO filter_rank
-                (filter_id, rank)
-            VALUES
-                (:id, (SELECT
-                          CASE WHEN (SELECT id from filter_rank) IS NOT NULL THEN
-                              MAX(rank)+1
-                          ELSE 
-                              0
-                          END
-                      FROM filter_rank)
-                )
-            """,
-            f
-        )
         self.database.commit()
         return f["id"]
 
@@ -173,11 +149,7 @@ class Filters(object):
 
     def get_filters(self) -> List[Filter]:
         filters: List[Filter] = []
-        for r in self.cursor.execute("""
-                SELECT * FROM filters
-                INNER JOIN filter_rank ON filters.id = filter_rank.filter_id
-                ORDER BY rank ASC
-                """).fetchall():
+        for r in self.cursor.execute("SELECT * FROM filters").fetchall():
             filters.append(Filter(
                 r["name"],
                 r["enabled"],
@@ -196,7 +168,6 @@ class Filters(object):
         filters: List[Filter] = []
         for r in self.cursor.execute("""
                 SELECT * FROM filters
-                INNER JOIN filter_rank ON filters.id = filter_rank.filter_id
                 WHERE filters.enabled = 1
                 ORDER BY rank ASC                
                 """).fetchall():
@@ -216,5 +187,4 @@ class Filters(object):
 
     def delete_filter(self, filter_id: int):
         self.cursor.execute("DELETE FROM filters WHERE id=?", (filter_id,))
-        self.cursor.execute("DELETE FROM filter_rank WHERE filter_id=?", (filter_id,))
         self.database.commit()
