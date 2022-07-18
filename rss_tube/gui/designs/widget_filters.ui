@@ -64,34 +64,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pb_top">
-       <property name="text">
-        <string>Move to Top</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_up">
-       <property name="text">
-        <string>Move Up</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_down">
-       <property name="text">
-        <string>Move Down</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_bottom">
-       <property name="text">
-        <string>Move to Bottom</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

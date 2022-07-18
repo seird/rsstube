@@ -35,6 +35,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         self.mainwindow = mainwindow
         self.feeds = Feeds()
         self.filter_properties = {}
+        self.cb_invert.hide()
 
         self.initUI()
 
@@ -360,80 +361,6 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
             # Delete from the table
             self.tableWidget.removeRow(selected_row)
 
-    def move_top_callback(self):
-        selected_row = self.tableWidget.currentRow()
-        if selected_row <= 0:
-            return
-
-        tw: FilterTableWidgetItem = self.tableWidget.item(selected_row, 0)
-        filter_id = tw.filter_id
-
-        self.tableWidget.removeRow(selected_row)
-        self.tableWidget.insertRow(0)
-
-        f = self.filters.get_filter(filter_id)
-        self.tableWidget.setItem(0, 0, FilterTableWidgetItem(f))
-
-        self.tableWidget.selectRow(0)
-
-        self.filters.rank_top(f)
-
-    def move_up_callback(self):
-        selected_row = self.tableWidget.currentRow()
-        if selected_row <= 0:
-            return
-
-        tw: FilterTableWidgetItem = self.tableWidget.item(selected_row, 0)
-        filter_id = tw.filter_id
-
-        self.tableWidget.removeRow(selected_row)
-        self.tableWidget.insertRow(selected_row-1)
-
-        f = self.filters.get_filter(filter_id)
-        self.tableWidget.setItem(selected_row-1, 0, FilterTableWidgetItem(f))
-
-        self.tableWidget.selectRow(selected_row-1)
-
-        self.filters.rank_up(f)
-
-    def move_down_callback(self):
-        selected_row = self.tableWidget.currentRow()
-        row_count = self.tableWidget.rowCount()
-        if selected_row < 0 or selected_row == (row_count - 1):
-            return
-
-        tw: FilterTableWidgetItem = self.tableWidget.item(selected_row, 0)
-        filter_id = tw.filter_id
-
-        self.tableWidget.removeRow(selected_row)
-        self.tableWidget.insertRow(selected_row+1)
-
-        f = self.filters.get_filter(filter_id)
-        self.tableWidget.setItem(selected_row+1, 0, FilterTableWidgetItem(f))
-
-        self.tableWidget.selectRow(selected_row+1)
-
-        self.filters.rank_down(f)
-
-    def move_bottom_callback(self):
-        selected_row = self.tableWidget.currentRow()
-        row_count = self.tableWidget.rowCount()
-        if selected_row < 0 or selected_row == (row_count-1):
-            return
-
-        tw: FilterTableWidgetItem = self.tableWidget.item(selected_row, 0)
-        filter_id = tw.filter_id
-
-        self.tableWidget.removeRow(selected_row)
-        self.tableWidget.insertRow(row_count-1)
-
-        f = self.filters.get_filter(filter_id)
-        self.tableWidget.setItem(row_count-1, 0, FilterTableWidgetItem(f))
-
-        self.tableWidget.selectRow(row_count-1)
-
-        self.filters.rank_bottom(f)
-
     def keyPressEvent(self, e: QtGui.QKeyEvent) -> None:
         if e.key() == QtCore.Qt.Key.Key_Delete:
             self.delete_filter_callback()
@@ -446,10 +373,6 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
         self.pb_new.clicked.connect(self.new_filter_callback)
         self.pb_edit.clicked.connect(self.edit_filter_callback)
         self.pb_delete.clicked.connect(self.delete_filter_callback)
-        self.pb_top.clicked.connect(self.move_top_callback)
-        self.pb_up.clicked.connect(self.move_up_callback)
-        self.pb_down.clicked.connect(self.move_down_callback)
-        self.pb_bottom.clicked.connect(self.move_bottom_callback)
 
         self.tableWidget.itemDoubleClicked.connect(self.edit_filter_callback)
         self.tableWidget.keyPressEvent = self.keyPressEvent
