@@ -169,7 +169,6 @@ class Filters(object):
         for r in self.cursor.execute("""
                 SELECT * FROM filters
                 WHERE filters.enabled = 1
-                ORDER BY rank ASC                
                 """).fetchall():
             filters.append(Filter(
                 r["name"],
