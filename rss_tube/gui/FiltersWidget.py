@@ -35,7 +35,6 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         self.mainwindow = mainwindow
         self.feeds = Feeds()
         self.filter_properties = {}
-        self.cb_invert.hide()
 
         self.initUI()
 
@@ -43,9 +42,6 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         self.line_name.setFocus()
 
         self.cb_enabled.setChecked(True)
-
-        # Invert
-        self.cb_invert.setChecked(False)
 
         # Apply to
         self.combo_apply_to_group.addItems(["All", "Category", "Channel"])
@@ -167,7 +163,6 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
                 "action": FilterAction(action_text),
                 "action_external_program": self.line_external_program.text(),
                 "enabled": self.cb_enabled.isChecked(),
-                "invert": self.cb_invert.isChecked()
             })
             self.accept()
         else:
@@ -207,9 +202,6 @@ class EditFilterDialog(NewFilterDialog):
 
         # Enabled
         self.cb_enabled.setChecked(f["enabled"])
-
-        # Invert
-        self.cb_invert.setChecked(f["invert"])
 
         # Apply to
         self.combo_apply_to_group.setCurrentText(f["apply_to_group"])
@@ -303,7 +295,6 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
             f = Filter(
                 name=filter_dialog.filter_properties["name"],
                 enabled=filter_dialog.filter_properties["enabled"],
-                invert=filter_dialog.filter_properties["invert"],
                 apply_to_group=filter_dialog.filter_properties["apply_to_group"],
                 apply_to=filter_dialog.filter_properties["apply_to"],
                 match=filter_dialog.filter_properties["match"],
@@ -327,7 +318,6 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
             f = Filter(
                 name=filter_dialog.filter_properties["name"],
                 enabled=filter_dialog.filter_properties["enabled"],
-                invert=filter_dialog.filter_properties["invert"],
                 apply_to_group=filter_dialog.filter_properties["apply_to_group"],
                 apply_to=filter_dialog.filter_properties["apply_to"],
                 match=filter_dialog.filter_properties["match"],
