@@ -406,10 +406,6 @@ class Feeds(object):
         self.database.commit()
 
     def apply_filters(self, feed: dict, entry: dict) -> Iterator[Tuple[FilterAction, dict]]:
-        """
-        If no filter matches, FilterAction.Nop is returned
-        Returns on first filter match
-        """
         for f in self.filters.get_enabled_filters():
             # check if this filter should be applied to the feed
             if f["apply_to_group"].lower() == "all":
@@ -436,11 +432,8 @@ class Feeds(object):
             else:
                 continue
             
-            if (not match if f["invert"] else match):
+            if match:
                 yield FilterAction(f["action"]), {"action_external_program": f["action_external_program"]}
-
-        # No filters matched
-        yield FilterAction.Nop, {}
 
     def update_feed_entries(self, feed_id: int, commit: bool = True):
         """
