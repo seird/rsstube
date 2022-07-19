@@ -31,7 +31,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: rsstube-installer-win.exe
-        path: rsstube-installer-win.exe
+        path: |
+          rsstube-installer-win.exe
+          rsstube-portable-win.zip
 
   build-ubuntu:
     strategy:
@@ -69,6 +71,7 @@ jobs:
         prerelease: false
         files: |
           rsstube-installer-win.exe
+          rsstube-portable-win.zip
           rsstube_amd64_ubuntu_focal.deb
           rsstube_amd64_ubuntu_hirsute.deb
           rsstube_amd64_ubuntu_impish.deb
