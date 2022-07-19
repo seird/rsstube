@@ -10,6 +10,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import styles
 from rss_tube.utils import center_widget
 from rss_tube.utils import set_icons, set_style
+from rss_tube.tasks import ExportSettingsTask, ImportSettingsTask
 
 
 logger = logging.getLogger("logger")
@@ -17,6 +18,8 @@ settings = Settings()
 
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
+    quit_requested = QtCore.pyqtSignal()
+
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
         super(SettingsDialog, self).__init__()
         self.setupUi(self)
@@ -76,14 +79,12 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_delete_added.setChecked(settings.value("delete/added_more_than", type=bool))
         self.spin_delete_added.setValue(settings.value("delete/added_more_than_days", type=int))
         self.cb_keep_unviewed.setChecked(settings.value("delete/keep_unviewed", type=bool))
-        self.pb_reset_feeds.hide()
-        self.pb_reset_categories.hide()
 
         # Filters tab
         self.gridLayout_tab_filters = QtWidgets.QGridLayout(self.tab_filters)
         self.gridLayout_tab_filters.addWidget(FiltersWidget(self))
 
-        # Connection tab
+        # Advanced tab
         self.groupBox_proxy.setChecked(settings.value("proxies/enabled", type=bool))
         self.line_proxy_host.setText(settings.value("proxies/socks/host", type=str))
         self.spin_proxy_port.setValue(settings.value("proxies/socks/port", type=int))
@@ -108,6 +109,31 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def combo_theme_changed(self):
         self.setting_theme_changed = True
         self.settings_changed_callback()
+    
+    def export_settings_callback(self):
+        fname = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Settings", settings.value("Settings/export_path", type=str), "*",
+        )[0]
+        if fname and os.path.exists(os.path.dirname(fname)):
+            self.export_settings_task = ExportSettingsTask(fname)
+            self.export_settings_task.start()
+            settings.setValue("Settings/export_path", fname)
+
+    def import_settings_success_callback(self):
+        response = QtWidgets.QMessageBox.information(
+            self, "Restart to apply settings", "Restart to apply settings"
+        )
+        if response == QtWidgets.QMessageBox.StandardButton.Ok:
+            self.quit_requested.emit()
+
+    def import_settings_callback(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Import Settings", settings.value("Settings/export_path", type=str), "*",
+        )[0]
+        if fname and os.path.exists(fname):
+            self.import_settings_task = ImportSettingsTask(fname)
+            self.import_settings_task.success.connect(self.import_settings_success_callback)
+            self.import_settings_task.start()
 
     def reset_settings_callback(self):
         response = QtWidgets.QMessageBox.warning(
@@ -119,6 +145,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         )
         if response == QtWidgets.QMessageBox.StandardButton.Ok:
             settings.clear()
+            self.quit_requested.emit()
 
     def player_path_callback(self):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open", os.path.dirname(self.line_player_path.text()), "*")[0]
@@ -159,12 +186,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_keep_unviewed.stateChanged.connect(self.settings_changed_callback)
 
         self.pb_open_database.clicked.connect(self.mainwindow.open_database_callback)
-        self.pb_reset_feeds.clicked.connect(self.mainwindow.feeds.delete_all_feeds)
-        self.pb_reset_categories.clicked.connect(self.mainwindow.feeds.delete_all_categories)
+
+        # Advanced tab
         self.pb_reset_settings.clicked.connect(self.reset_settings_callback)
+        self.pb_export_settings.clicked.connect(self.export_settings_callback)
+        self.pb_import_settings.clicked.connect(self.import_settings_callback)
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
-        # Connection tab
         self.groupBox_proxy.toggled.connect(self.settings_changed_callback)
         self.line_proxy_host.textChanged.connect(self.settings_changed_callback)
         self.spin_proxy_port.valueChanged.connect(self.settings_changed_callback)
@@ -221,7 +249,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("delete/added_more_than_days", self.spin_delete_added.value())
         settings.setValue("delete/keep_unviewed", self.cb_keep_unviewed.isChecked())
 
-        # Connection tab
+        # Advanced tab
         settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())
         settings.setValue("proxies/socks/host", self.line_proxy_host.text())
         settings.setValue("proxies/socks/port", self.spin_proxy_port.value())

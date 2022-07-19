@@ -159,6 +159,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def settings_callback(self):
         settings_dialog = SettingsDialog(self)
+        settings_dialog.quit_requested.connect(self.quit)
         accepted = settings_dialog.exec()
 
         self.set_shortcuts()

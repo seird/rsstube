@@ -2,6 +2,8 @@ import os
 
 from pathlib import Path
 
+from .__version__ import __title__
+
 
 DEFAULT_SETTINGS = {
     "theme": "light",
@@ -15,6 +17,7 @@ DEFAULT_SETTINGS = {
     "MainWindow/menu/show": True,
     "MainWindow/start_minimized": False,
     "MainWindow/export_location": os.path.join(Path.home(), "rsstube-channels.json"),
+    "Settings/export_path": os.path.join(Path.home(), f"{__title__.replace(' ', '-').lower()}-settings.bytes"),
     "MainWindow/entries_to_fetch": 1000,
     "MainWindow/category_icon/show": True,
     "MainWindow/feed_icon/show": True,
