@@ -75,6 +75,16 @@ class EntryYoutube(BaseEntry, Ui_Form):
         self.label_meta_website.setText(f"<a href=\"{entry['link']}\">{entry['link']}</a>")
         self.label_meta_views.setText(f"{entry['views']:,}")
         self.label_description.setHtml(convert_links(entry["description"]).replace("\n", "<br>"))
+    
+    def pb_play_callback(self):
+        self.pb_play.setDisabled(True)
+        QtCore.QTimer.singleShot(1000, lambda: self.pb_play.setEnabled(True))
+        self.play()
+    
+    def pb_play_audio_callback(self):
+        self.pb_audio.setDisabled(True)
+        QtCore.QTimer.singleShot(1000, lambda: self.pb_audio.setEnabled(True))
+        self.play_audio()
 
     def thumbnail_context(self, event: QtGui.QContextMenuEvent):
         context_menu = ThumbnailContextMenu(self)
@@ -94,7 +104,7 @@ class EntryYoutube(BaseEntry, Ui_Form):
         self.label_thumbnail.mousePressEvent = self.thumbnail_mouse_button
         self.label_thumbnail.contextMenuEvent = self.thumbnail_context
 
-        self.pb_play.clicked.connect(self.play)
-        self.pb_audio.clicked.connect(self.play_audio)
+        self.pb_play.clicked.connect(self.pb_play_callback)
+        self.pb_audio.clicked.connect(self.pb_play_audio_callback)
 
         self.pb_star.clicked.connect(self.star_toggled_callback)
