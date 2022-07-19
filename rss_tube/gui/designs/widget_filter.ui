@@ -197,6 +197,13 @@
        <widget class="QLineEdit" name="line_external_program"/>
       </item>
       <item>
+       <widget class="QCheckBox" name="cb_external_program_window">
+        <property name="text">
+         <string>Show console window</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_external_program_parameters">
         <property name="text">
          <string>TextLabel</string>

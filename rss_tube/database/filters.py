@@ -32,7 +32,7 @@ supported_parameters = [
 
 
 class Filter(dict):
-    def __init__(self, name: str, enabled: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], action_external_program: str, filter_id: int = None):
+    def __init__(self, name: str, enabled: bool, apply_to_group: str, apply_to: str, match: str, action: FilterAction, rules: List[Dict], action_external_program: str, show_console_window: bool, filter_id: int = None):
         super(Filter, self).__init__()
         self.update({
             "id": filter_id,
@@ -44,6 +44,7 @@ class Filter(dict):
             "action": pickle.loads(action) if isinstance(action, bytes) else action,
             "rules": pickle.loads(rules) if isinstance(rules, bytes) else rules,
             "action_external_program": action_external_program,
+            "show_console_window": show_console_window,
         })
 
     def get_rules_list(self) -> List[Dict]:
@@ -81,6 +82,11 @@ class Filters(object):
         except sqlite3.OperationalError:
             logger.debug(f"Column action_external_program already exists")
 
+        try:
+            self.cursor.execute("ALTER TABLE filters ADD COLUMN show_console_window INTEGER default 0")
+        except sqlite3.OperationalError:
+            logger.debug(f"Column show_console_window already exists")
+
 
         # Filters table
         self.cursor.execute("""
@@ -94,7 +100,8 @@ class Filters(object):
             match          TEXT,
             action         BLOB,
             rules          BLOB,
-            action_external_program TEXT)
+            action_external_program TEXT,
+            show_console_window INTEGER)
         """)
 
         self.database.commit()
@@ -103,9 +110,9 @@ class Filters(object):
         self.cursor.execute(
             """
             INSERT INTO filters
-                (name, enabled, apply_to_group, apply_to, match, action, rules, action_external_program)
+                (name, enabled, apply_to_group, apply_to, match, action, rules, action_external_program, show_console_window)
             VALUES
-                (:name, :enabled, :apply_to_group, :apply_to, :match, :action, :rules, :action_external_program)
+                (:name, :enabled, :apply_to_group, :apply_to, :match, :action, :rules, :action_external_program, :show_console_window)
             """,
             f.blobbed()
         )
@@ -120,7 +127,8 @@ class Filters(object):
             """
             UPDATE filters SET
                 name=:name, enabled=:enabled, apply_to_group=:apply_to_group,
-                apply_to=:apply_to, match=:match, action=:action, rules=:rules, action_external_program=:action_external_program
+                apply_to=:apply_to, match=:match, action=:action, rules=:rules,
+                action_external_program=:action_external_program, show_console_window=:show_console_window
             WHERE
                 id=:id
             """,
@@ -140,6 +148,7 @@ class Filters(object):
                 r["action"],
                 r["rules"],
                 r["action_external_program"],
+                r["show_console_window"],
                 filter_id=r["id"]
             )
         else:
@@ -157,6 +166,7 @@ class Filters(object):
                 r["action"],
                 r["rules"],
                 r["action_external_program"],
+                r["show_console_window"],
                 filter_id=r["id"]
             ))
         return filters
@@ -176,6 +186,7 @@ class Filters(object):
                 r["action"],
                 r["rules"],
                 r["action_external_program"],
+                r["show_console_window"],
                 filter_id=r["id"]
             ))
         return filters

@@ -134,6 +134,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
     def combo_action_changed_callback(self, text: str):
         self.label_external_program_parameters.setVisible(text == FilterAction.RunExternalProgram.value)
         self.line_external_program.setVisible(text == FilterAction.RunExternalProgram.value)
+        self.cb_external_program_window.setVisible(text == FilterAction.RunExternalProgram.value)
 
     def dialog_accept_callback(self):
         """
@@ -162,6 +163,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
                 "match": "any" if self.cb_match_any.isChecked() else "all" if self.cb_match_all.isChecked() else "",
                 "action": FilterAction(action_text),
                 "action_external_program": self.line_external_program.text(),
+                "show_console_window": self.cb_external_program_window.isChecked(),
                 "enabled": self.cb_enabled.isChecked(),
             })
             self.accept()
@@ -210,6 +212,7 @@ class EditFilterDialog(NewFilterDialog):
         # Action
         self.combo_action.setCurrentText(f["action"].value)
         self.line_external_program.setText(f["action_external_program"])
+        self.cb_external_program_window.setChecked(f["show_console_window"])
 
         # Match
         if f["match"] == "any":
@@ -301,6 +304,7 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
                 action=filter_dialog.filter_properties["action"],
                 rules=filter_dialog.filter_properties["rules"],
                 action_external_program=filter_dialog.filter_properties["action_external_program"],
+                show_console_window=filter_dialog.filter_properties["show_console_window"],
             )
             self.filters.store_filter(f)
 
@@ -324,6 +328,7 @@ class FiltersWidget(QtWidgets.QDialog, Ui_Form_Filters):
                 action=filter_dialog.filter_properties["action"],
                 rules=filter_dialog.filter_properties["rules"],
                 action_external_program=filter_dialog.filter_properties["action_external_program"],
+                show_console_window=filter_dialog.filter_properties["show_console_window"],
                 filter_id=fw.filter_id
             )
             self.filters.update_filter(f)

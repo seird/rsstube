@@ -100,6 +100,9 @@ class Ui_Dialog(object):
         self.line_external_program = QtWidgets.QLineEdit(self.groupBox)
         self.line_external_program.setObjectName("line_external_program")
         self.verticalLayout.addWidget(self.line_external_program)
+        self.cb_external_program_window = QtWidgets.QCheckBox(self.groupBox)
+        self.cb_external_program_window.setObjectName("cb_external_program_window")
+        self.verticalLayout.addWidget(self.cb_external_program_window)
         self.label_external_program_parameters = QtWidgets.QLabel(self.groupBox)
         self.label_external_program_parameters.setObjectName("label_external_program_parameters")
         self.verticalLayout.addWidget(self.label_external_program_parameters)
@@ -118,6 +121,7 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "Apply to:"))
         self.label.setText(_translate("Dialog", "Filter name:"))
         self.label_3.setText(_translate("Dialog", "Action to perform:"))
+        self.cb_external_program_window.setText(_translate("Dialog", "Show console window"))
         self.label_external_program_parameters.setText(_translate("Dialog", "TextLabel"))
 
 

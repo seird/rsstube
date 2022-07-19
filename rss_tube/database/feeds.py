@@ -1,8 +1,8 @@
 import datetime
 import logging
-import os
+import subprocess
 import time
-import threading
+import os
 
 from typing import Any, Iterator, List, Optional, Tuple
 
@@ -433,7 +433,10 @@ class Feeds(object):
                 continue
             
             if match:
-                yield FilterAction(f["action"]), {"action_external_program": f["action_external_program"]}
+                yield FilterAction(f["action"]), {
+                    "action_external_program": f["action_external_program"],
+                    "show_console_window": f["show_console_window"]
+                }
 
     def update_feed_entries(self, feed_id: int, commit: bool = True):
         """
@@ -458,13 +461,13 @@ class Feeds(object):
             entry_fetched = self.cursor.execute("SELECT * FROM entries WHERE entry_id=:entry_id", entry).fetchone()
             if not entry_fetched:
                 # Filter the new entry
+                entry.update({
+                    "feed_id": feed_id,
+                    "deleted": 0,
+                    "viewed": 0,
+                    "star": 0,
+                })
                 for action, action_args in self.apply_filters(parsed_feed, entry):
-                    entry.update({
-                        "feed_id": feed_id,
-                        "deleted": 0,
-                        "viewed": 0,
-                        "star": 0,
-                    })
                     if action == FilterAction.Delete:
                         entry.update({"deleted": 1})
                     elif action == FilterAction.MarkViewed:
@@ -475,14 +478,21 @@ class Feeds(object):
                         entry.update({"viewed": 1, "star": 1})
                     elif action == FilterAction.RunExternalProgram:
                         command = action_args["action_external_program"]
+                        show_console = action_args["show_console_window"]
                         for p in supported_parameters:
                             command = command.replace(p[0], entry[p[2]])
                         logger.debug(f"Executing command '{command}' on entry")
                         try:
-                            thread = threading.Thread(target=os.system, args=(command, ))
-                            thread.start()
+                            if os.name == "nt":
+                                si = subprocess.STARTUPINFO()
+                                if not show_console:
+                                    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                                subprocess.Popen(command, startupinfo=si)
+                            else:
+                                # TODO: show console on linux
+                                subprocess.Popen(command, shell=True)
                         except Exception as e:
-                            logger.error(f"Error executing command: {e}")
+                            logger.error(f"Error executing [{command}]: {e}")
 
                 self.cursor.execute(
                     """
