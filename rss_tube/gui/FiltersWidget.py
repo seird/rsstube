@@ -20,7 +20,7 @@ class FilterRuleWidget(QtWidgets.QWidget, QtWidgets.QTableWidgetItem, Ui_Form_Fi
         super(FilterRuleWidget, self).__init__(*args, **kwargs)
         self.setupUi(self)
 
-        self.combo_target.addItems(["Title", "Description", "Author", "Category"])
+        self.combo_target.addItems(["Title", "Description", "Author"])
         self.combo_type.addItems(["contains", "equals", "doesn't contain", "doesn't equal"])
 
 
