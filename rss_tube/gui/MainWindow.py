@@ -15,7 +15,7 @@ from rss_tube.database.settings import Settings
 from rss_tube.gui.EntryWidgets.BaseEntry import BaseEntry
 from rss_tube.updater import Updater
 from rss_tube.utils import get_abs_path, set_icons, set_style
-from rss_tube.tasks import Tasks, AddFeedTask, ExportFeedsTask, ImportFeedsTask
+from rss_tube.tasks import Tasks, AddFeedTask, ExportFeedsTask, ImportFeedsTask, ImportFiltersTask, ExportFiltersTask
 from .AboutDialog import AboutDialog
 from .RenameDialog import RenameCategoryDialog, RenameChannelDialog
 from .ShortcutDialog import ShortcutsDialog
@@ -160,6 +160,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def settings_callback(self):
         settings_dialog = SettingsDialog(self)
         settings_dialog.quit_requested.connect(self.quit)
+        settings_dialog.import_channels.connect(self.import_channels_callback)
+        settings_dialog.export_channels.connect(self.export_channels_callback)
+        settings_dialog.import_filters.connect(self.import_filters_callback)
+        settings_dialog.export_filters.connect(self.export_filters_callback)
         accepted = settings_dialog.exec()
 
         self.set_shortcuts()
@@ -269,7 +273,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                 self.tree_feeds.add_category(category)
 
     def import_channels_callback(self):
-        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Import", settings.value("MainWindow/export_location", type=str), "*")[0]
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Import Channels", settings.value("Channels/export_path", type=str), "*")[0]
         if fname and os.path.exists(fname):
             self.import_feeds_task = ImportFeedsTask(fname)
             self.import_feeds_task.imported.connect(self.channel_imported_callback)
@@ -280,11 +284,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tree_feeds.add_feed(feed_id)
 
     def export_channels_callback(self):
-        fname = QtWidgets.QFileDialog.getSaveFileName(self, "Save", settings.value("MainWindow/export_location", type=str), "*")[0]
+        fname = QtWidgets.QFileDialog.getSaveFileName(self, "Export Channels", settings.value("Channels/export_path", type=str), "*")[0]
         if fname and os.path.exists(os.path.dirname(fname)):
             self.export_feeds_task = ExportFeedsTask(fname)
             self.export_feeds_task.start()
-            settings.setValue("MainWindow/export_location", fname)
+            settings.setValue("Channels/export_path", fname)
+    
+    def import_filters_callback(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Import Filters", settings.value("Filters/export_path", type=str), "*")[0]
+        if fname and os.path.exists(fname):
+            self.import_filters_task = ImportFiltersTask(fname)
+            self.import_filters_task.imported.connect(self.channel_imported_callback)
+            self.import_filters_task.start()
+
+    def export_filters_callback(self):
+        fname = QtWidgets.QFileDialog.getSaveFileName(self, "Export Filters", settings.value("Filters/export_path", type=str), "*")[0]
+        if fname and os.path.exists(os.path.dirname(fname)):
+            self.export_filters_task = ExportFiltersTask(fname)
+            self.export_filters_task.start()
+            settings.setValue("Channels/export_path", fname)
 
     def update_feeds_callback(self):
         settings.set_last_refresh()

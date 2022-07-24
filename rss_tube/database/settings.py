@@ -28,7 +28,8 @@ class Settings(QtCore.QSettings):
             for key in self.allKeys()
             if not (  # skip settings that might not translate well between platforms
                 isinstance(self.value(key), QtCore.QByteArray)
-                or key == "MainWindow/export_location"
+                or key == "Channels/export_path"
+                or key == "Filters/export_path"
                 or key == "Settings/export_path"
                 or key == "player/mpv/path"
                 or key == "player/vlc/path"

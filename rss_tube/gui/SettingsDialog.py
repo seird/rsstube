@@ -19,6 +19,10 @@ settings = Settings()
 
 class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     quit_requested = QtCore.pyqtSignal()
+    import_channels = QtCore.pyqtSignal()
+    export_channels = QtCore.pyqtSignal()
+    import_filters = QtCore.pyqtSignal()
+    export_filters = QtCore.pyqtSignal()
 
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
         super(SettingsDialog, self).__init__()
@@ -191,6 +195,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.pb_reset_settings.clicked.connect(self.reset_settings_callback)
         self.pb_export_settings.clicked.connect(self.export_settings_callback)
         self.pb_import_settings.clicked.connect(self.import_settings_callback)
+        self.pb_import_channels.clicked.connect(self.import_channels.emit)
+        self.pb_export_channels.clicked.connect(self.export_channels.emit)
+        self.pb_import_filters.clicked.connect(self.import_filters.emit)
+        self.pb_export_filters.clicked.connect(self.export_filters.emit)
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
         self.groupBox_proxy.toggled.connect(self.settings_changed_callback)

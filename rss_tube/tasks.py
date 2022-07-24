@@ -174,6 +174,37 @@ class ExportFeedsTask(BaseTask):
             json.dump(j, f, indent=4)
 
 
+class ImportFiltersTask(BaseTask):
+    imported = pyqtSignal(int)
+
+    def __init__(self, fname: str):
+        super(ImportFiltersTask, self).__init__()
+        self.fname = fname
+
+    def task(self):
+        try:
+            with open(self.fname, "r") as f:
+                j = json.load(f)
+        except FileNotFoundError:
+            logger.error(f"ImportFiltersTask failed: {self.name} does not exist.")
+            self.failed.emit()
+            return
+
+        ...
+
+
+class ExportFiltersTask(BaseTask):
+    def __init__(self, fname: str):
+        super(ExportFiltersTask, self).__init__()
+        self.fname = fname
+
+    def task(self):
+        ...
+
+        # with open(self.fname, "w") as f:
+        #     json.dump(j, f, indent=4)
+
+
 class SaveThumbnailTask(BaseTask):
     def __init__(self, img_url: str, fname: str):
         super(SaveThumbnailTask, self).__init__()
