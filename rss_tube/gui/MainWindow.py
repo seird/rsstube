@@ -550,7 +550,10 @@ def start_gui():
     logdir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.StandardLocation.AppDataLocation)[0]
     if not os.path.exists(logdir):
         os.mkdir(logdir)
-    logging.basicConfig(filename=os.path.join(logdir, __title__.replace(" ", "-") + ".log"), format='%(levelname)s > %(name)s > %(asctime)s > %(message)s')
+    logging.basicConfig(
+        filename=os.path.join(logdir, __title__.replace(" ", "-") + ".log"),
+        format="%(levelname)s > %(name)s > %(asctime)s > %(filename)20s:%(lineno)3s - %(funcName)20s() > %(message)s",
+    )
 
     window = MainWindow(app)
 

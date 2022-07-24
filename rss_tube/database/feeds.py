@@ -9,6 +9,7 @@ from typing import Any, Iterator, List, Optional, Tuple
 from PyQt6 import QtCore
 
 from rss_tube.database.settings import Settings
+from rss_tube.database.cache import Cache
 from rss_tube.download import Downloader
 from rss_tube.parser import parse_url, parse_feed
 from .database import Database
@@ -23,6 +24,7 @@ class Feeds(object):
     def __init__(self):
         self.database = Database("feeds", QtCore.QStandardPaths.StandardLocation.AppLocalDataLocation)
         self.downloader = Downloader()
+        self.cache = Cache()
         self.filters = Filters()
         self.cursor = self.database.cursor()
 
@@ -74,6 +76,14 @@ class Feeds(object):
             star           INTEGER)
         """)
 
+        # Purged entries table
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS purged (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            link         TEXT
+        )
+        """)
+
         self.database.commit()
 
     def delete_all_feeds(self):
@@ -113,6 +123,47 @@ class Feeds(object):
             (category,)
         )
         self.database.commit()
+    
+    def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True):
+        # Delete all the saved thumbnails
+        links = []
+        for q in self.cursor.execute(
+            f"""
+            SELECT thumbnail, link FROM entries
+            WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
+            ORDER BY added_on DESC
+            LIMIT -1 OFFSET ?
+            """,
+            (feed_id, num_entries_to_keep)
+        ).fetchall():
+            self.cache.delete(q["thumbnail"])
+            links.append((q["link"],))
+
+        # Delete the entry from the entries table
+        self.cursor.execute(
+            f"""
+            DELETE FROM entries
+            WHERE id in (
+                SELECT id FROM entries
+                WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
+                ORDER BY added_on DESC
+                LIMIT -1 OFFSET ?
+            )
+            """,
+            (feed_id, num_entries_to_keep)
+        )
+
+        # Add the entry link to the purged table to prevent it from being re-added
+        self.cursor.executemany("INSERT INTO purged (link) VALUES (?)", links)
+        
+        self.database.isolation_level = None
+        self.cursor.execute("VACUUM")
+        self.database.isolation_level = ''
+        self.database.commit()
+
+    def purge_feeds(self, num_entries_to_keep: int, keep_unviewed: bool = True):
+        for feed in self.get_feeds():
+            self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
 
     def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)
@@ -458,6 +509,10 @@ class Feeds(object):
         preload_thumbnails = settings.value("cache/preload_thumbnails", type=bool)
 
         for i, entry in parsed_feed["entries"].items():
+            if self.cursor.execute("SELECT * FROM purged WHERE link=:link", entry).fetchall():
+                logger.debug(f"Entry {entry['link']} has been purged, skippping.")
+                continue
+
             entry_fetched = self.cursor.execute("SELECT * FROM entries WHERE entry_id=:entry_id", entry).fetchone()
             if not entry_fetched:
                 # Filter the new entry

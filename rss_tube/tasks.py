@@ -25,7 +25,6 @@ class Tasks(QtCore.QThread):
         self.running = False
 
         self.feed_update_task = FeedsUpdateTask()
-        self.delete_entries_task = DeleteEntriesTask()
 
         self.interval = settings.value("tasks/interval", type=int)
 
@@ -40,7 +39,6 @@ class Tasks(QtCore.QThread):
         schedule.clear("update-feed")
         schedule.clear("delete_entries")
         self.feed_update_job = schedule.every(settings.value("feeds/update_interval/minutes", type=int)).minutes.do(self.feed_update_task.start).tag("update-feed")
-        schedule.every(settings.value("delete/interval/hours", type=int)).hours.do(self.delete_entries_task.start).tag("delete_entries")
 
         self.job_update_info.emit(self.feed_update_job.last_run or datetime.now(), self.feed_update_job.next_run or datetime.now())
         self.feed_update_task._finished.connect(self._feed_update_task_finished_callback)
@@ -88,6 +86,52 @@ class DeleteEntriesTask(BaseTask):
                 settings.value("delete/added_more_than_days", type=int),
                 settings.value("delete/keep_unviewed", type=bool)
             )
+
+
+class PurgeFeedsTask(BaseTask):
+    maximum = pyqtSignal(int)
+    current = pyqtSignal(str)
+    progress = pyqtSignal(int)
+
+    def __init__(self):
+        super(PurgeFeedsTask, self).__init__()
+        self.request_stop = False
+
+    def task(self):
+        self.request_stop =  False
+
+        feeds = Feeds()
+        feeds_list = feeds.get_feeds()
+
+        self.maximum.emit(len(feeds_list))
+
+        for i, feed in enumerate(feeds_list):
+            if self.request_stop:
+                break
+
+            self.current.emit(feed["author"])
+
+            feeds.purge_feed(
+                feed["id"],
+                settings.value("purge/entries_to_keep", type=int),
+                settings.value("purge/keep_unviewed",  type=bool)
+            )
+
+            self.progress.emit(i+1)
+
+
+class PurgeFeedTask(BaseTask):
+    def __init__(self, feed_id: int):
+        super(PurgeFeedTask, self).__init__()
+        self.feed_id = feed_id
+
+    def task(self):
+        feeds = Feeds()
+        feeds.purge_feed(
+            self.feed_id,
+            settings.value("purge/entries_to_keep", type=int),
+            settings.value("purge/keep_unviewed",  type=bool)
+        )
 
 
 class FeedsUpdateTask(BaseTask):

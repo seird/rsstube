@@ -67,3 +67,11 @@ class Cache(object):
         )
         self.database.commit()
         return filepath
+
+    def delete(self, key: str):
+        q = self.cursor.execute("SELECT filename FROM cache WHERE url=?", (key,)).fetchone()
+        if q:
+            filepath = os.path.join(self.cache_dir, q["filename"])
+            os.remove(filepath)
+            self.cursor.execute("DELETE FROM cache WHERE url=?", (key,))
+            self.database.commit()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>424</height>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -486,7 +486,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_9">
+        <widget class="QGroupBox" name="groupbox_delete_entries">
          <property name="title">
           <string>Delete</string>
          </property>
@@ -537,6 +537,38 @@
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>days ago</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Purge</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pb_purge_entries">
+            <property name="text">
+             <string>Purge entries...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_9">
+         <property name="title">
+          <string>Cache</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pb_reset_cache">
+            <property name="text">
+             <string>Reset</string>
             </property>
            </widget>
           </item>
@@ -640,22 +672,6 @@
            <widget class="QPushButton" name="pb_export_filters">
             <property name="text">
              <string>Export</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Cache</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <item row="0" column="0" colspan="2">
-           <widget class="QPushButton" name="pb_reset_cache">
-            <property name="text">
-             <string>Reset</string>
             </property>
            </widget>
           </item>

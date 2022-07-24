@@ -5,6 +5,7 @@ from PyQt6 import QtCore, QtWidgets
 
 from .designs.widget_settings import Ui_Dialog
 from .FiltersWidget import FiltersWidget
+from .PurgeEntriesDialog import PurgeEntriesDialog
 from .ShortcutDialog import ShortcutsDialog
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import styles
@@ -27,6 +28,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
         super(SettingsDialog, self).__init__()
         self.setupUi(self)
+
+        self.groupbox_delete_entries.hide()
 
         self.settings_changed = False
         self.setting_theme_changed = False
@@ -114,6 +117,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.setting_theme_changed = True
         self.settings_changed_callback()
     
+    def purge_entries_callback(self):
+        purge_entries_dialog = PurgeEntriesDialog(self)
+        purge_entries_dialog.exec()
+    
     def export_settings_callback(self):
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, "Export Settings", settings.value("Settings/export_path", type=str), "*",
@@ -188,6 +195,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_delete_added.stateChanged.connect(self.settings_changed_callback)
         self.spin_delete_added.valueChanged.connect(self.settings_changed_callback)
         self.cb_keep_unviewed.stateChanged.connect(self.settings_changed_callback)
+        self.pb_purge_entries.clicked.connect(self.purge_entries_callback)
+        self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
         self.pb_open_database.clicked.connect(self.mainwindow.open_database_callback)
 
@@ -199,7 +208,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.pb_export_channels.clicked.connect(self.export_channels.emit)
         self.pb_import_filters.clicked.connect(self.import_filters.emit)
         self.pb_export_filters.clicked.connect(self.export_filters.emit)
-        self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
         self.groupBox_proxy.toggled.connect(self.settings_changed_callback)
         self.line_proxy_host.textChanged.connect(self.settings_changed_callback)
