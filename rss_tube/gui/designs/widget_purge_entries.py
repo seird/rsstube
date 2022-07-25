@@ -34,7 +34,7 @@ class Ui_Dialog(object):
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
         self.spinBox = QtWidgets.QSpinBox(Dialog)
-        self.spinBox.setMinimum(10)
+        self.spinBox.setMinimum(0)
         self.spinBox.setMaximum(99999)
         self.spinBox.setProperty("value", 10)
         self.spinBox.setObjectName("spinBox")

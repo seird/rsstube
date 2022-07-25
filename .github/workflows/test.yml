@@ -1,0 +1,82 @@
+name: build
+
+on:
+  push:
+    branches-ignore:
+      - master
+    tags-ignore:
+      - '*'
+
+jobs:
+
+  build-win64:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+          python-version: '3.9.12'
+    - name: Upgrade pip and enable wheel support
+      run: python -m pip install --upgrade pip setuptools wheel
+    - name: Install Requirements
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+      shell: bash
+    - name: Build
+      run: |
+        powershell -File build-win.ps1
+        mv inno-output\rsstube-installer.exe rsstube-installer-win.exe
+      shell: cmd
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rsstube-installer-win.exe
+        path: |
+          rsstube-installer-win.exe
+          rsstube-portable-win.zip
+
+  build-ubuntu:
+    strategy:
+      matrix:
+        tag: [focal]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+          python-version: '3.9.7'
+    - name: Upgrade pip and enable wheel support
+      run: python -m pip install --upgrade pip setuptools wheel
+    - name: Build
+      run: |
+        make build
+        cp dist/rsstube_amd64.deb rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
+        path: rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
+
+  build-macos:
+    runs-on: macos-12
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+          python-version: '3.9.12'
+    - name: Upgrade pip and enable wheel support
+      run: python -m pip install --upgrade pip setuptools wheel
+    - name: Build
+      run: |
+        make build-macos
+        brew install create-dmg
+        create-dmg --volname "RSSTube" --app-drop-link 0 0 --no-internet-enable "rsstube.dmg" "./dist/RSSTube.app"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rsstube.dmg
+        path: rsstube.dmg
