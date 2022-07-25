@@ -68,6 +68,7 @@ def set_icons(w: QtWidgets.QMainWindow, style: str = "dark"):
     w.pb_new_feed.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed_new.svg")))
     w.pb_update_feeds.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/update_feeds.svg")))
     w.pb_settings.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/settings.svg")))
+    w.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/tray.png")))
 
     w.entry_widgets["youtube"].pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/audio.png")))
 
