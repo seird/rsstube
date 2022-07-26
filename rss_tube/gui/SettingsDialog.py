@@ -29,8 +29,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         super(SettingsDialog, self).__init__()
         self.setupUi(self)
 
-        self.groupbox_delete_entries.hide()
-
         self.settings_changed = False
         self.setting_theme_changed = False
         self.schedule_changed = False
@@ -83,9 +81,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         self.cb_preload_thumbnails.setChecked(settings.value("cache/preload_thumbnails", type=bool))
         self.spin_entries_to_fetch.setValue(settings.value("MainWindow/entries_to_fetch", type=int))
-        self.cb_delete_added.setChecked(settings.value("delete/added_more_than", type=bool))
-        self.spin_delete_added.setValue(settings.value("delete/added_more_than_days", type=int))
-        self.cb_keep_unviewed.setChecked(settings.value("delete/keep_unviewed", type=bool))
 
         # Filters tab
         self.gridLayout_tab_filters = QtWidgets.QGridLayout(self.tab_filters)
@@ -192,9 +187,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         self.cb_preload_thumbnails.stateChanged.connect(self.settings_changed_callback)
         self.spin_entries_to_fetch.valueChanged.connect(self.settings_changed_callback)
-        self.cb_delete_added.stateChanged.connect(self.settings_changed_callback)
-        self.spin_delete_added.valueChanged.connect(self.settings_changed_callback)
-        self.cb_keep_unviewed.stateChanged.connect(self.settings_changed_callback)
         self.pb_purge_entries.clicked.connect(self.purge_entries_callback)
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
@@ -261,9 +253,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         settings.setValue("cache/preload_thumbnails", self.cb_preload_thumbnails.isChecked())
         settings.setValue("MainWindow/entries_to_fetch", self.spin_entries_to_fetch.value())
-        settings.setValue("delete/added_more_than", self.cb_delete_added.isChecked())
-        settings.setValue("delete/added_more_than_days", self.spin_delete_added.value())
-        settings.setValue("delete/keep_unviewed", self.cb_keep_unviewed.isChecked())
 
         # Advanced tab
         settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())

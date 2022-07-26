@@ -78,16 +78,6 @@ class BaseTask(QtCore.QThread):
             self.running = False
 
 
-class DeleteEntriesTask(BaseTask):
-    def task(self):
-        if settings.value("delete/added_more_than", type=bool):
-            feeds = Feeds()
-            feeds.delete_entries_added_more_than_days(
-                settings.value("delete/added_more_than_days", type=int),
-                settings.value("delete/keep_unviewed", type=bool)
-            )
-
-
 class PurgeFeedsTask(BaseTask):
     maximum = pyqtSignal(int)
     current = pyqtSignal(str)

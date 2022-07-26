@@ -486,64 +486,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupbox_delete_entries">
-         <property name="title">
-          <string>Delete</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="cb_keep_unviewed">
-            <property name="text">
-             <string>Keep unviewed entries</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="cb_delete_added">
-            <property name="text">
-             <string>Delete entries added more than</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QSpinBox" name="spin_delete_added">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>65</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="value">
-             <number>14</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>days ago</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Purge</string>
@@ -764,9 +706,6 @@
   <tabstop>combo_player_quality</tabstop>
   <tabstop>cb_preload_thumbnails</tabstop>
   <tabstop>spin_entries_to_fetch</tabstop>
-  <tabstop>cb_delete_added</tabstop>
-  <tabstop>spin_delete_added</tabstop>
-  <tabstop>cb_keep_unviewed</tabstop>
  </tabstops>
  <resources/>
  <connections>
