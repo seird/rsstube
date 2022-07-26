@@ -126,15 +126,23 @@ class Feeds(object):
     
     def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True):
         # Delete all the saved thumbnails
+        params = {
+            "feed_id": feed_id,
+            "num_entries_to_keep": num_entries_to_keep
+        }
+
         links = []
         for q in self.cursor.execute(
             f"""
+            SELECT * FROM (SELECT thumbnail, link FROM entries
+                WHERE feed_id=:feed_id AND star=0 AND deleted=0 {'AND viewed=1' if keep_unviewed else ''}
+                ORDER BY added_on DESC
+                LIMIT -1 OFFSET :num_entries_to_keep)
+            UNION ALL
             SELECT thumbnail, link FROM entries
-            WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
-            ORDER BY added_on DESC
-            LIMIT -1 OFFSET ?
+                WHERE feed_id=:feed_id AND deleted=1
             """,
-            (feed_id, num_entries_to_keep)
+            params
         ).fetchall():
             self.cache.delete(q["thumbnail"])
             links.append((q["link"],))
@@ -144,13 +152,16 @@ class Feeds(object):
             f"""
             DELETE FROM entries
             WHERE id in (
+                SELECT id FROM (SELECT id FROM entries
+                    WHERE feed_id=:feed_id AND star=0 {'AND viewed=1' if keep_unviewed else ''}
+                    ORDER BY added_on DESC
+                    LIMIT -1 OFFSET :num_entries_to_keep)
+                UNION ALL
                 SELECT id FROM entries
-                WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
-                ORDER BY added_on DESC
-                LIMIT -1 OFFSET ?
+                    WHERE feed_id=:feed_id AND deleted=1 
             )
             """,
-            (feed_id, num_entries_to_keep)
+            params
         )
 
         # Add the entry link to the purged table to prevent it from being re-added
