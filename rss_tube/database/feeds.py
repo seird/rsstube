@@ -136,7 +136,7 @@ class Feeds(object):
             f"""
             SELECT * FROM (SELECT thumbnail, link FROM entries
                 WHERE feed_id=:feed_id AND star=0 AND deleted=0 {'AND viewed=1' if keep_unviewed else ''}
-                ORDER BY added_on DESC
+                ORDER BY published DESC
                 LIMIT -1 OFFSET :num_entries_to_keep)
             UNION ALL
             SELECT thumbnail, link FROM entries
@@ -154,7 +154,7 @@ class Feeds(object):
             WHERE id in (
                 SELECT id FROM (SELECT id FROM entries
                     WHERE feed_id=:feed_id AND star=0 {'AND viewed=1' if keep_unviewed else ''}
-                    ORDER BY added_on DESC
+                    ORDER BY published DESC
                     LIMIT -1 OFFSET :num_entries_to_keep)
                 UNION ALL
                 SELECT id FROM entries
