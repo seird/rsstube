@@ -30,6 +30,10 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
         self.pb_start.setText("Start" if enabled else "Stop")
         for pb in self.buttonBox.buttons():
             pb.setEnabled(enabled)
+    
+    def report_callback(self, report: dict):
+        self.progressBar.setValue(report["progress"])
+        self.label_report.setText(f"Purged {report['entries']} entries in {report['feeds']} feeds.")
 
     def finished_callback(self):
         self.started = False
@@ -43,7 +47,7 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
             self.set_buttons_enabled(False)
             self.purge_feeds_task.maximum.connect(lambda m: self.progressBar.setRange(0, m))
             self.purge_feeds_task.current.connect(lambda t: self.label_current.setText(f"Processing '{t}' ..."))
-            self.purge_feeds_task.progress.connect(lambda p: self.progressBar.setValue(p))
+            self.purge_feeds_task.report.connect(self.report_callback)
             self.purge_feeds_task.finished.connect(self.finished_callback)
             self.purge_feeds_task.start()
         else:

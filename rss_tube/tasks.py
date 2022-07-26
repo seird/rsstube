@@ -81,7 +81,7 @@ class BaseTask(QtCore.QThread):
 class PurgeFeedsTask(BaseTask):
     maximum = pyqtSignal(int)
     current = pyqtSignal(str)
-    progress = pyqtSignal(int)
+    report = pyqtSignal(dict) # {"progress": <int>, "entries": <int>, "feeds": <int>}
 
     def __init__(self):
         super(PurgeFeedsTask, self).__init__()
@@ -95,19 +95,28 @@ class PurgeFeedsTask(BaseTask):
 
         self.maximum.emit(len(feeds_list))
 
+        report = {
+            "progress": 0,
+            "entries": 0,
+            "feeds": 0
+        }
+
         for i, feed in enumerate(feeds_list):
             if self.request_stop:
                 break
 
             self.current.emit(feed["author"])
 
-            feeds.purge_feed(
+            num_purged = feeds.purge_feed(
                 feed["id"],
                 settings.value("purge/entries_to_keep", type=int),
                 settings.value("purge/keep_unviewed",  type=bool)
             )
 
-            self.progress.emit(i+1)
+            report["entries"] += num_purged
+            report["feeds"] += num_purged > 0
+            report["progress"] = i+1
+            self.report.emit(report)
 
 
 class PurgeFeedTask(BaseTask):

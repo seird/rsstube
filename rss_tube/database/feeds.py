@@ -124,7 +124,7 @@ class Feeds(object):
         )
         self.database.commit()
     
-    def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True):
+    def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True) -> int:
         # Delete all the saved thumbnails
         params = {
             "feed_id": feed_id,
@@ -172,9 +172,13 @@ class Feeds(object):
         self.database.isolation_level = ''
         self.database.commit()
 
-    def purge_feeds(self, num_entries_to_keep: int, keep_unviewed: bool = True):
+        return len(links)
+
+    def purge_feeds(self, num_entries_to_keep: int, keep_unviewed: bool = True) -> int:
+        entries_purged = 0
         for feed in self.get_feeds():
-            self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
+            entries_purged += self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
+        return entries_purged
 
     def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)
