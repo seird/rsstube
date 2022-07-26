@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(451, 442)
+        Dialog.resize(451, 435)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
@@ -222,6 +222,9 @@ class Ui_Dialog(object):
         self.pb_purge_entries = QtWidgets.QPushButton(self.groupBox_2)
         self.pb_purge_entries.setObjectName("pb_purge_entries")
         self.gridLayout_8.addWidget(self.pb_purge_entries, 0, 0, 1, 1)
+        self.cb_purge_schedule = QtWidgets.QCheckBox(self.groupBox_2)
+        self.cb_purge_schedule.setObjectName("cb_purge_schedule")
+        self.gridLayout_8.addWidget(self.cb_purge_schedule, 1, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
         self.groupBox_9 = QtWidgets.QGroupBox(self.tab_database)
         self.groupBox_9.setObjectName("groupBox_9")
@@ -366,6 +369,7 @@ class Ui_Dialog(object):
         self.label_7.setText(_translate("Dialog", "most recent entries"))
         self.groupBox_2.setTitle(_translate("Dialog", "Purge"))
         self.pb_purge_entries.setText(_translate("Dialog", "Purge entries..."))
+        self.cb_purge_schedule.setText(_translate("Dialog", "Purge entries periodically"))
         self.groupBox_9.setTitle(_translate("Dialog", "Cache"))
         self.pb_reset_cache.setText(_translate("Dialog", "Reset"))
         self.pb_open_database.setText(_translate("Dialog", "Open database directory"))

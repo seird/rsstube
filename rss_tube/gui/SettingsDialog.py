@@ -81,6 +81,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         self.cb_preload_thumbnails.setChecked(settings.value("cache/preload_thumbnails", type=bool))
         self.spin_entries_to_fetch.setValue(settings.value("MainWindow/entries_to_fetch", type=int))
+        self.cb_purge_schedule.setChecked(settings.value("purge/enabled", type=bool))
 
         # Filters tab
         self.gridLayout_tab_filters = QtWidgets.QGridLayout(self.tab_filters)
@@ -188,6 +189,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_preload_thumbnails.stateChanged.connect(self.settings_changed_callback)
         self.spin_entries_to_fetch.valueChanged.connect(self.settings_changed_callback)
         self.pb_purge_entries.clicked.connect(self.purge_entries_callback)
+        self.cb_purge_schedule.stateChanged.connect(self.settings_changed_callback)
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
         self.pb_open_database.clicked.connect(self.mainwindow.open_database_callback)
@@ -253,6 +255,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         settings.setValue("cache/preload_thumbnails", self.cb_preload_thumbnails.isChecked())
         settings.setValue("MainWindow/entries_to_fetch", self.spin_entries_to_fetch.value())
+        settings.setValue("purge/enabled", self.cb_purge_schedule.isChecked())
 
         # Advanced tab
         settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())

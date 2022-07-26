@@ -35,9 +35,15 @@ class Tasks(QtCore.QThread):
             self.feed_update_job.last_run = datetime.now()
         self.job_update_info.emit(self.feed_update_job.last_run, self.feed_update_job.next_run)
 
+        # Start purge task
+        if settings.value("purge/enabled", type=bool):
+            self.purge_task = PurgeFeedsTask()
+            self.purge_task.start()
+            self.purge_task.started.connect(lambda: logger.debug("Auto PurgeFeedsTask started."))
+            self.purge_task.finished.connect(lambda: logger.debug("Auto PurgeFeedsTask finished."))
+
     def set_schedule(self):
         schedule.clear("update-feed")
-        schedule.clear("delete_entries")
         self.feed_update_job = schedule.every(settings.value("feeds/update_interval/minutes", type=int)).minutes.do(self.feed_update_task.start).tag("update-feed")
 
         self.job_update_info.emit(self.feed_update_job.last_run or datetime.now(), self.feed_update_job.next_run or datetime.now())
@@ -117,6 +123,8 @@ class PurgeFeedsTask(BaseTask):
             report["feeds"] += num_purged > 0
             report["progress"] = i+1
             self.report.emit(report)
+
+        logger.debug(f"Purged {report['entries']} entries in {report['feeds']} feeds.")
 
 
 class PurgeFeedTask(BaseTask):
