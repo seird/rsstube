@@ -34,7 +34,7 @@ DEFAULT_SETTINGS = {
     "player/vlc/path": "vlc",
     "player/vlc/args": "",
     "cache/preload_thumbnails": False,
-    "purge/enabled": True,
+    "purge/enabled": False,
     "purge/keep_unviewed": True,
     "purge/entries_to_keep": 15,
     "shortcuts/filter": "Ctrl+F",
