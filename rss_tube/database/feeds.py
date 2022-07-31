@@ -1,6 +1,7 @@
 import datetime
 import logging
 import subprocess
+import sqlite3
 import time
 import os
 
@@ -38,17 +39,23 @@ class Feeds(object):
         """)
         
         # Feeds table
+        try:
+            self.cursor.execute("ALTER TABLE feeds ADD COLUMN purge_excluded INTEGER default 0")
+        except sqlite3.OperationalError:
+            logger.debug(f"Column purge_excluded already exists")
+
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS feeds (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            notify       INTEGER,
-            author       TEXT,
-            category     TEXT,
-            type         TEXT,
-            url          TEXT,
-            channel_url  TEXT,
-            added_on     TEXT,
-            refreshed_on TEXT)
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            notify         INTEGER,
+            purge_excluded INTEGER,
+            author         TEXT,
+            category       TEXT,
+            type           TEXT,
+            url            TEXT,
+            channel_url    TEXT,
+            added_on       TEXT,
+            refreshed_on   TEXT)
         """)
 
         # Feed Entries table
@@ -318,6 +325,9 @@ class Feeds(object):
 
     def get_feeds(self) -> List:
         return self.cursor.execute("SELECT * FROM feeds ORDER BY author ASC").fetchall()
+    
+    def get_purgeable_feeds(self) -> List:
+        return self.cursor.execute("SELECT * FROM feeds WHERE purge_excluded=0").fetchall()
 
     def get_feed(self, feed_id: int) -> Any:
         return self.cursor.execute("SELECT * FROM feeds WHERE id = ?", (feed_id,)).fetchone()
@@ -639,6 +649,13 @@ class Feeds(object):
 
     def mark_star(self, entry_id: int, star: bool):
         self.cursor.execute("UPDATE entries SET star=? WHERE id=?", (star, entry_id))
+        self.database.commit()
+
+    def get_excluded_channels(self) -> List:
+        return self.cursor.execute("SELECT * FROM feeds WHERE purge_excluded=1").fetchall()
+
+    def set_purge_excluded(self, id: int, excluded: bool):
+        self.cursor.execute("UPDATE feeds SET purge_excluded=? WHERE id=?", (excluded, id))
         self.database.commit()
 
     def __len__(self):

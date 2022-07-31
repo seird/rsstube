@@ -1,6 +1,7 @@
 from PyQt6 import QtGui, QtWidgets
 
 from .designs.widget_purge_entries import Ui_Dialog
+from .PurgeExcludeDialog import PurgeExcludeDialog
 from rss_tube.tasks import PurgeFeedsTask
 from rss_tube.database.settings import Settings
 from rss_tube.utils import center_widget
@@ -53,6 +54,10 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
         else:
             self.purge_feeds_task.request_stop = True
             self.set_buttons_enabled(True)
+        
+    def exclude_callback(self):
+        dialog = PurgeExcludeDialog(self)
+        dialog.exec()
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         if self.started:
@@ -63,4 +68,5 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
     def link_callbacks(self):
         self.pb_start.clicked.connect(self.start_callback)
         self.spinBox.valueChanged.connect(lambda x: settings.setValue("purge/entries_to_keep", x))
+        self.pb_exclude_channels.clicked.connect(self.exclude_callback)
         self.checkBox.stateChanged.connect(lambda x: settings.setValue("purge/keep_unviewed", x))

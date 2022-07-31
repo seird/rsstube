@@ -97,7 +97,7 @@ class PurgeFeedsTask(BaseTask):
         self.request_stop =  False
 
         feeds = Feeds()
-        feeds_list = feeds.get_feeds()
+        feeds_list = feeds.get_purgeable_feeds()
 
         self.maximum.emit(len(feeds_list))
 
