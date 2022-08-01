@@ -18,8 +18,6 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
         self.started = False
         self.purge_feeds_task = PurgeFeedsTask()
 
-        self.checkBox.setChecked(settings.value("purge/keep_unviewed", type=bool))
-        self.spinBox.setValue(settings.value("purge/entries_to_keep", type=int))
         self.progressBar.reset()
 
         center_widget(parent, self)
@@ -30,6 +28,10 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
         self.pb_start.setText("Start" if enabled else "Stop")
         for pb in self.buttonBox.buttons():
             pb.setEnabled(enabled)
+    
+    def report_callback(self, report: dict):
+        self.progressBar.setValue(report["progress"])
+        self.label_report.setText(f"Purged {report['entries']} entries in {report['feeds']} feeds.")
 
     def finished_callback(self):
         self.started = False
@@ -43,7 +45,7 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
             self.set_buttons_enabled(False)
             self.purge_feeds_task.maximum.connect(lambda m: self.progressBar.setRange(0, m))
             self.purge_feeds_task.current.connect(lambda t: self.label_current.setText(f"Processing '{t}' ..."))
-            self.purge_feeds_task.progress.connect(lambda p: self.progressBar.setValue(p))
+            self.purge_feeds_task.report.connect(self.report_callback)
             self.purge_feeds_task.finished.connect(self.finished_callback)
             self.purge_feeds_task.start()
         else:
@@ -58,5 +60,3 @@ class PurgeEntriesDialog(QtWidgets.QDialog, Ui_Dialog):
     
     def link_callbacks(self):
         self.pb_start.clicked.connect(self.start_callback)
-        self.spinBox.valueChanged.connect(lambda x: settings.setValue("purge/entries_to_keep", x))
-        self.checkBox.stateChanged.connect(lambda x: settings.setValue("purge/keep_unviewed", x))

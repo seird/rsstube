@@ -50,6 +50,7 @@ class NewFilterDialog(QtWidgets.QDialog, Ui_Dialog_Filter):
         # Action
         self.combo_action.addItems([action.value for action in FilterAction if action is not FilterAction.Nop])
         self.combo_action.setCurrentText("Delete")
+        self.line_external_program.setPlaceholderText("yt-dlp %U")
         text = "Supported parameters (case sensitive):"
         for p in supported_parameters:
             text += f"\n    {p[0]}: {p[1]}"

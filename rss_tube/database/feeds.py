@@ -1,6 +1,7 @@
 import datetime
 import logging
 import subprocess
+import sqlite3
 import time
 import os
 
@@ -38,17 +39,23 @@ class Feeds(object):
         """)
         
         # Feeds table
+        try:
+            self.cursor.execute("ALTER TABLE feeds ADD COLUMN purge_excluded INTEGER default 0")
+        except sqlite3.OperationalError:
+            logger.debug(f"Column purge_excluded already exists")
+
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS feeds (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            notify       INTEGER,
-            author       TEXT,
-            category     TEXT,
-            type         TEXT,
-            url          TEXT,
-            channel_url  TEXT,
-            added_on     TEXT,
-            refreshed_on TEXT)
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            notify         INTEGER,
+            purge_excluded INTEGER,
+            author         TEXT,
+            category       TEXT,
+            type           TEXT,
+            url            TEXT,
+            channel_url    TEXT,
+            added_on       TEXT,
+            refreshed_on   TEXT)
         """)
 
         # Feed Entries table
@@ -124,17 +131,25 @@ class Feeds(object):
         )
         self.database.commit()
     
-    def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True):
+    def purge_feed(self, feed_id: int, num_entries_to_keep: int, keep_unviewed: bool = True) -> int:
         # Delete all the saved thumbnails
+        params = {
+            "feed_id": feed_id,
+            "num_entries_to_keep": num_entries_to_keep
+        }
+
         links = []
         for q in self.cursor.execute(
             f"""
+            SELECT * FROM (SELECT thumbnail, link FROM entries
+                WHERE feed_id=:feed_id AND star=0 AND deleted=0 {'AND viewed=1' if keep_unviewed else ''}
+                ORDER BY published DESC
+                LIMIT -1 OFFSET :num_entries_to_keep)
+            UNION ALL
             SELECT thumbnail, link FROM entries
-            WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
-            ORDER BY added_on DESC
-            LIMIT -1 OFFSET ?
+                WHERE feed_id=:feed_id AND deleted=1
             """,
-            (feed_id, num_entries_to_keep)
+            params
         ).fetchall():
             self.cache.delete(q["thumbnail"])
             links.append((q["link"],))
@@ -144,13 +159,16 @@ class Feeds(object):
             f"""
             DELETE FROM entries
             WHERE id in (
+                SELECT id FROM (SELECT id FROM entries
+                    WHERE feed_id=:feed_id AND star=0 {'AND viewed=1' if keep_unviewed else ''}
+                    ORDER BY published DESC
+                    LIMIT -1 OFFSET :num_entries_to_keep)
+                UNION ALL
                 SELECT id FROM entries
-                WHERE feed_id=? AND star=0 {'AND viewed=1' if keep_unviewed else ''}
-                ORDER BY added_on DESC
-                LIMIT -1 OFFSET ?
+                    WHERE feed_id=:feed_id AND deleted=1 
             )
             """,
-            (feed_id, num_entries_to_keep)
+            params
         )
 
         # Add the entry link to the purged table to prevent it from being re-added
@@ -161,9 +179,13 @@ class Feeds(object):
         self.database.isolation_level = ''
         self.database.commit()
 
-    def purge_feeds(self, num_entries_to_keep: int, keep_unviewed: bool = True):
+        return len(links)
+
+    def purge_feeds(self, num_entries_to_keep: int, keep_unviewed: bool = True) -> int:
+        entries_purged = 0
         for feed in self.get_feeds():
-            self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
+            entries_purged += self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
+        return entries_purged
 
     def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)
@@ -303,6 +325,9 @@ class Feeds(object):
 
     def get_feeds(self) -> List:
         return self.cursor.execute("SELECT * FROM feeds ORDER BY author ASC").fetchall()
+    
+    def get_purgeable_feeds(self) -> List:
+        return self.cursor.execute("SELECT * FROM feeds WHERE purge_excluded=0").fetchall()
 
     def get_feed(self, feed_id: int) -> Any:
         return self.cursor.execute("SELECT * FROM feeds WHERE id = ?", (feed_id,)).fetchone()
@@ -624,6 +649,13 @@ class Feeds(object):
 
     def mark_star(self, entry_id: int, star: bool):
         self.cursor.execute("UPDATE entries SET star=? WHERE id=?", (star, entry_id))
+        self.database.commit()
+
+    def get_excluded_channels(self) -> List:
+        return self.cursor.execute("SELECT * FROM feeds WHERE purge_excluded=1").fetchall()
+
+    def set_purge_excluded(self, id: int, excluded: bool):
+        self.cursor.execute("UPDATE feeds SET purge_excluded=? WHERE id=?", (excluded, id))
         self.database.commit()
 
     def __len__(self):

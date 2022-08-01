@@ -71,7 +71,7 @@ def parse_feed(feed_bytes: bytes, feed_type: str = "", author: str = "") -> dict
         author = root.find(prefix + "author").find(prefix + "name").text if author == "" else author
     else:
         entries = root.xpath("//item")
-        author = root.xpath("//*[local-name()='name']")[0].text
+        author = root.xpath("//*[local-name()='name']")[0].text if author == "" else author
 
     feed = {
         "author": author,

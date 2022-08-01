@@ -486,75 +486,86 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupbox_delete_entries">
+        <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>Delete</string>
+          <string>Purge</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4">
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="6" column="0" colspan="2">
+           <widget class="QPushButton" name="pb_purge_entries">
+            <property name="text">
+             <string>Purge entries manually...</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
+           <widget class="QCheckBox" name="cb_purge_schedule">
+            <property name="text">
+             <string>Purge entries periodically</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="pb_exclude_channels">
+            <property name="text">
+             <string>Exclude channels ...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
            <widget class="QCheckBox" name="cb_keep_unviewed">
             <property name="text">
              <string>Keep unviewed entries</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="cb_delete_added">
-            <property name="text">
-             <string>Delete entries added more than</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QSpinBox" name="spin_delete_added">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>65</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="value">
-             <number>14</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>days ago</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Purge</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_8">
-          <item row="0" column="0">
-           <widget class="QPushButton" name="pb_purge_entries">
-            <property name="text">
-             <string>Purge entries...</string>
-            </property>
-           </widget>
+          <item row="5" column="0" colspan="2">
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Keep</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spin_entries_to_keep">
+                <property name="minimum">
+                 <number>0</number>
+                </property>
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+                <property name="value">
+                 <number>10</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>most recent entries for each feed.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -656,7 +667,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_14">
+        <widget class="QGroupBox" name="groupBox_filters">
          <property name="title">
           <string>Filters</string>
          </property>
@@ -764,9 +775,6 @@
   <tabstop>combo_player_quality</tabstop>
   <tabstop>cb_preload_thumbnails</tabstop>
   <tabstop>spin_entries_to_fetch</tabstop>
-  <tabstop>cb_delete_added</tabstop>
-  <tabstop>spin_delete_added</tabstop>
-  <tabstop>cb_keep_unviewed</tabstop>
  </tabstops>
  <resources/>
  <connections>

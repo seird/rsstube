@@ -35,9 +35,15 @@ class Tasks(QtCore.QThread):
             self.feed_update_job.last_run = datetime.now()
         self.job_update_info.emit(self.feed_update_job.last_run, self.feed_update_job.next_run)
 
+        # Start purge task
+        if settings.value("purge/enabled", type=bool):
+            self.purge_task = PurgeFeedsTask()
+            self.purge_task.start()
+            self.purge_task.started.connect(lambda: logger.debug("Auto PurgeFeedsTask started."))
+            self.purge_task.finished.connect(lambda: logger.debug("Auto PurgeFeedsTask finished."))
+
     def set_schedule(self):
         schedule.clear("update-feed")
-        schedule.clear("delete_entries")
         self.feed_update_job = schedule.every(settings.value("feeds/update_interval/minutes", type=int)).minutes.do(self.feed_update_task.start).tag("update-feed")
 
         self.job_update_info.emit(self.feed_update_job.last_run or datetime.now(), self.feed_update_job.next_run or datetime.now())
@@ -78,20 +84,10 @@ class BaseTask(QtCore.QThread):
             self.running = False
 
 
-class DeleteEntriesTask(BaseTask):
-    def task(self):
-        if settings.value("delete/added_more_than", type=bool):
-            feeds = Feeds()
-            feeds.delete_entries_added_more_than_days(
-                settings.value("delete/added_more_than_days", type=int),
-                settings.value("delete/keep_unviewed", type=bool)
-            )
-
-
 class PurgeFeedsTask(BaseTask):
     maximum = pyqtSignal(int)
     current = pyqtSignal(str)
-    progress = pyqtSignal(int)
+    report = pyqtSignal(dict) # {"progress": <int>, "entries": <int>, "feeds": <int>}
 
     def __init__(self):
         super(PurgeFeedsTask, self).__init__()
@@ -101,9 +97,15 @@ class PurgeFeedsTask(BaseTask):
         self.request_stop =  False
 
         feeds = Feeds()
-        feeds_list = feeds.get_feeds()
+        feeds_list = feeds.get_purgeable_feeds()
 
         self.maximum.emit(len(feeds_list))
+
+        report = {
+            "progress": 0,
+            "entries": 0,
+            "feeds": 0
+        }
 
         for i, feed in enumerate(feeds_list):
             if self.request_stop:
@@ -111,13 +113,18 @@ class PurgeFeedsTask(BaseTask):
 
             self.current.emit(feed["author"])
 
-            feeds.purge_feed(
+            num_purged = feeds.purge_feed(
                 feed["id"],
                 settings.value("purge/entries_to_keep", type=int),
                 settings.value("purge/keep_unviewed",  type=bool)
             )
 
-            self.progress.emit(i+1)
+            report["entries"] += num_purged
+            report["feeds"] += num_purged > 0
+            report["progress"] = i+1
+            self.report.emit(report)
+
+        logger.debug(f"Purged {report['entries']} entries in {report['feeds']} feeds.")
 
 
 class PurgeFeedTask(BaseTask):

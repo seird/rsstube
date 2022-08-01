@@ -84,7 +84,7 @@ class ShortcutsWidget(QtWidgets.QWidget):
 
 
 class ShortcutsDialog(QtWidgets.QDialog):
-    def __init__(self, mainwindow: QtWidgets.QMainWindow):
+    def __init__(self, parent: QtWidgets.QWidget):
         super(ShortcutsDialog, self).__init__()
 
         self.shortcuts_widget = ShortcutsWidget(self)
@@ -97,7 +97,7 @@ class ShortcutsDialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Keyboard Shortcuts")
         self.setMinimumWidth(300)
-        center_widget(mainwindow, self)
+        center_widget(parent, self)
 
         self.link_callbacks()
 
