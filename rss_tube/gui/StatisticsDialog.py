@@ -40,4 +40,6 @@ class StatisticsDialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Statistics")
 
+        self.setMinimumSize(250, 140)
+        self.resize(self.minimumSize())
         center_widget(mainwindow, self)

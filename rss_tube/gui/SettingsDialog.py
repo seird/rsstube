@@ -6,6 +6,7 @@ from PyQt6 import QtCore, QtWidgets
 from .designs.widget_settings import Ui_Dialog
 from .FiltersWidget import FiltersWidget
 from .PurgeEntriesDialog import PurgeEntriesDialog
+from .PurgeExcludeDialog import PurgeExcludeDialog
 from .ShortcutDialog import ShortcutsDialog
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import styles
@@ -43,6 +44,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.link_callbacks()
 
     def initUI(self):
+        self.groupBox_filters.hide()
+
         self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).setEnabled(False)
 
         # General Tab
@@ -82,6 +85,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_preload_thumbnails.setChecked(settings.value("cache/preload_thumbnails", type=bool))
         self.spin_entries_to_fetch.setValue(settings.value("MainWindow/entries_to_fetch", type=int))
         self.cb_purge_schedule.setChecked(settings.value("purge/enabled", type=bool))
+        self.cb_keep_unviewed.setChecked(settings.value("purge/keep_unviewed", type=bool))
+        self.spin_entries_to_keep.setValue(settings.value("purge/entries_to_keep", type=int))
 
         # Filters tab
         self.gridLayout_tab_filters = QtWidgets.QGridLayout(self.tab_filters)
@@ -158,6 +163,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open", os.path.dirname(self.line_player_path.text()), "*")[0]
         if fname and os.path.exists(os.path.dirname(fname)):
             self.line_player_path.setText(fname)
+    
+    def exclude_callback(self):
+        dialog = PurgeExcludeDialog(self)
+        dialog.exec()
 
     def link_callbacks(self):
         self.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply_settings)
@@ -190,6 +199,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.spin_entries_to_fetch.valueChanged.connect(self.settings_changed_callback)
         self.pb_purge_entries.clicked.connect(self.purge_entries_callback)
         self.cb_purge_schedule.stateChanged.connect(self.settings_changed_callback)
+        self.spin_entries_to_keep.valueChanged.connect(self.settings_changed_callback)
+        self.cb_keep_unviewed.stateChanged.connect(self.settings_changed_callback)
+        self.pb_exclude_channels.clicked.connect(self.exclude_callback)
+        
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
         self.pb_open_database.clicked.connect(self.mainwindow.open_database_callback)
@@ -256,6 +269,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("cache/preload_thumbnails", self.cb_preload_thumbnails.isChecked())
         settings.setValue("MainWindow/entries_to_fetch", self.spin_entries_to_fetch.value())
         settings.setValue("purge/enabled", self.cb_purge_schedule.isChecked())
+        settings.setValue("purge/entries_to_keep", self.spin_entries_to_keep.value())
+        settings.setValue("purge/keep_unviewed", self.cb_keep_unviewed.isChecked())
 
         # Advanced tab
         settings.setValue("proxies/enabled", self.groupBox_proxy.isChecked())
