@@ -371,11 +371,9 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
         self.set_tree_icons()
 
     def remove_category(self, category: str):
-        category_items = self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly)
-        if not category_items:
-            return
-        category_item_to_remove = category_items[0]
-        self.takeTopLevelItem(self.indexOfTopLevelItem(category_item_to_remove))
+        for item in self.findItems(category, QtCore.Qt.MatchFlag.MatchExactly):
+            if isinstance(item, TreeWidgetItemCategory):
+                self.takeTopLevelItem(self.indexOfTopLevelItem(item))
 
     def remove_feed(self, feed_id: int):
         feed = self.feeds.get_feed(feed_id)
