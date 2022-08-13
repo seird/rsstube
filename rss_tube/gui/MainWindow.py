@@ -176,8 +176,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             self.tasks_thread.set_schedule()
 
     def update_proxies(self):
-        for feed_type in self.entry_widgets:
-            self.entry_widgets[feed_type].download.update_proxy()
+        for entry_widget in self.entry_widgets.values():
+            entry_widget.download.update_proxy()
         self.feeds.downloader.update_proxy()
 
     def search_text_changed_callback(self, text):

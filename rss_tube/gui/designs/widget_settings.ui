@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>442</height>
+    <height>447</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,6 +166,13 @@
            <widget class="QCheckBox" name="cb_show_description">
             <property name="text">
              <string>Show video description</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="cb_show_thumbnail">
+            <property name="text">
+             <string>Show video thumbnail</string>
             </property>
            </widget>
           </item>
@@ -766,15 +773,37 @@
   <tabstop>combo_theme</tabstop>
   <tabstop>cb_show_menu</tabstop>
   <tabstop>cb_show_description</tabstop>
+  <tabstop>cb_show_thumbnail</tabstop>
   <tabstop>cb_show_tray</tabstop>
   <tabstop>cb_minimize_to_tray</tabstop>
   <tabstop>cb_start_minimized</tabstop>
   <tabstop>spin_update_feed_interval_minutes</tabstop>
   <tabstop>combo_logging</tabstop>
+  <tabstop>pb_open_log</tabstop>
+  <tabstop>combo_player</tabstop>
+  <tabstop>line_player_path</tabstop>
+  <tabstop>pb_player_path</tabstop>
   <tabstop>line_player_args</tabstop>
   <tabstop>combo_player_quality</tabstop>
   <tabstop>cb_preload_thumbnails</tabstop>
   <tabstop>spin_entries_to_fetch</tabstop>
+  <tabstop>cb_purge_schedule</tabstop>
+  <tabstop>cb_keep_unviewed</tabstop>
+  <tabstop>pb_exclude_channels</tabstop>
+  <tabstop>spin_entries_to_keep</tabstop>
+  <tabstop>pb_purge_entries</tabstop>
+  <tabstop>pb_reset_cache</tabstop>
+  <tabstop>pb_open_database</tabstop>
+  <tabstop>pb_reset_settings</tabstop>
+  <tabstop>pb_import_settings</tabstop>
+  <tabstop>pb_export_settings</tabstop>
+  <tabstop>pb_import_channels</tabstop>
+  <tabstop>pb_export_channels</tabstop>
+  <tabstop>pb_import_filters</tabstop>
+  <tabstop>pb_export_filters</tabstop>
+  <tabstop>groupBox_proxy</tabstop>
+  <tabstop>line_proxy_host</tabstop>
+  <tabstop>spin_proxy_port</tabstop>
  </tabstops>
  <resources/>
  <connections>

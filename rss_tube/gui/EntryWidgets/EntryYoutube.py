@@ -47,8 +47,9 @@ class EntryYoutube(BaseEntry, Ui_Form):
     def __init__(self, parent):
         super(EntryYoutube, self).__init__(parent)
         self.setupUi(self)
-
-        self.show_description(settings.value("youtube/show_description", type=bool))
+        
+        self.show_description(settings.value("entry/show_description", type=bool))
+        self.show_thumbnail(settings.value("entry/show_thumbnail", type=bool))
         self.label_thumbnail.setToolTip("Click to play with external player")
 
         self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))
@@ -67,8 +68,9 @@ class EntryYoutube(BaseEntry, Ui_Form):
         self.set_star(entry["star"])
 
         self.thumbnail_url = entry["thumbnail"]
-        image_bytes = self.download.get_bytes(entry["thumbnail"])
-        self.label_thumbnail.setPixmap(load_pixmap(image_bytes))
+        if settings.value("entry/show_thumbnail", type=bool):
+            image_bytes = self.download.get_bytes(entry["thumbnail"])
+            self.label_thumbnail.setPixmap(load_pixmap(image_bytes))
         self.label_date.setText(datetime.strptime(entry["published"], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d, %H:%M"))
         channel_url = self.feeds.get_feed(entry["feed_id"])["channel_url"]
         self.label_meta_author.setText(f"<a href=\"{channel_url}\">{entry['author']}</a>")

@@ -53,7 +53,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.combo_theme.setCurrentText(settings.value("theme", type=str))
 
         self.cb_show_menu.setChecked(settings.value("MainWindow/menu/show", type=bool))
-        self.cb_show_description.setChecked(settings.value("youtube/show_description", type=bool))
+        self.cb_show_description.setChecked(settings.value("entry/show_description", type=bool))
+        self.cb_show_thumbnail.setChecked(settings.value("entry/show_thumbnail", type=bool))
 
         self.cb_show_tray.setChecked(settings.value("tray/show", type=bool))
         self.cb_minimize_to_tray.setChecked(settings.value("tray/minimize", type=bool))
@@ -176,6 +177,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         self.cb_show_menu.stateChanged.connect(self.settings_changed_callback)
         self.cb_show_description.stateChanged.connect(self.settings_changed_callback)
+        self.cb_show_thumbnail.stateChanged.connect(self.settings_changed_callback)
 
         self.cb_minimize_to_tray.stateChanged.connect(self.settings_changed_callback)
         self.cb_show_tray.stateChanged.connect(self.settings_changed_callback)
@@ -236,8 +238,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
         settings.setValue("MainWindow/menu/show", self.cb_show_menu.isChecked())
         self.mainwindow.menubar.setVisible(settings.value("MainWindow/menu/show", type=bool))
-        settings.setValue("youtube/show_description", self.cb_show_description.isChecked())
-        self.mainwindow.entry_widgets["youtube"].show_description(settings.value("youtube/show_description", type=bool))
+        settings.setValue("entry/show_description", self.cb_show_description.isChecked())
+        settings.setValue("entry/show_thumbnail", self.cb_show_thumbnail.isChecked())
+        for widget in self.mainwindow.entry_widgets.values():
+            widget.show_description(settings.value("entry/show_description", type=bool))
+            widget.show_thumbnail(settings.value("entry/show_thumbnail", type=bool))
 
         settings.setValue("tray/show", self.cb_show_tray.isChecked())
         self.mainwindow.tray.setVisible(self.cb_show_tray.isChecked())

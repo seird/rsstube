@@ -57,6 +57,9 @@ class BaseEntry(QtWidgets.QWidget):
     def show_description(self, show: bool = True):
         self.label_description.setVisible(show)
 
+    def show_thumbnail(self, show: bool = True):
+        self.label_thumbnail.setVisible(show)
+
     def play(self):
         self.player.play(self.video_url)
 
