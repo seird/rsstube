@@ -15,7 +15,7 @@ with open("version.txt", "r") as f:
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'PyQt6', 'schedule', 'lxml'
+    'requests', 'PyQt6', 'schedule', 'lxml', 'packaging'
 ]
 
 # What packages are optional?

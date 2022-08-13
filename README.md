@@ -78,5 +78,6 @@ $ iscc rss-tube.iss
 - PyQt6
 - requests
 - schedule
+- packaging
 - (pysocks to connect to a socks5 proxy)
 - (mpv + yt-dlp/youtube-dl or vlc, to directly play videos)
