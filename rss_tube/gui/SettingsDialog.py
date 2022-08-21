@@ -10,7 +10,7 @@ from .PurgeExcludeDialog import PurgeExcludeDialog
 from .ShortcutDialog import ShortcutsDialog
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import styles
-from rss_tube.utils import center_widget
+from rss_tube.utils import center_widget, open_file
 from rss_tube.utils import set_icons, set_style
 from rss_tube.tasks import ExportSettingsTask, ImportSettingsTask
 
@@ -184,7 +184,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.cb_start_minimized.stateChanged.connect(self.settings_changed_callback)
 
         self.combo_logging.currentTextChanged.connect(self.settings_changed_callback)
-        self.pb_open_log.clicked.connect(self.mainwindow.open_log_callback)
+        self.pb_open_log.clicked.connect(lambda: open_file(logger.root.handlers[0].baseFilename))
 
         # Schedule Tab
         self.spin_update_feed_interval_minutes.valueChanged.connect(self.schedule_changed_callback)
@@ -207,7 +207,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         
         self.pb_reset_cache.clicked.connect(self.mainwindow.feeds.downloader.cache.clear)
 
-        self.pb_open_database.clicked.connect(self.mainwindow.open_database_callback)
+        self.pb_open_database.clicked.connect(lambda: open_file(self.mainwindow.feeds.database.dir))
 
         # Advanced tab
         self.pb_reset_settings.clicked.connect(self.reset_settings_callback)

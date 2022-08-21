@@ -1,6 +1,8 @@
 import logging
 import os
+import platform
 import re
+import subprocess
 
 from pathlib import Path
 
@@ -134,3 +136,11 @@ def convert_links(text: str):
         )
 
     return _link.sub(replace, text)
+
+def open_file(filename: str):
+    if platform.system() == "Linux":
+        subprocess.call(["xdg-open", filename])
+    elif platform.system() == "Windows":
+        os.startfile(filename)
+    elif platform.system() == "Darwin":
+        subprocess.call(["open", filename])

@@ -5,7 +5,6 @@ import os
 import sys
 import tempfile
 from typing import Optional
-import webbrowser
 
 from PyQt6 import QtWidgets, QtGui, QtCore, QtNetwork
 
@@ -388,13 +387,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             if not self.table_entries.isRowHidden(current_row):
                 self.table_entries.selectRow(current_row)
                 return
-                
-
-    def open_database_callback(self):
-        webbrowser.open(self.feeds.database.dir)
-
-    def open_log_callback(self):
-        webbrowser.open(logger.root.handlers[0].baseFilename)
 
     def change_category_name(self, current_name: str):
         dialog = RenameCategoryDialog(self, current_name)
