@@ -82,9 +82,14 @@ def parse_feed(feed_bytes: bytes, feed_type: str = "", author: str = "") -> dict
     for i, entry in enumerate(entries):
         try:
             if feed_type == "youtube":
-                date_published = datetime.strptime(entry.find(prefix + "published").text, "%Y-%m-%dT%H:%M:%S%z").astimezone(local_timezone)
-                date_updated = datetime.strptime(entry.find(prefix + "updated").text, "%Y-%m-%dT%H:%M:%S%z").astimezone(local_timezone)
-
+                try:
+                    date_published = datetime.strptime(entry.find(prefix + "published").text, "%Y-%m-%dT%H:%M:%S%z").astimezone(local_timezone)
+                    date_updated = datetime.strptime(entry.find(prefix + "updated").text, "%Y-%m-%dT%H:%M:%S%z").astimezone(local_timezone)
+                except ValueError as e:
+                    logger.error(f"Parsing youtube date failed: {e}")
+                    date_published = datetime.now()
+                    date_updated = datetime.now()
+                    
                 group = entry.find(prefixes["media"] + "group")
                 community = group.find(prefixes["media"] + "community")
 
@@ -107,7 +112,11 @@ def parse_feed(feed_bytes: bytes, feed_type: str = "", author: str = "") -> dict
                 })
 
             elif feed_type == "soundcloud":
-                date_published = datetime.strptime(entry.xpath("*[local-name()='pubDate']")[0].text, "%a, %d %b %Y %H:%M:%S %z").astimezone(local_timezone)
+                try:
+                    date_published = datetime.strptime(entry.xpath("*[local-name()='pubDate']")[0].text.split(", ")[-1], "%d %b %Y %H:%M:%S %z").astimezone(local_timezone)
+                except ValueError as e:
+                    logger.error(f"Parsing soundcloud date failed: {e}")
+                    date_published = datetime.now()
 
                 feed["entries"].update({
                     i: {
