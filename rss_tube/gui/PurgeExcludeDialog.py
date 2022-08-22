@@ -60,7 +60,7 @@ class PurgeExcludeWidget(QtWidgets.QWidget):
             entry = ChannelEntryWidget(
                 channel["id"],
                 channel["author"],
-                channel["purge_excluded"]
+                channel["purge_excluded"] or False
             )
             self.vertical_layout.addWidget(entry)
 

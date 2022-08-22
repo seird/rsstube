@@ -76,6 +76,7 @@ def parse_feed(feed_bytes: bytes, feed_type: str = "", author: str = "") -> dict
     feed = {
         "author": author,
         "type": feed_type,
+        "purge_excluded": False,
         "entries": {}
     }
 

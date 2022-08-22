@@ -242,10 +242,10 @@ class Feeds(object):
         self.cursor.execute(
             """
             INSERT INTO feeds 
-                (author, category, type, url, channel_url, added_on, refreshed_on) 
+                (author, category, type, url, channel_url, added_on, refreshed_on, purge_excluded) 
             VALUES
                 (:author, :category, :type, :url, :channel_url, datetime('now', 'localtime'),
-                 datetime('now', 'localtime'));
+                 datetime('now', 'localtime'), :purge_excluded);
             """,
             parsed_feed
         )
