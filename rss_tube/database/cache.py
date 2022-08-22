@@ -72,6 +72,9 @@ class Cache(object):
         q = self.cursor.execute("SELECT filename FROM cache WHERE url=?", (key,)).fetchone()
         if q:
             filepath = os.path.join(self.cache_dir, q["filename"])
-            os.remove(filepath)
+            try:
+                os.remove(filepath)
+            except FileNotFoundError:
+                logger.warning(f"\"{filepath}\" doesn't exist.")
             self.cursor.execute("DELETE FROM cache WHERE url=?", (key,))
             self.database.commit()
