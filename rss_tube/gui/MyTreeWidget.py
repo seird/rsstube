@@ -90,8 +90,8 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
     def set_font(self):
         category_viewed = self.parent.feeds.get_category_viewed(self.category)
         font = QtGui.QFont()
-        font.setBold(not category_viewed)
         if not category_viewed:
+            font.setBold(True)
             font.setPointSize(font.pointSize() + 1)
         self.setFont(0, font)
         self.setForeground(
@@ -153,8 +153,8 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
     def set_font(self):
         feed_viewed = self.parent.feeds.get_feed_viewed(self.feed_id)
         font = QtGui.QFont()
-        font.setBold(not feed_viewed)
         if not feed_viewed:
+            font.setBold(True)
             font.setPointSize(font.pointSize() + 1)
         self.setFont(0, font)
         self.setForeground(
@@ -240,8 +240,8 @@ class TreeWidgetItemStarred(QtWidgets.QTreeWidgetItem):
     def set_font(self):
         stars_viewed = self.parent.feeds.get_stars_viewed()
         font = QtGui.QFont()
-        font.setBold(not stars_viewed)
         if not stars_viewed:
+            font.setBold(True)
             font.setPointSize(font.pointSize() + 1)
         self.setFont(0, font)
         self.setForeground(
