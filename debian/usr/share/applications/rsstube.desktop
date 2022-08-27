@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=rsstube
+Name=RSS Tube
 Comment=A simple desktop application for Youtube, based on RSS feeds.
 Path=/usr/lib/rsstube
 Exec=/usr/lib/rsstube/rsstube

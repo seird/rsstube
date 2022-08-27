@@ -74,7 +74,7 @@ jobs:
       run: |
         make build-macos
         brew install create-dmg
-        create-dmg --volname "RSSTube" --app-drop-link 0 0 --no-internet-enable "rsstube.dmg" "./dist/RSSTube.app"
+        create-dmg --volname "RSSTube" --app-drop-link 0 0 --no-internet-enable "rsstube.dmg" "./dist/RSS Tube.app"
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:

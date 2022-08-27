@@ -1,5 +1,7 @@
 # -*- mode: python -*-
 
+import platform
+
 block_cipher = None
 
 a = Analysis(['rss_tube/__main__.py'],
@@ -35,3 +37,9 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                name='rsstube')
+
+if platform.system() == "Darwin":
+    app = BUNDLE(coll,
+             name='RSS Tube.app',
+             icon='logo.ico',
+             bundle_identifier=None)
