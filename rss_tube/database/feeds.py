@@ -83,7 +83,7 @@ class Feeds(object):
             star           INTEGER)
         """)
 
-        # Purged entries table
+        # Purged entries table -- blacklist for new entries
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS purged (
             id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -186,6 +186,13 @@ class Feeds(object):
         for feed in self.get_feeds():
             entries_purged += self.purge_feed(feed["id"], num_entries_to_keep, keep_unviewed=keep_unviewed)
         return entries_purged
+
+    def unblacklist_purged_entries(self):
+        self.cursor.execute("DELETE FROM purged")
+        self.database.isolation_level = None
+        self.cursor.execute("VACUUM")
+        self.database.isolation_level = ''
+        self.database.commit()
 
     def add_feed(self, url: str, category: str, feed_name: str = "") -> Optional[int]:
         url = parse_url(url)

@@ -9,6 +9,7 @@ from .PurgeEntriesDialog import PurgeEntriesDialog
 from .PurgeExcludeDialog import PurgeExcludeDialog
 from .ShortcutDialog import ShortcutsDialog
 from rss_tube.database.settings import Settings
+from rss_tube.database.feeds import Feeds
 from rss_tube.gui.themes import styles
 from rss_tube.utils import center_widget, open_file
 from rss_tube.utils import set_icons, set_style
@@ -119,6 +120,10 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.setting_theme_changed = True
         self.settings_changed_callback()
     
+    def unblacklist_callback(self):
+        feeds = Feeds()
+        feeds.unblacklist_purged_entries()
+    
     def purge_entries_callback(self):
         purge_entries_dialog = PurgeEntriesDialog(self)
         purge_entries_dialog.exec()
@@ -199,6 +204,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
         # Database Tab
         self.cb_preload_thumbnails.stateChanged.connect(self.settings_changed_callback)
         self.spin_entries_to_fetch.valueChanged.connect(self.settings_changed_callback)
+        self.pb_unblacklist.clicked.connect(self.unblacklist_callback)
         self.pb_purge_entries.clicked.connect(self.purge_entries_callback)
         self.cb_purge_schedule.stateChanged.connect(self.settings_changed_callback)
         self.spin_entries_to_keep.valueChanged.connect(self.settings_changed_callback)
