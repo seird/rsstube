@@ -22,7 +22,7 @@ $ pip install rsstube
 
 Dark theme                                                            |  Light theme
 :--------------------------------------------------------------------:|:---------------------------------------------------------------------:
-![](https://raw.githubusercontent.com/seird/rsstube/master/images/dark.png)  |  ![](https://raw.githubusercontent.com/seird/rsstube/master/images/light.png)
+![](https://raw.githubusercontent.com/seird/rsstube/develop/images/dark.png)  |  ![](https://raw.githubusercontent.com/seird/rsstube/develop/images/light.png)
 
 
 ## Manual Installation
