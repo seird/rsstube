@@ -38,6 +38,7 @@ class NewFeedDialog(QtWidgets.QDialog, Ui_Dialog):
         str_valid_url += " - https://www.youtube.com/user/<username>\n"
         str_valid_url += " - https://www.youtube.com/channel/<channel_id>\n"
         str_valid_url += " - https://www.youtube.com/c/<channel_name>\n"
+        str_valid_url += " - https://www.youtube.com/@<username>\n"
         str_valid_url += " - https://www.youtube.com/feeds/videos.xml?user=<username>\n"
         str_valid_url += " - https://www.youtube.com/feeds/videos.xml?channel_id=<channel_id>\n"
         str_valid_url += " - https://soundcloud.com/<username>\n"

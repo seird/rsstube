@@ -25,7 +25,7 @@ def parse_url(url: str) -> str:
     elif "youtube.com/user/" in url:
         username = url.split("youtube.com/user/")[1].split("/")[0]
         return f"https://www.youtube.com/feeds/videos.xml?user={username}"
-    elif "youtube.com/c/" in url:
+    elif "youtube.com/c/" in url or "youtube.com/@" in url:
         # extract the channel id from the web page
         downloader = Downloader()
         response = downloader.get_accept_cookies(url)
