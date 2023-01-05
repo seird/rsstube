@@ -2,8 +2,6 @@ name: build
 
 on:
   push:
-    branches-ignore:
-      - release
     tags-ignore:
       - '*'
 
@@ -12,11 +10,11 @@ jobs:
   build-win64:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-          python-version: '3.9.12'
+          python-version: '3.10.8'
     - name: Upgrade pip and enable wheel support
       run: python -m pip install --upgrade pip setuptools wheel
     - name: Install Requirements
@@ -30,7 +28,7 @@ jobs:
         mv inno-output\rsstube-installer.exe rsstube-installer-win.exe
       shell: cmd
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: rsstube-installer-win.exe
         path: |
@@ -43,9 +41,9 @@ jobs:
         tag: [focal]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
           python-version: '3.9.7'
     - name: Upgrade pip and enable wheel support
@@ -55,7 +53,7 @@ jobs:
         make build
         cp dist/rsstube_amd64.deb rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
         path: rsstube_amd64_ubuntu_${{ matrix.tag }}.deb
@@ -63,11 +61,11 @@ jobs:
   build-macos:
     runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-          python-version: '3.9.12'
+          python-version: '3.10.8'
     - name: Upgrade pip and enable wheel support
       run: python -m pip install --upgrade pip setuptools wheel
     - name: Build
@@ -76,7 +74,7 @@ jobs:
         brew install create-dmg
         create-dmg --volname "RSSTube" --app-drop-link 0 0 --no-internet-enable "rsstube.dmg" "./dist/RSS Tube.app"
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: rsstube.dmg
         path: rsstube.dmg
@@ -84,9 +82,9 @@ jobs:
   build-pip:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
           python-version: '3.9.7'
     - name: Upgrade pip and enable wheel support
@@ -98,7 +96,7 @@ jobs:
     - name: create pip package
       run: python -m build
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: rsstube.whl
         path: dist/rsstube-*.whl
