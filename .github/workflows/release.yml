@@ -38,7 +38,7 @@ jobs:
   build-ubuntu:
     strategy:
       matrix:
-        tag: [focal, hirsute, impish, jammy]
+        tag: [focal, jammy]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -121,7 +121,5 @@ jobs:
           rsstube-portable-win.zip
           rsstube.dmg
           rsstube_amd64_ubuntu_focal.deb
-          rsstube_amd64_ubuntu_hirsute.deb
-          rsstube_amd64_ubuntu_impish.deb
           rsstube_amd64_ubuntu_jammy.deb
           rsstube-${{ github.ref_name }}-py3-none-any.whl
