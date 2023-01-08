@@ -33,7 +33,6 @@ jobs:
         name: rsstube-installer-win.exe
         path: |
           rsstube-installer-win.exe
-          rsstube-portable-win.zip
 
   build-ubuntu:
     strategy:
@@ -118,7 +117,6 @@ jobs:
         prerelease: false
         files: |
           rsstube-installer-win.exe
-          rsstube-portable-win.zip
           rsstube.dmg
           rsstube_amd64_ubuntu_focal.deb
           rsstube_amd64_ubuntu_jammy.deb

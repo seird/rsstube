@@ -35,7 +35,6 @@ jobs:
         name: rsstube-installer-win.exe
         path: |
           rsstube-installer-win.exe
-          rsstube-portable-win.zip
 
   build-ubuntu:
     strategy:
