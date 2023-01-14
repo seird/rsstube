@@ -97,7 +97,6 @@ class PurgeExcludeDialog(QtWidgets.QDialog):
         self.purge_excluded_widget.line_search.setFocus()
 
         self.setWindowTitle("Check channels to exclude")
-
-        self.setMinimumSize(parent.width()*0.5, parent.height()*0.8)
+        self.setMinimumSize(int(parent.width()*0.5), int(parent.height()*0.8))
         self.resize(self.minimumSize())
         center_widget(parent, self)
