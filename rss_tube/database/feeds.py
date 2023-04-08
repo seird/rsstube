@@ -454,7 +454,10 @@ class Feeds(object):
         """
         Get the viewed status of an entry.
         """
-        return self.cursor.execute("SELECT viewed FROM entries WHERE id=? AND deleted=0", (entry_id,)).fetchone()["viewed"]
+        if entry := self.cursor.execute("SELECT viewed FROM entries WHERE id=? AND deleted=0", (entry_id,)).fetchone():
+            return entry["viewed"]
+        else:
+            return False
 
     def delete_entries_older_than_days(self, days: int, keep_unviewed: bool):
         """
