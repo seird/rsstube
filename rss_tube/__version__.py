@@ -3,4 +3,4 @@ __description__ = 'A simple desktop application for Youtube, based on RSS feeds.
 __url__ = 'https://github.com/seird/rsstube'
 __versionurl__ = 'https://raw.githubusercontent.com/seird/rsstube/develop/version.json'
 __author_email__ = 'k.dries@protonmail.com'
-__version__ = "0.6.14"
+__version__ = "0.6.15"
