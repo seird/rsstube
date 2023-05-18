@@ -6,7 +6,7 @@ from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
 from rss_tube.download import Downloader
 from rss_tube.player import Player
-from rss_tube.utils import get_abs_path
+from rss_tube.utils import get_theme_file
 
 from .entry_actions import PlayAudioOnlyAction
 
@@ -18,7 +18,7 @@ settings = Settings()
 class BaseEntry(QtWidgets.QWidget):
     unstarred = QtCore.pyqtSignal()
 
-    def __init__(self, parent):
+    def __init__(self, mainwindow: QtWidgets.QMainWindow):
         super(BaseEntry, self).__init__()
 
         self.video_url = ""
@@ -27,10 +27,10 @@ class BaseEntry(QtWidgets.QWidget):
         self.entry_id = ""
         self._id = None
 
-        self.parent = parent
+        self.mainwindow = mainwindow
         self.player = Player()
         self.download = Downloader()
-        self.feeds: Feeds = self.parent.feeds
+        self.feeds: Feeds = self.mainwindow.feeds
 
         self.starred = False
 
@@ -41,7 +41,7 @@ class BaseEntry(QtWidgets.QWidget):
 
     def set_star(self, starred: bool = False):
         star_img = "star.svg" if starred else "unstarred.svg"
-        self.pb_star.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/{star_img}")))
+        self.pb_star.setIcon(QtGui.QIcon(get_theme_file(self.mainwindow.app, f"{star_img}")))
 
     def star_toggled_callback(self):
         self.starred = not self.starred

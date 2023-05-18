@@ -1,11 +1,11 @@
 from PyQt6 import QtGui, QtWidgets
 from rss_tube.__version__ import __title__
-from rss_tube.utils import get_abs_path
+from rss_tube.utils import get_theme_file
 
 
 class Tray(QtWidgets.QSystemTrayIcon):
-    def __init__(self, theme: str = "light"):
-        super(Tray, self).__init__(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{theme}/tray.png")))
+    def __init__(self, mainwindow: QtWidgets.QMainWindow, theme: str = "light"):
+        super(Tray, self).__init__(QtGui.QIcon(get_theme_file(mainwindow.app, f"rss_tube/gui/themes/{theme}/tray.png")))
 
         self.setToolTip(__title__)
 

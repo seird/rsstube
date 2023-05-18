@@ -6,7 +6,7 @@ from .__version__ import __title__
 
 
 DEFAULT_SETTINGS = {
-    "theme": "light",
+    "theme": "automatic",
     "logging/level": "Disabled",
     "tasks/interval": 240,
     "proxies/enabled": False,

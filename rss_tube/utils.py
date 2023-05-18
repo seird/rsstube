@@ -6,7 +6,7 @@ import subprocess
 
 from pathlib import Path
 
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 from rss_tube.__version__ import __title__, __version__, __url__, __description__
 from textwrap import dedent
 from rss_tube.gui.themes import styles
@@ -40,41 +40,58 @@ def get_abs_path(s) -> str:
     return os.path.join(h, p).replace("\\", "/")
 
 
+def automatic_to_style(app: QtWidgets.QApplication) -> str:
+    if app.styleHints().colorScheme() == QtCore.Qt.ColorScheme.Dark:
+        return "dark"
+    else:
+        return "light"
+
+
 def set_style(app: QtWidgets.QApplication, style: str = "dark"):
     app.setStyle("fusion")
 
     if style not in styles.keys():
         logger.error(f"set_style: style {style} is unsupported.")
         return
+    
+    if style == "automatic":
+        style = automatic_to_style(app)  
 
     stylesheet = ""
-    with open(get_abs_path(f"rss_tube/gui/themes/{style}/{style}.css"), "r") as f:
+    with open(get_theme_file(app, f"{style}.css"), "r") as f:
         stylesheet += f.read()
-    # with open(get_abs_path(f"rss_tube/gui/themes/{style}/MainWindow.css"), "r") as f:
-    #     s = f.read()
-    #     s = s.replace("rss_tube", get_abs_path("rss_tube"))
-    #     stylesheet += s
-    with open(get_abs_path(f"rss_tube/gui/themes/{style}/EntryYoutube.css"), "r") as f:
+    with open(get_theme_file(app, f"EntryYoutube.css"), "r") as f:
         stylesheet += f.read()
-    with open(get_abs_path(f"rss_tube/gui/themes/{style}/EntrySoundcloud.css"), "r") as f:
+    with open(get_theme_file(app, f"EntrySoundcloud.css"), "r") as f:
         stylesheet += f.read()
 
     app.setPalette(styles[style].get_palette())
     app.setStyleSheet(stylesheet)
 
-    app.setWindowIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/logo.png")))
+    app.setWindowIcon(QtGui.QIcon(get_theme_file(app, f"logo.png")))
 
 
 def set_icons(w: QtWidgets.QMainWindow, style: str = "dark"):
-    w.pb_new_category.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category_new.svg")))
-    w.pb_new_feed.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/feed_new.svg")))
-    w.pb_update_feeds.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/update_feeds.svg")))
-    w.pb_settings.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/settings.svg")))
-    w.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/tray.png")))
+    if style == "automatic":
+        style = automatic_to_style(w.app) 
 
-    w.entry_widgets["youtube"].pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/audio.png")))
+    w.pb_new_category.setIcon(QtGui.QIcon(get_theme_file(w.app, "category_new.svg")))
+    w.pb_new_feed.setIcon(QtGui.QIcon(get_theme_file(w.app, "feed_new.svg")))
+    w.pb_update_feeds.setIcon(QtGui.QIcon(get_theme_file(w.app, "update_feeds.svg")))
+    w.pb_settings.setIcon(QtGui.QIcon(get_theme_file(w.app, "settings.svg")))
+    w.tray.setIcon(QtGui.QIcon(get_theme_file(w.app, "tray.png")))
+
+    w.entry_widgets["youtube"].pb_audio.setIcon(QtGui.QIcon(get_theme_file(w.app, f"audio.png")))
 
     w.tree_feeds.set_tree_icons()
+
+
+def get_theme_file(app: QtWidgets.QApplication, file: str, style: str = None) -> str:
+    style = settings.value("theme", type=str) if not style else style
+    if style in ("automatic", "default"):
+        style = automatic_to_style(app)
+    return get_abs_path(f"rss_tube/gui/themes/{style.replace(' ', '_')}/{file}")
+
 
 def get_about() -> str:
     about = dedent(f"""

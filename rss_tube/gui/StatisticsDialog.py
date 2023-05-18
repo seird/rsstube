@@ -6,7 +6,7 @@ from functools import reduce
 from textwrap import dedent
 
 from rss_tube.database.feeds import Feeds
-from rss_tube.utils import center_widget, get_abs_path
+from rss_tube.utils import center_widget
 
 
 class StatisticsDialog(QtWidgets.QDialog):

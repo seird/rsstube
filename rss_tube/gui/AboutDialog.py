@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from rss_tube.__version__ import __version__, __title__
 from .designs.widget_help import Ui_Dialog
 from rss_tube.database.settings import Settings
-from rss_tube.utils import get_abs_path, center_widget, get_about, get_debug_info
+from rss_tube.utils import center_widget, get_about, get_debug_info, get_theme_file
 
 
 settings = Settings()
@@ -22,7 +22,7 @@ class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
         self.label_about.setTextFormat(QtCore.Qt.TextFormat.RichText)
         self.label_about.setWordWrap(True)
 
-        self.label_logo.setPixmap(QtGui.QPixmap(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/logo.png")))
+        self.label_logo.setPixmap(QtGui.QPixmap(get_theme_file(mainwindow.app, "logo.png")))
         self.label_title.setText(f"  {__title__} {__version__}")
         self.label_title.setFont(QtGui.QFont("", 22, QtGui.QFont.Weight.Bold))
 

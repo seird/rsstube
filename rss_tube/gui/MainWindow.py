@@ -13,7 +13,7 @@ from rss_tube.database.feeds import Feeds
 from rss_tube.database.settings import Settings
 from rss_tube.gui.EntryWidgets.BaseEntry import BaseEntry
 from rss_tube.updater import Updater
-from rss_tube.utils import get_abs_path, set_icons, set_style
+from rss_tube.utils import set_icons, set_style, get_theme_file
 from rss_tube.tasks import Tasks, AddFeedTask, ExportFeedsTask, ImportFeedsTask, ImportFiltersTask, ExportFiltersTask
 from .AboutDialog import AboutDialog
 from .RenameDialog import RenameCategoryDialog, RenameChannelDialog
@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         self.menubar.setVisible(settings.value("MainWindow/menu/show", type=bool))
 
-        self.tray = Tray(settings.value("theme", type=str))
+        self.tray = Tray(self, settings.value("theme", type=str))
         if settings.value("tray/show", type=bool):
             self.tray.show()
 
@@ -156,6 +156,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                 self.hide()
                 self.window_state_to_restore = window_state_temp
 
+    def style_change_requested_callback(self, style: str):
+        set_style(self.app, style)
+        set_icons(self, style)
+        # reapply the font of all the items in the tree widget
+        for i in range(self.tree_feeds.topLevelItemCount()):
+            item = self.tree_feeds.topLevelItem(i)
+            item.set_font()
+            for j in range(item.childCount()):
+                child = item.child(j)
+                child.set_font()
+
     def settings_callback(self):
         settings_dialog = SettingsDialog(self)
         settings_dialog.quit_requested.connect(self.quit)
@@ -163,6 +174,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         settings_dialog.export_channels.connect(self.export_channels_callback)
         settings_dialog.import_filters.connect(self.import_filters_callback)
         settings_dialog.export_filters.connect(self.export_filters_callback)
+        settings_dialog.theme_change_requested.connect(self.style_change_requested_callback)
         accepted = settings_dialog.exec()
 
         self.set_shortcuts()
@@ -340,7 +352,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         if new_entries_unviewed := self.feeds.get_new_entries_unviewed(last_refresh):
             # Change to tray icon to show that there are new entries
             if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowState.WindowMinimized):
-                self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray_new.png")))
+                self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray_new.png")))
 
     def display_entry(self, entry_id: int):
         entry = self.feeds.get_entry(entry_id)
@@ -455,6 +467,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tasks_thread.job_update_info.connect(self.job_update_info_callback)
 
         self.line_search.textChanged.connect(self.search_text_changed_callback)
+        
+        self.app.styleHints().colorSchemeChanged.connect(lambda _: self.style_change_requested_callback(settings.value("theme", type=str)))
 
         for entry in self.entry_widgets.values():
             entry.unstarred.connect(self.unstarred_callback)
@@ -515,7 +529,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
                     self.hide()
                 else:
                     # Restore tray icon in case of new entries
-                    self.tray.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/tray.png")))
+                    self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
 
         event.accept()
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from rss_tube.database.settings import Settings
 from rss_tube.tasks import SaveThumbnailTask
-from rss_tube.utils import convert_links, get_abs_path, load_pixmap
+from rss_tube.utils import convert_links, get_theme_file, load_pixmap
 
 from .entry_actions import PlayAudioOnlyAction, PlayResolutionAction, SaveThumbnailAction
 from .BaseEntry import BaseEntry
@@ -44,15 +44,15 @@ class ThumbnailContextMenu(QtWidgets.QMenu):
 
 
 class EntryYoutube(BaseEntry, Ui_Form):
-    def __init__(self, parent):
-        super(EntryYoutube, self).__init__(parent)
+    def __init__(self, mainwindow: QtWidgets.QMainWindow):
+        super(EntryYoutube, self).__init__(mainwindow)
         self.setupUi(self)
         
         self.show_description(settings.value("entry/show_description", type=bool))
         self.show_thumbnail(settings.value("entry/show_thumbnail", type=bool))
         self.label_thumbnail.setToolTip("Click to play with external player")
 
-        self.pb_audio.setIcon(QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{settings.value('theme', type=str)}/audio.png")))
+        self.pb_audio.setIcon(QtGui.QIcon(get_theme_file(mainwindow.app, "audio.png")))
 
         self.link_callbacks()
 

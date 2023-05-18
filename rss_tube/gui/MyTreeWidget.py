@@ -4,7 +4,7 @@ from typing import Iterable, List, Union, Type
 from rss_tube.database.settings import Settings
 from rss_tube.gui.themes import unviewed_color
 from rss_tube.tasks import FeedUpdateTask
-from rss_tube.utils import get_abs_path
+from rss_tube.utils import get_theme_file
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .MyTableWidget import MyTableWidget
 
@@ -406,9 +406,9 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
 
             if show_category_icon:
                 if isinstance(item, TreeWidgetItemCategory):
-                    item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/category.svg")))
+                    item.setIcon(0, QtGui.QIcon(get_theme_file(self.mainwindow.app, "category.svg")))
                 elif isinstance(item, TreeWidgetItemStarred):
-                    item.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/star.svg")))
+                    item.setIcon(0, QtGui.QIcon(get_theme_file(self.mainwindow.app, "star.svg")))
             
             if not show_feed_icon:
                 continue
@@ -421,7 +421,7 @@ class MyTreeWidget(QtWidgets.QTreeWidget):
                     icon = "soundcloud"
                 else:
                     continue
-                child.setIcon(0, QtGui.QIcon(get_abs_path(f"rss_tube/gui/themes/{style}/{icon}.svg")))
+                child.setIcon(0, QtGui.QIcon(get_theme_file(self.mainwindow.app, f"{icon}.svg")))
 
 
     def table_entry_clicked_callback(self, entry_id: int):

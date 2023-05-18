@@ -26,13 +26,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
     export_channels = QtCore.pyqtSignal()
     import_filters = QtCore.pyqtSignal()
     export_filters = QtCore.pyqtSignal()
+    theme_change_requested = QtCore.pyqtSignal(str)
 
     def __init__(self, mainwindow: QtWidgets.QMainWindow):
         super(SettingsDialog, self).__init__()
         self.setupUi(self)
 
         self.settings_changed = False
-        self.setting_theme_changed = False
         self.schedule_changed = False
         self.changes_applied = False
 
@@ -117,7 +117,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
             self.groupBox_player_quality.hide()
 
     def combo_theme_changed(self):
-        self.setting_theme_changed = True
         self.settings_changed_callback()
     
     def unblacklist_callback(self):
@@ -230,17 +229,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Dialog):
 
     def apply_settings(self):
         # General Tab
-        if self.setting_theme_changed:
-            settings.setValue("theme", self.combo_theme.currentText().lower().replace(" ", "_"))
-            set_style(self.mainwindow.app, style=settings.value("theme", "dark", type=str))
-            set_icons(self.mainwindow, style=settings.value("theme", "dark", type=str))
-            # reapply the font of all the items in the tree widget
-            for i in range(self.mainwindow.tree_feeds.topLevelItemCount()):
-                item = self.mainwindow.tree_feeds.topLevelItem(i)
-                item.set_font()
-                for j in range(item.childCount()):
-                    child = item.child(j)
-                    child.set_font()
+        current_theme = settings.value("theme", type=str)
+        selected_theme = self.combo_theme.currentText()
+        if current_theme != selected_theme:
+            settings.setValue("theme", selected_theme)
+            self.theme_change_requested.emit(selected_theme)
 
         settings.setValue("MainWindow/menu/show", self.cb_show_menu.isChecked())
         self.mainwindow.menubar.setVisible(settings.value("MainWindow/menu/show", type=bool))
