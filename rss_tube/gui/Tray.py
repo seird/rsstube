@@ -5,7 +5,7 @@ from rss_tube.utils import get_theme_file
 
 class Tray(QtWidgets.QSystemTrayIcon):
     def __init__(self, mainwindow: QtWidgets.QMainWindow, theme: str = "light"):
-        super(Tray, self).__init__(QtGui.QIcon(get_theme_file(mainwindow.app, f"rss_tube/gui/themes/{theme}/tray.png")))
+        super(Tray, self).__init__(QtGui.QIcon(get_theme_file(mainwindow.app, "tray.png", theme)))
 
         self.setToolTip(__title__)
 

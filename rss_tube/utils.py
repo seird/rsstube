@@ -58,12 +58,13 @@ def set_style(app: QtWidgets.QApplication, style: str = "dark"):
         style = automatic_to_style(app)  
 
     stylesheet = ""
-    with open(get_theme_file(app, f"{style}.css"), "r") as f:
-        stylesheet += f.read()
-    with open(get_theme_file(app, f"EntryYoutube.css"), "r") as f:
-        stylesheet += f.read()
-    with open(get_theme_file(app, f"EntrySoundcloud.css"), "r") as f:
-        stylesheet += f.read()
+    if style != "default":
+        with open(get_theme_file(app, f"{style}.css"), "r") as f:
+            stylesheet += f.read()
+        with open(get_theme_file(app, f"EntryYoutube.css"), "r") as f:
+            stylesheet += f.read()
+        with open(get_theme_file(app, f"EntrySoundcloud.css"), "r") as f:
+            stylesheet += f.read()
 
     app.setPalette(styles[style].get_palette())
     app.setStyleSheet(stylesheet)
