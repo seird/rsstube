@@ -2,6 +2,7 @@ import datetime
 import getpass
 import logging
 import os
+import platform
 import sys
 import tempfile
 from typing import Optional
@@ -109,8 +110,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.window_state_to_restore = QtCore.Qt.WindowState.WindowNoState
         
         if settings.value("MainWindow/start_minimized", type=bool) and settings.value("tray/show", type=bool):
-            self.tray_activated_callback(QtWidgets.QSystemTrayIcon.ActivationReason.Trigger)
-        
+            self.hide()
 
     def acquire_lock(self, force: bool = False) -> bool:
         temp_dir = tempfile.gettempdir()
@@ -146,15 +146,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         settings.setValue("MainWindow/splitter_vertical", self.splitter_vertical.saveState())
         # settings.endGroup()
 
-    def tray_activated_callback(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
-        if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Trigger:
-            if self.windowState() & QtCore.Qt.WindowState.WindowMinimized or self.windowState() == (QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowMaximized):
-                self.bring_to_front()
-            else:
-                window_state_temp = self.windowState()
-                self.setWindowState(QtCore.Qt.WindowState.WindowMinimized)
-                self.hide()
-                self.window_state_to_restore = window_state_temp
+    def tray_activated_callback(
+        self, reason: QtWidgets.QSystemTrayIcon.ActivationReason
+    ):
+        if (
+            reason == QtWidgets.QSystemTrayIcon.ActivationReason.Trigger
+            and platform.system() != "Darwin"
+        ):
+            self.bring_to_front()
 
     def style_change_requested_callback(self, style: str):
         set_style(self.app, style)
@@ -429,9 +428,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def bring_to_front(self):
         self.ensurePolished()
-        self.setWindowState(self.window_state_to_restore & ~QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowActive)
+        self.setWindowState(
+            self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized
+            | QtCore.Qt.WindowState.WindowActive
+        )
         self.show()
         self.activateWindow()
+        self.raise_()
 
     def link_callbacks(self):
         self.pb_previous.hide()
@@ -454,7 +457,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.actionShortcuts.triggered.connect(self.shortcuts_callback)
         self.actionStatistics.triggered.connect(self.statistics_callback)
 
-        self.tray.actionQuit.triggered.connect(self.close)
+        self.tray.actionQuit.triggered.connect(self.shutDown)
         self.tray.actionNewFeed.triggered.connect(self.new_feed_callback)
         self.tray.actionNewCategory.triggered.connect(self.new_category_callback)
         self.tray.actionUpdate.triggered.connect(self.update_feeds_callback)
@@ -489,7 +492,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.shortcut_toggle_star = QtGui.QShortcut(QtGui.QKeySequence.fromString(settings.value("shortcuts/toggle_star", type=str)), self)
 
         self.shortcut_search.activated.connect(self.line_search.setFocus)
-        self.shortcut_quit.activated.connect(self.close)
+        self.shortcut_quit.activated.connect(self.shutDown)
         self.shortcut_refresh.activated.connect(self.update_feeds_callback)
         self.shortcut_new_feed.activated.connect(self.new_feed_callback)
         self.shortcut_new_category.activated.connect(self.new_category_callback)
@@ -533,20 +536,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         event.accept()
 
-    def handle_close(self):
-        logger.debug("MainWindow: closeEvent detected.")
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        self.hide()
+        event.ignore()
+    
+    def shutDown(self):
         self.save_window_state()
 
         if settings.value("tray/show", type=bool):
             self.tray.hide()
 
         self.lock_file.unlock()
-
-    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        self.handle_close()
-        event.accept()
         self.quit()
-
 
 def start_gui():
     app = QtWidgets.QApplication(sys.argv)
