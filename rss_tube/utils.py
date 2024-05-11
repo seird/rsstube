@@ -61,10 +61,10 @@ def set_style(app: QtWidgets.QApplication, style: str = "dark"):
     if style != "default":
         with open(get_theme_file(app, f"{style}.css"), "r") as f:
             stylesheet += f.read()
-        with open(get_theme_file(app, f"EntryYoutube.css"), "r") as f:
-            stylesheet += f.read()
-        with open(get_theme_file(app, f"EntrySoundcloud.css"), "r") as f:
-            stylesheet += f.read()
+    with open(get_theme_file(app, f"EntryYoutube.css", style, True), "r") as f:
+        stylesheet += f.read()
+    with open(get_theme_file(app, f"EntrySoundcloud.css", style, True), "r") as f:
+        stylesheet += f.read()
 
     app.setPalette(styles[style].get_palette())
     app.setStyleSheet(stylesheet)
@@ -87,10 +87,11 @@ def set_icons(w: QtWidgets.QMainWindow, style: str = "dark"):
     w.tree_feeds.set_tree_icons()
 
 
-def get_theme_file(app: QtWidgets.QApplication, file: str, style: str = None) -> str:
+def get_theme_file(app: QtWidgets.QApplication, file: str, style: str = None, force: bool = False) -> str:
     style = settings.value("theme", type=str) if not style else style
     if style in ("automatic", "default"):
-        style = automatic_to_style(app)
+        if not force:
+            style = automatic_to_style(app)
     return get_abs_path(f"rss_tube/gui/themes/{style.replace(' ', '_')}/{file}")
 
 
