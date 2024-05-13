@@ -154,6 +154,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             and platform.system() != "Darwin"
         ):
             self.bring_to_front()
+            self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
 
     def style_change_requested_callback(self, style: str):
         set_style(self.app, style)
@@ -350,7 +351,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
         if new_entries_unviewed := self.feeds.get_new_entries_unviewed(last_refresh):
             # Change to tray icon to show that there are new entries
-            if settings.value("tray/show", type=bool) and (self.windowState() & QtCore.Qt.WindowState.WindowMinimized):
+            if settings.value("tray/show", type=bool) and self.isHidden():
                 self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray_new.png")))
 
     def display_entry(self, entry_id: int):
@@ -526,13 +527,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
         if event.type() == QtCore.QEvent.Type.WindowStateChange:
-            if settings.value("tray/show", type=bool) and settings.value("tray/minimize", type=bool):
-                if self.windowState() & QtCore.Qt.WindowState.WindowMinimized:
-                    self.window_state_to_restore = self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized | QtCore.Qt.WindowState.WindowActive
-                    self.hide()
-                else:
-                    # Restore tray icon in case of new entries
-                    self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
+            if settings.value("tray/show", type=bool):
+                # Restore tray icon in case of new entries
+                self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
 
         event.accept()
 
