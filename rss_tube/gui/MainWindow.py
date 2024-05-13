@@ -107,7 +107,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         set_icons(self, style=settings.value("theme", type=str))
 
         self.show()
-        self.window_state_to_restore = QtCore.Qt.WindowState.WindowNoState
         
         if settings.value("MainWindow/start_minimized", type=bool) and settings.value("tray/show", type=bool):
             self.hide()
@@ -463,7 +462,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         self.tray.actionNewCategory.triggered.connect(self.new_category_callback)
         self.tray.actionUpdate.triggered.connect(self.update_feeds_callback)
         self.tray.actionSettings.triggered.connect(self.settings_callback)
-        self.tray.actionToggleWindow.triggered.connect(lambda: self.tray_activated_callback(QtWidgets.QSystemTrayIcon.ActivationReason.Trigger))
+        self.tray.actionShowWindow.triggered.connect(lambda: self.tray_activated_callback(QtWidgets.QSystemTrayIcon.ActivationReason.Trigger))
         self.tray.activated.connect(self.tray_activated_callback)
 
         self.tasks_thread.feed_update_task.finished.connect(self.update_feeds_finished)

@@ -13,11 +13,11 @@ build-macos: clean
 	pip install Pillow
 	pyinstaller rss-tube.spec
 
-install: build
-	sudo dpkg -i dist/rsstube_amd64.deb
+install:
+	dpkg -i dist/rsstube_amd64.deb
 
 uninstall:
-	sudo dpkg -r rsstube
+	dpkg -r rsstube
 
 clean:
 	rm -rf dist build

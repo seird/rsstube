@@ -30,8 +30,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
 
         menu.addSeparator()
 
-        self.actionToggleWindow = QtGui.QAction("Toggle Window", self)
-        menu.addAction(self.actionToggleWindow)
+        self.actionShowWindow = QtGui.QAction("Show Window", self)
+        menu.addAction(self.actionShowWindow)
 
         menu.addSeparator()
 
