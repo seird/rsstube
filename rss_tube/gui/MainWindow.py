@@ -428,11 +428,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
 
     def bring_to_front(self):
         self.ensurePolished()
+        self.show()
         self.setWindowState(
             self.windowState() & ~QtCore.Qt.WindowState.WindowMinimized
             | QtCore.Qt.WindowState.WindowActive
         )
-        self.show()
         self.activateWindow()
         self.raise_()
 
