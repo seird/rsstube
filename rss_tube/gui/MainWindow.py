@@ -46,6 +46,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
     def init_ui(self):
         self.setupUi(self)
 
+        self.installEventFilter(self)
+
         self.setWindowTitle(__title__)
 
         set_style(self.app, style=settings.value("theme", type=str))
@@ -145,6 +147,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
         settings.setValue("MainWindow/splitter_vertical", self.splitter_vertical.saveState())
         # settings.endGroup()
 
+    def eventFilter(self, a0: QtCore.QObject | None, a1: QtCore.QEvent | None) -> bool:
+        if a1 and a1.type() == QtCore.QEvent.Type.WindowActivate:
+            self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
+        return super().eventFilter(a0, a1)
+
     def tray_activated_callback(
         self, reason: QtWidgets.QSystemTrayIcon.ActivationReason
     ):
@@ -153,7 +160,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, QtCore.QCoreApplication):
             and platform.system() != "Darwin"
         ):
             self.bring_to_front()
-            self.tray.setIcon(QtGui.QIcon(get_theme_file(self.app, "tray.png")))
 
     def style_change_requested_callback(self, style: str):
         set_style(self.app, style)
