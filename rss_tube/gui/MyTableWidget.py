@@ -1,7 +1,13 @@
 from datetime import datetime
 from typing import List
 
+from rss_tube.database.settings import Settings
+from rss_tube.gui.themes import unviewed_color
+
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+
+settings = Settings()
 
 
 class TableWidgetItemEntryContextMenu(QtWidgets.QMenu):
@@ -72,6 +78,12 @@ class MyTableWidget(QtWidgets.QTableWidget):
             item_author.setFont(font)
             item_published.setFont(font)
 
+            color = QtGui.QColor(unviewed_color(settings.value("theme", type=str), self.mainwindow.app))
+
+            item_title.setForeground(QtGui.QBrush(color))
+            item_author.setForeground(QtGui.QBrush(color))
+            item_published.setForeground(QtGui.QBrush(color))
+
         self.setItem(row, 0, item_title)
         self.setItem(row, 1, item_author)
         self.setItem(row, 2, item_published)
@@ -136,6 +148,10 @@ class MyTableWidget(QtWidgets.QTableWidget):
         self.item(current_row, 0).setFont(font)
         self.item(current_row, 1).setFont(font)
         self.item(current_row, 2).setFont(font)
+        
+        self.item(current_row, 0).setForeground(QtGui.QBrush())
+        self.item(current_row, 1).setForeground(QtGui.QBrush())
+        self.item(current_row, 2).setForeground(QtGui.QBrush())
 
         self.mainwindow.display_entry(current.entry_id)
         self.feeds.set_entry_viewed(current.entry_id, viewed=True)

@@ -98,7 +98,7 @@ class TreeWidgetItemCategory(QtWidgets.QTreeWidgetItem):
             0,
             QtGui.QBrush(QtGui.QColor(
                 self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if category_viewed \
-                else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
+                else unviewed_color(settings.value("theme", type=str), self.parent.mainwindow.app)
             ))
         )
 
@@ -161,7 +161,7 @@ class TreeWidgetItemFeed(QtWidgets.QTreeWidgetItem):
             0,
             QtGui.QBrush(QtGui.QColor(
                 self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if feed_viewed \
-                else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
+                else unviewed_color(settings.value("theme", type=str), self.parent.mainwindow.app)
             ))
         )
 
@@ -248,7 +248,7 @@ class TreeWidgetItemStarred(QtWidgets.QTreeWidgetItem):
             0,
             QtGui.QBrush(QtGui.QColor(
                 self.parent.palette().brush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text) if stars_viewed \
-                else unviewed_color.get(settings.value("theme", type=str), 0x68B668)
+                else unviewed_color(settings.value("theme", type=str), self.parent.mainwindow.app)
             ))
         )
 
