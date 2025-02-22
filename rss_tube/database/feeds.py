@@ -66,6 +66,7 @@ class Feeds(object):
             added_on       TEXT,
             refreshed_on   TEXT,
             viewed         INTEGER,
+            played         INTEGER,
             deleted        INTEGER,
             author         TEXT,
             title          TEXT,
@@ -82,6 +83,12 @@ class Feeds(object):
             link_raw       TEXT,
             star           INTEGER)
         """)
+        
+        try:
+            self.cursor.execute("ALTER TABLE entries ADD COLUMN played INTEGER default 0")
+        except sqlite3.OperationalError:
+            logger.debug(f"Column played already exists")
+
 
         # Purged entries table -- blacklist for new entries
         self.cursor.execute("""
@@ -456,6 +463,22 @@ class Feeds(object):
         """
         if entry := self.cursor.execute("SELECT viewed FROM entries WHERE id=? AND deleted=0", (entry_id,)).fetchone():
             return entry["viewed"]
+        else:
+            return False
+
+    def set_entry_played(self, entry_id: int, played: bool = True):
+        """
+        Set the played status of an entry.
+        """
+        self.cursor.execute("UPDATE entries SET played=? WHERE id=?", (played, entry_id))
+        self.database.commit()
+
+    def get_entry_played(self, entry_id: int) -> bool:
+        """
+        Get the played status of an entry.
+        """
+        if entry := self.cursor.execute("SELECT played FROM entries WHERE id=? AND deleted=0", (entry_id,)).fetchone():
+            return entry["played"]
         else:
             return False
 

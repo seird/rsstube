@@ -50,6 +50,12 @@ class EntrySoundcloud(BaseEntry, Ui_Form):
 
         self.label_title.setText(entry["title"])
 
+        if (self.feeds.get_entry_played(self._id)):
+            self.label_entry_played.setText("✓")
+            self.label_entry_played.show()
+        else:
+            self.label_entry_played.hide()
+            
         self.starred = entry["star"]
         self.set_star(entry["star"])
 

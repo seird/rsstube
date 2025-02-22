@@ -62,12 +62,15 @@ class BaseEntry(QtWidgets.QWidget):
 
     def play(self):
         self.player.play(self.video_url)
+        self.feeds.set_entry_played(self._id, True)
 
     def play_video(self, play_quality_once: str = ""):
         self.player.play(self.video_url, play_quality_once=play_quality_once)
+        self.feeds.set_entry_played(self._id, True)
 
     def play_audio(self):
         self.player.play(self.video_url, play_quality_once=PlayAudioOnlyAction().resolution)
+        self.feeds.set_entry_played(self._id, True)
 
     def clear_player_status(self):
         if "Playing" not in self.label_player_status.text():
@@ -84,8 +87,14 @@ class BaseEntry(QtWidgets.QWidget):
     def thumbnail_mouse_button(self, event: QtGui.QMouseEvent):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.player.play(self.video_url)
+            self.feeds.set_entry_played(self._id, True)
         else:
             super(BaseEntry, self).mousePressEvent(event)
+    
+    def link_mouse_button(self, event: QtGui.QMouseEvent):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.feeds.set_entry_played(self._id, True)
+        super(BaseEntry, self).mousePressEvent(event)
 
     def _link_callbacks(self):
         self.player.started.connect(lambda: self.label_player_status.setText("Playing..."))

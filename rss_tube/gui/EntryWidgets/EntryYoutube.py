@@ -67,6 +67,12 @@ class EntryYoutube(BaseEntry, Ui_Form):
         self.starred = entry["star"]
         self.set_star(entry["star"])
 
+        if (self.feeds.get_entry_played(self._id)):
+            self.label_entry_played.setText("✓")
+            self.label_entry_played.show()
+        else:
+            self.label_entry_played.hide()
+            
         self.thumbnail_url = entry["thumbnail"]
         if settings.value("entry/show_thumbnail", type=bool):
             image_bytes = self.download.get_bytes(entry["thumbnail"])
@@ -105,7 +111,8 @@ class EntryYoutube(BaseEntry, Ui_Form):
     def link_callbacks(self):
         self.label_thumbnail.mousePressEvent = self.thumbnail_mouse_button
         self.label_thumbnail.contextMenuEvent = self.thumbnail_context
-
+        self.label_meta_website.mousePressEvent = self.link_mouse_button
+            
         self.pb_play.clicked.connect(self.pb_play_callback)
         self.pb_audio.clicked.connect(self.pb_play_audio_callback)
 
